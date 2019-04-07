@@ -65,6 +65,9 @@ TODO
 - Add links for easier browsing between translated pages.
 - Add a button to duplicate a site (item pool, pages and navigation)
 - Add a button to apply settings or another site (except language).
+- Database: invert the process to avoid to rebuild all pairs each time they are
+  read. So save all pairs (one or two ways?) in the database when relations are
+  created or updated.
 
 
 Warning

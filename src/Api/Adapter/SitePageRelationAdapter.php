@@ -44,10 +44,16 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             $sitePageAdapter = $this->getAdapter('site_pages');
             $page = $sitePageAdapter->findEntity($data['o:page']['o:id']);
             $relatedPage = $sitePageAdapter->findEntity($data['o-module-language-switcher:related_page']['o:id']);
-            $entity
-                ->setPage($page)
-                ->setRelatedPage($relatedPage);
-            ;
+            // Useless, but cleaner.
+            if ($data['o:page']['o:id'] > $data['o-module-language-switcher:related_page']['o:id']) {
+                $entity
+                    ->setPage($relatedPage)
+                    ->setRelatedPage($page);
+            } else {
+                $entity
+                    ->setPage($page)
+                    ->setRelatedPage($relatedPage);
+            }
         }
         // This entity cannot be updated currently.
     }
@@ -69,32 +75,62 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
 
     public function buildQuery(QueryBuilder $qb, array $query)
     {
+        // "source" and "relation" may be page id or related page id, because
+        // the relations are both ways.
+        // TODO Check if the join with the site allows really to check rights/visibility and is really needed.
+        $expr = $qb->expr();
+        if (isset($query['relation'])) {
+            $ids = $this->findRelatedPageIds($query['relation']);
+
+            $pageAlias = $this->createAlias();
+            $relatedPageAlias = $this->createAlias();
+            $qb->innerJoin(
+                $this->getEntityClass() . '.page',
+                $pageAlias
+            );
+            $qb->innerJoin(
+                $this->getEntityClass() . '.relatedPage',
+                $relatedPageAlias
+            );
+            $qb->where($expr->orX(
+                $expr->in(
+                    $pageAlias . '.id',
+                    $this->createNamedParameter($qb, $ids)
+                ),
+                $expr->in(
+                    $relatedPageAlias . '.id',
+                    $this->createNamedParameter($qb, $ids)
+                )
+            ));
+        }
+
         if (isset($query['page_id'])) {
             if (!is_array($query['page_id'])) {
                 $query['page_id'] = [$query['page_id']];
             }
-            $resourceAlias = $this->createAlias();
+            $pageAlias = $this->createAlias();
             $qb->innerJoin(
                 $this->getEntityClass() . '.page',
-                $resourceAlias
+                $pageAlias
             );
-            $qb->andWhere($qb->expr()->in(
-                $resourceAlias . '.id',
+            $qb->andWhere($expr->in(
+                $pageAlias . '.id',
                 $this->createNamedParameter($qb, $query['page_id'])
             ));
+
         }
 
         if (isset($query['related_page_id'])) {
             if (!is_array($query['related_page_id'])) {
                 $query['related_page_id'] = [$query['related_page_id']];
             }
-            $resourceAlias = $this->createAlias();
+            $pageAlias = $this->createAlias();
             $qb->innerJoin(
                 $this->getEntityClass() . '.relatedPage',
-                $resourceAlias
+                $pageAlias
             );
-            $qb->andWhere($qb->expr()->in(
-                $resourceAlias . '.id',
+            $qb->andWhere($expr->in(
+                $pageAlias . '.id',
                 $this->createNamedParameter($qb, $query['related_page_id'])
             ));
         }
@@ -104,13 +140,13 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             if (!is_array($query['page_slug'])) {
                 $query['page_slug'] = [$query['page_slug']];
             }
-            $resourceAlias = $this->createAlias();
+            $pageAlias = $this->createAlias();
             $qb->innerJoin(
                 $this->getEntityClass() . '.page',
-                $resourceAlias
+                $pageAlias
             );
-            $qb->andWhere($qb->expr()->in(
-                $resourceAlias . '.slug',
+            $qb->andWhere($expr->in(
+                $pageAlias . '.slug',
                 $this->createNamedParameter($qb, $query['page_slug'])
             ));
         }
@@ -119,28 +155,88 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             if (!is_array($query['related_page_slug'])) {
                 $query['related_page_slug'] = [$query['related_page_slug']];
             }
-            $resourceAlias = $this->createAlias();
+            $pageAlias = $this->createAlias();
             $qb->innerJoin(
                 $this->getEntityClass() . '.relatedPage',
-                $resourceAlias
+                $pageAlias
             );
-            $qb->andWhere($qb->expr()->in(
-                $resourceAlias . '.slug',
+            $qb->andWhere($expr->in(
+                $pageAlias . '.slug',
                 $this->createNamedParameter($qb, $query['related_page_slug'])
             ));
         }
 
         if (isset($query['site_id'])) {
-            $resourceAlias = $this->createAlias();
+            $pageAlias = $this->createAlias();
             $qb->innerJoin(
                 $this->getEntityClass() . '.page',
-                $resourceAlias
+                $pageAlias
             );
-            $qb->andWhere($qb->expr()->in(
-                $resourceAlias . '.site',
+            $qb->andWhere($expr->in(
+                $pageAlias . '.site',
                 $this->createNamedParameter($qb, $query['site_id'])
             ));
         }
+    }
+
+    /**
+     * Get all the ids related to an id, directly or indirectly.
+     *
+     * The visibility is not checked: it should be done separetely when the
+     * objects are loaded.
+     * See Omeka Classic plugin MultiLanguage, Table_MultilanguageRelatedRecord::findRelatedRecordIds().
+     *
+     * The other way is to store all mappings.
+     *
+     * @todo Remove this process and save all pairs when a relation is saved.
+     *
+     * @param int $id The resource id.
+     * @param bool $included Include the specified resource id to the list.
+     * @return array List of resource ids.
+     */
+    protected function findRelatedPageIds($id, $included = false)
+    {
+        // TODO Write the query that includes this query in the main query.
+        $sql = <<<SQL
+SELECT DISTINCT(IF(page_id = :page_id, related_page_id, page_id)) AS related
+FROM site_page_relation
+WHERE page_id = :page_id OR related_page_id = :page_id
+ORDER BY related;
+SQL;
+
+        $connection = $this->getEntityManager()->getConnection();
+        $stmt = $connection->prepare($sql);
+        $stmt->bindValue('page_id', $id);
+        $stmt->execute();
+        $ids = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        if (empty($ids)) {
+            return [];
+        }
+
+        // Add indirect related ids when there are more than one relation.
+        $ids[] = $id;
+        // $idsString = implode(',', $ids);
+        $sql = <<<SQL
+SELECT DISTINCT(IF(page_id IN (:page_ids), related_page_id, page_id)) AS related
+FROM site_page_relation
+WHERE page_id IN (:page_ids) OR related_page_id IN (:page_ids)
+ORDER BY related;
+SQL;
+        $stmt = $connection->prepare($sql);
+        $stmt->bindValue('page_ids', implode(',', $ids));
+        $stmt->execute();
+        $result = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+        $result = array_unique(array_merge($ids, $result));
+        if (!$included) {
+            $idKey = array_search($id, $result);
+            if ($idKey !== false) {
+                unset($result[$idKey]);
+            }
+        }
+
+        sort($result);
+        return $result;
     }
 
     /**

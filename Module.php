@@ -71,22 +71,25 @@ class Module extends AbstractModule
         $page = $event->getTarget();
         $jsonLd = $event->getParam('jsonLd');
         $api = $this->getServiceLocator()->get('Omeka\ApiManager');
-        // TODO Page visibility is automatically checked?
+        $pageId = $page->id();
         $relations = $api
             ->search(
                 'site_page_relations',
-                ['page_id' => $page->id()]
+                ['relation' => $pageId]
                 // ['returnScalar' => 'relatedPage']
             )
             ->getContent();
-        $relations = array_map(function($relation) {
-            return $relation->relatedPage()->getReference();
+        $relations = array_map(function($relation) use ($pageId) {
+            $relatedPage = $relation->relatedPage();
+            return $pageId === $relatedPage->id()
+                ? $relation->page()->getReference()
+                : $relatedPage->getReference();
         }, $relations);
         $jsonLd['o-module-language-switcher:related_page'] = $relations;
         $event->setParam('jsonLd', $jsonLd);
     }
 
-    public function handleApiUpdatePostPage (Event $event)
+    public function handleApiUpdatePostPage(Event $event)
     {
         /** @var \Omeka\Api\Manager $api */
         $api = $this->getServiceLocator()->get('Omeka\ApiManager');
@@ -98,27 +101,38 @@ class Module extends AbstractModule
         $selected = $request->getValue('o-module-language-switcher:related_page', []);
         $selected = array_map('intval', $selected);
 
+        // The page cannot be related to itself.
+        $key = array_search($pageId, $selected);
+        if ($key !== false) {
+            unset($selected[$key]);
+        }
+
         // Get the existing relations to check if some of them were removed.
         $existing = $api
             ->search(
                 'site_page_relations',
-                ['page_id' => $pageId]
+                ['relation' => $pageId]
                 // ['returnScalar' => 'relatedPage']
             )
             ->getContent();
-        $existing = array_map(function($pageRelation) {
-            return $pageRelation->relatedPage()->id();
+        $existing = array_map(function($relation) use ($pageId) {
+            $relatedPage = $relation->relatedPage();
+            return $pageId === $relatedPage->id()
+                ? $relation->page()->id()
+                : $relatedPage->id();
         }, $existing);
 
         $added = array_diff($selected, $existing);
         $removed = array_diff($existing, $selected);
         // $kept = array_intersect($selected, $existing);
 
-        foreach ($added as $relation) {
-            $api->create('site_page_relations', ['o:page' => ['o:id' => $pageId], 'o-module-language-switcher:related_page' => ['o:id' => $relation]]);
+        foreach ($added as $relationId) {
+            $api->create('site_page_relations', ['o:page' => ['o:id' => $pageId], 'o-module-language-switcher:related_page' => ['o:id' => $relationId]]);
         }
-        foreach ($removed as $relation) {
-            $api->delete('site_page_relations', ['page' => $pageId, 'relatedPage' => $relation]);
+        foreach ($removed as $relationId) {
+            $api->delete('site_page_relations', ['page' => $pageId, 'relatedPage' => $relationId]);
         }
+
+        // TODO Manage all pairs to avoid to rebuild them each time a page is read. See SitePageRelationAdapter::findRelatedPageIds()
     }
 }
