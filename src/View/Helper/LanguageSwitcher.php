@@ -72,7 +72,7 @@ class LanguageSwitcher extends AbstractHelper
             $relations = $api
                 ->search(
                     'site_page_relations',
-                    ['page_slug' => $pageSlug]
+                    ['site_id' => $site->id(), 'page_slug' => $pageSlug]
                 )
                 ->getContent();
             $relatedPages = [];

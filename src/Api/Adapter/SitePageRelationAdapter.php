@@ -99,6 +99,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             ));
         }
 
+        // Note: use of a slug requires the site id/slug too to avoid duplicate.
         if (isset($query['page_slug'])) {
             if (!is_array($query['page_slug'])) {
                 $query['page_slug'] = [$query['page_slug']];
@@ -126,6 +127,18 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             $qb->andWhere($qb->expr()->in(
                 $resourceAlias . '.slug',
                 $this->createNamedParameter($qb, $query['related_page_slug'])
+            ));
+        }
+
+        if (isset($query['site_id'])) {
+            $resourceAlias = $this->createAlias();
+            $qb->innerJoin(
+                $this->getEntityClass() . '.page',
+                $resourceAlias
+            );
+            $qb->andWhere($qb->expr()->in(
+                $resourceAlias . '.site',
+                $this->createNamedParameter($qb, $query['site_id'])
             ));
         }
     }
