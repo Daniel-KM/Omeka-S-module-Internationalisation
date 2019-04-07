@@ -26,6 +26,12 @@ class SitePageForm extends \Omeka\Form\SitePageForm
                 ],
             ]);
         }
+
+        $inputFilter = $this->getInputFilter();
+        $inputFilter->add([
+            'name' => 'o-module-language-switcher:related_page',
+            'required' => false,
+        ]);
     }
 
     public function setData($data)

@@ -139,6 +139,10 @@ SQL;
             $connection->executeQuery($sql, ['page_ids' => $existingIds], ['page_ids' => $connection::PARAM_INT_ARRAY]);
         }
 
+        if (empty($selected)) {
+            return;
+        }
+
         // Add all pairs.
         $sql = <<<SQL
 INSERT INTO site_page_relation
