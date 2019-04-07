@@ -1,0 +1,9 @@
+/build
+/vendor
+/node_modules
+/asset/vendor
+.sass-cache/
+.php_cs.cache
+.bundle
+.DS_Store
+composer.phar

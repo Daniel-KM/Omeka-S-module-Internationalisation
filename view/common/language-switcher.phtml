@@ -1,0 +1,23 @@
+<?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var array $locales
+ */
+
+?>
+<?php if ($locales): ?>
+    <?php $currentLocale = $this->siteSetting('locale') ?: 'en_US'; ?>
+    <ul class="locale-switcher">
+        <?php foreach ($locales as $locale): ?>
+            <?php $country = $this->localeToCountry($locale['locale']); ?>
+            <li>
+                <?php if ($currentLocale == $locale['locale']): ?>
+                    <span class="active flag-icon flag-icon-<?php echo strtolower($country); ?>"></span>
+                <?php else: ?>
+                    <a href="<?php echo $locale['url']; ?>" title="<?php echo $locale['locale_label']; ?>"><span class="flag-icon flag-icon-<?php echo strtolower($country); ?>"></span></a>
+                <?php endif; ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
