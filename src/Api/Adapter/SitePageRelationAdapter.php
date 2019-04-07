@@ -75,13 +75,14 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
 
     public function buildQuery(QueryBuilder $qb, array $query)
     {
-        // "source" and "relation" may be page id or related page id, because
-        // the relations are both ways.
         // TODO Check if the join with the site allows really to check rights/visibility and is really needed.
         $expr = $qb->expr();
         if (isset($query['relation'])) {
-            $ids = $this->findRelatedPageIds($query['relation']);
-
+            if (!is_array($query['relation'])) {
+                $query['relation'] = [$query['relation']];
+            }
+            // The "relation" may be page id or related page id, because they
+            // are pairs (both ways).
             $pageAlias = $this->createAlias();
             $relatedPageAlias = $this->createAlias();
             $qb->innerJoin(
@@ -95,11 +96,11 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             $qb->where($expr->orX(
                 $expr->in(
                     $pageAlias . '.id',
-                    $this->createNamedParameter($qb, $ids)
+                    $this->createNamedParameter($qb, $query['relation'])
                 ),
                 $expr->in(
                     $relatedPageAlias . '.id',
-                    $this->createNamedParameter($qb, $ids)
+                    $this->createNamedParameter($qb, $query['relation'])
                 )
             ));
         }
@@ -177,66 +178,6 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
                 $this->createNamedParameter($qb, $query['site_id'])
             ));
         }
-    }
-
-    /**
-     * Get all the ids related to an id, directly or indirectly.
-     *
-     * The visibility is not checked: it should be done separetely when the
-     * objects are loaded.
-     * See Omeka Classic plugin MultiLanguage, Table_MultilanguageRelatedRecord::findRelatedRecordIds().
-     *
-     * The other way is to store all mappings.
-     *
-     * @todo Remove this process and save all pairs when a relation is saved.
-     *
-     * @param int $id The resource id.
-     * @param bool $included Include the specified resource id to the list.
-     * @return array List of resource ids.
-     */
-    protected function findRelatedPageIds($id, $included = false)
-    {
-        // TODO Write the query that includes this query in the main query.
-        $sql = <<<SQL
-SELECT DISTINCT(IF(page_id = :page_id, related_page_id, page_id)) AS related
-FROM site_page_relation
-WHERE page_id = :page_id OR related_page_id = :page_id
-ORDER BY related;
-SQL;
-
-        $connection = $this->getEntityManager()->getConnection();
-        $stmt = $connection->prepare($sql);
-        $stmt->bindValue('page_id', $id);
-        $stmt->execute();
-        $ids = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        if (empty($ids)) {
-            return [];
-        }
-
-        // Add indirect related ids when there are more than one relation.
-        $ids[] = $id;
-        // $idsString = implode(',', $ids);
-        $sql = <<<SQL
-SELECT DISTINCT(IF(page_id IN (:page_ids), related_page_id, page_id)) AS related
-FROM site_page_relation
-WHERE page_id IN (:page_ids) OR related_page_id IN (:page_ids)
-ORDER BY related;
-SQL;
-        $stmt = $connection->prepare($sql);
-        $stmt->bindValue('page_ids', implode(',', $ids));
-        $stmt->execute();
-        $result = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-
-        $result = array_unique(array_merge($ids, $result));
-        if (!$included) {
-            $idKey = array_search($id, $result);
-            if ($idKey !== false) {
-                unset($result[$idKey]);
-            }
-        }
-
-        sort($result);
-        return $result;
     }
 
     /**

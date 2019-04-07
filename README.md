@@ -37,15 +37,27 @@ composer install
 Usage
 -----
 
-In admin board, there is a new field to fill in the site page: the pages that
-are a translation of the current page. So select the related pages and translate
-them. The site setting `Locale` should be set for each site that has translated
-pages.
+First, in admin board, set the locale setting for all sites. It allows to set
+the language of all pages.
 
-Then, in public front-end, the user can switch between sites via a flag.
+Second, make the relations between translated pages. For that purpose, there is
+a new field to fill in the site page: the pages that are a translation of the
+current page. So select the related pages and translate them.
 
-**Important**: the view helper is not added automatically to the theme. So add
-this somewhere in the file `layout.phtml`:
+It’s important to set relations for all pages, else the language switcher will
+display a "page doesn’t exist" error if the user browse to it. Furthemore, it is
+recommended to use all the same settings, item pools, themes, rights, etc. for
+all related sites so the visitor can browse smoothly.
+
+In the case where the page is not yet translated, and you want to avoid an
+error, you can create a page with the block "Simple Page", that is available in
+the module [Next], and that display the same content than the specified page.
+
+Then, in public front-end, the visitor can switch between sites via a flag.
+
+**Important**: the language switcher is not added automatically to the theme. So
+add the view helper somewhere in the file `layout.phtml`, generally in the
+header:
 
 ```
 <?php echo $this->languageSwitcher(); ?>
@@ -54,20 +66,17 @@ this somewhere in the file `layout.phtml`:
 ```
 
 The partial `common/language-switcher.phtml` view can be themed: simply copy it
-in your theme.
+in your theme and customize it.
 
 
 TODO
 ----
 
 - Return original page when it is not translated in a site, instead of an error.
-- Add options to manage multilanguage property values.
+- Add options to manage multilanguage property values (various way).
 - Add links for easier browsing between translated pages.
-- Add a button to duplicate a site (item pool, pages and navigation)
+- Add a button to duplicate a site (item pool, pages and navigation, relations).
 - Add a button to apply settings or another site (except language).
-- Database: invert the process to avoid to rebuild all pairs each time they are
-  read. So save all pairs (one or two ways?) in the database when relations are
-  created or updated.
 
 
 Warning
@@ -136,6 +145,7 @@ Copyright
 [`Generic`]: https://github.com/Daniel-KM/Omeka-S-module-Generic
 [`LanguageSwitcher.zip`]: https://github.com/Daniel-KM/Omeka-S-module-LanguageSwitcher/releases
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
+[Next]: https://github.com/Daniel-KM/Omeka-S-module-Next
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-LanguageSwitcher/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html

@@ -67,19 +67,33 @@ class LanguageSwitcher extends AbstractHelper
         $controller = $params->fromRoute('__CONTROLLER__');
         $data = [];
         if ($controller === 'Page') {
-            $pageSlug = $params->fromRoute('page-slug');
             $api = $view->api();
+            $pageSlug = $params->fromRoute('page-slug');
+            $page = $api
+                ->read(
+                    'site_pages',
+                    ['site' => $site->id(), 'slug' => $pageSlug]
+                )
+                ->getContent();
+            // Page cannot be empty because controller is for page.
             $relations = $api
                 ->search(
                     'site_page_relations',
-                    ['site_id' => $site->id(), 'page_slug' => $pageSlug]
+                    ['relation' => $page->id()]
                 )
                 ->getContent();
+
+            $pageId = $page->id();
             $relatedPages = [];
             foreach ($relations as $relation) {
-                $siteSlug = $relation->relatedPage()->site()->slug();
-                $relatedPages[$siteSlug] = $relation->relatedPage()->slug();
+                $related = $relation->relatedPage();
+                if ($pageId === $related->id()) {
+                    $related = $relation->page();
+                }
+                $siteSlug = $related->site()->slug();
+                $relatedPages[$siteSlug] = $related->slug();
             }
+
             foreach ($locales as $siteSlug => $localeId) {
                 $url = isset($relatedPages[$siteSlug])
                     ? $urlHelper(null, ['site-slug' => $siteSlug, 'page-slug' => $relatedPages[$siteSlug]], true)

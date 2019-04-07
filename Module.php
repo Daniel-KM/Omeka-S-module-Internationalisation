@@ -76,14 +76,13 @@ class Module extends AbstractModule
             ->search(
                 'site_page_relations',
                 ['relation' => $pageId]
-                // ['returnScalar' => 'relatedPage']
             )
             ->getContent();
         $relations = array_map(function($relation) use ($pageId) {
-            $relatedPage = $relation->relatedPage();
-            return $pageId === $relatedPage->id()
+            $related = $relation->relatedPage();
+            return $pageId === $related->id()
                 ? $relation->page()->getReference()
-                : $relatedPage->getReference();
+                : $related->getReference();
         }, $relations);
         $jsonLd['o-module-language-switcher:related_page'] = $relations;
         $event->setParam('jsonLd', $jsonLd);
@@ -91,9 +90,14 @@ class Module extends AbstractModule
 
     public function handleApiUpdatePostPage(Event $event)
     {
-        /** @var \Omeka\Api\Manager $api */
-        $api = $this->getServiceLocator()->get('Omeka\ApiManager');
-        /** @var \Omeka\Api\Request $request */
+        $services = $this->getServiceLocator();
+        /**
+         * @var \Doctrine\DBAL\Connection $connection
+         * @var \Omeka\Api\Manager $api
+         * @var \Omeka\Api\Request $request
+         */
+        $connection = $services->get('Omeka\Connection');
+        $api = $services->get('Omeka\ApiManager');
         $request = $event->getParam('request');
         $response = $event->getParam('response');
         $pageId = $response->getContent()->getId();
@@ -107,32 +111,52 @@ class Module extends AbstractModule
             unset($selected[$key]);
         }
 
-        // Get the existing relations to check if some of them were removed.
+        // To simplify process, all existing pairs are deleted before saving.
+
+        // Direct query is used because the visibility don't need to be checked:
+        // it is done when the page is loaded and even hidden, the relation
+        // should remain.
+        // TODO Check if this process remove hidden pages in true life (with language switcher, the user should see all localized sites).
+
         $existing = $api
             ->search(
                 'site_page_relations',
                 ['relation' => $pageId]
-                // ['returnScalar' => 'relatedPage']
             )
             ->getContent();
-        $existing = array_map(function($relation) use ($pageId) {
-            $relatedPage = $relation->relatedPage();
-            return $pageId === $relatedPage->id()
+        $existingIds = array_map(function($relation) use ($pageId) {
+            $relatedId = $relation->relatedPage()->id();
+            return $pageId === $relatedId
                 ? $relation->page()->id()
-                : $relatedPage->id();
+                : $relatedId;
         }, $existing);
 
-        $added = array_diff($selected, $existing);
-        $removed = array_diff($existing, $selected);
-        // $kept = array_intersect($selected, $existing);
-
-        foreach ($added as $relationId) {
-            $api->create('site_page_relations', ['o:page' => ['o:id' => $pageId], 'o-module-language-switcher:related_page' => ['o:id' => $relationId]]);
-        }
-        foreach ($removed as $relationId) {
-            $api->delete('site_page_relations', ['page' => $pageId, 'relatedPage' => $relationId]);
+        if (count($existingIds)) {
+            $sql = <<<SQL
+DELETE FROM site_page_relation
+WHERE page_id IN (:page_ids) OR related_page_id IN (:page_ids)
+SQL;
+            $connection->executeQuery($sql, ['page_ids' => $existingIds], ['page_ids' => $connection::PARAM_INT_ARRAY]);
         }
 
-        // TODO Manage all pairs to avoid to rebuild them each time a page is read. See SitePageRelationAdapter::findRelatedPageIds()
+        // Add all pairs.
+        $sql = <<<SQL
+INSERT INTO site_page_relation
+VALUES
+SQL;
+
+        $ids = $selected;
+        $ids[] = $pageId;
+        sort($ids);
+        $relatedIds = $ids;
+        foreach ($ids as $id) {
+            foreach ($relatedIds as $relatedId) {
+                if ($relatedId > $id) {
+                    $sql .= "\n($id, $relatedId),";
+                }
+            }
+        }
+        $sql = rtrim($sql, ',');
+        $connection->exec($sql);
     }
 }

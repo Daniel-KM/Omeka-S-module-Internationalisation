@@ -26,12 +26,12 @@ class LanguageSwitcherFactory implements FactoryInterface
 SELECT site.slug AS site_slug, REPLACE(site_setting.value, '"', "") AS localeId
 FROM site_setting
 JOIN site ON site.id = site_setting.site_id
-WHERE site_setting.id = ?
+WHERE site_setting.id = :setting_id
 SQL;
-        $bind = ['locale'];
+        $bind = ['setting_id' => 'locale'];
         if ($isPublic) {
-            $sql .= ' AND site.is_public = ?';
-            $bind[] = [1];
+            $sql .= ' AND site.is_public = :is_public';
+            $bind['is_public'] = 1;
         }
 
         /* @var \Doctrine\DBAL\Connection $connection */
