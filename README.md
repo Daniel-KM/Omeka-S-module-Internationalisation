@@ -73,10 +73,10 @@ TODO
 ----
 
 - Return original page when it is not translated in a site, instead of an error.
-- Add options to manage multilanguage property values (various way).
+- Add options to manage multilanguage property values (various ways).
 - Add links for easier browsing between translated pages.
 - Add a button to duplicate a site (item pool, pages and navigation, relations).
-- Add a button to apply settings or another site (except language).
+- Add a button to apply settings of another site (except language).
 
 
 Warning
