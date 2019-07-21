@@ -22,7 +22,7 @@ class SitePageForm extends \Omeka\Form\SitePageForm
                     'required' => false,
                     'multiple' => true,
                     'class' => 'chosen-select',
-                    'data-placeholder' => 'Select translations of this page…' // @translate
+                    'data-placeholder' => 'Select translations of this page…', // @translate
                 ],
             ]);
         }
@@ -39,7 +39,7 @@ class SitePageForm extends \Omeka\Form\SitePageForm
         if (isset($data['o-module-language-switcher:related_page'])
             && is_array($data['o-module-language-switcher:related_page'])
         ) {
-            $data['o-module-language-switcher:related_page'] = array_map(function($relatedPage) {
+            $data['o-module-language-switcher:related_page'] = array_map(function ($relatedPage) {
                 return is_numeric($relatedPage)
                     ? $relatedPage
                     : (is_array($relatedPage)

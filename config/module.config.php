@@ -32,7 +32,7 @@ return [
         'factories' => [
             \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
             Form\Element\SitePageSelect::class => Service\Form\Element\SitePageSelectFactory::class,
-        ]
+        ],
     ],
     'translator' => [
         'translation_file_patterns' => [

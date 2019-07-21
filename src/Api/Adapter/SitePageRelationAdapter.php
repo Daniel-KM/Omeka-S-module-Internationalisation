@@ -118,7 +118,6 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
                 $pageAlias . '.id',
                 $this->createNamedParameter($qb, $query['page_id'])
             ));
-
         }
 
         if (isset($query['related_page_id'])) {

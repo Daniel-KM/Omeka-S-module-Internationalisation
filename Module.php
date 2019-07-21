@@ -83,7 +83,7 @@ class Module extends AbstractModule
                 ['relation' => $pageId]
             )
             ->getContent();
-        $relations = array_map(function($relation) use ($pageId) {
+        $relations = array_map(function ($relation) use ($pageId) {
             $related = $relation->relatedPage();
             return $pageId === $related->id()
                 ? $relation->page()->getReference()
@@ -129,7 +129,7 @@ class Module extends AbstractModule
                 ['relation' => $pageId]
             )
             ->getContent();
-        $existingIds = array_map(function($relation) use ($pageId) {
+        $existingIds = array_map(function ($relation) use ($pageId) {
             $relatedId = $relation->relatedPage()->id();
             return $pageId === $relatedId
                 ? $relation->page()->id()
