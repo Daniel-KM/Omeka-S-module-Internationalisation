@@ -1,7 +1,7 @@
 <?php
 namespace LanguageSwitcher\Form;
 
-use LanguageSwitcher\Form\Element\SitePageSelect;
+use LanguageSwitcher\Form\Element\SitesPageSelect;
 
 class SitePageForm extends \Omeka\Form\SitePageForm
 {
@@ -12,7 +12,7 @@ class SitePageForm extends \Omeka\Form\SitePageForm
         if (!$this->getOption('addPage')) {
             $this->add([
                 'name' => 'o-module-language-switcher:related_page',
-                'type' => SitePageSelect::class,
+                'type' => SitesPageSelect::class,
                 'options' => [
                     'label' => 'Translations', // @translate
                     'info' => 'The selected pages are translations of the current page. The language switcher displays only one related page by site.', // @translate

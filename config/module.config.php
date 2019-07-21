@@ -31,7 +31,7 @@ return [
     'form_elements' => [
         'factories' => [
             \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
-            Form\Element\SitePageSelect::class => Service\Form\Element\SitePageSelectFactory::class,
+            Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
         ],
     ],
     'translator' => [

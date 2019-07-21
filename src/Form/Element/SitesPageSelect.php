@@ -1,7 +1,7 @@
 <?php
 namespace LanguageSwitcher\Form\Element;
 
-class SitePageSelect extends AbstractGroupBySiteSelect
+class SitesPageSelect extends AbstractGroupBySiteSelect
 {
     public function getResourceName()
     {
