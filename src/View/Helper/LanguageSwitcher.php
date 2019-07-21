@@ -18,7 +18,7 @@ class LanguageSwitcher extends AbstractHelper
      *
      * @var array
      */
-    protected $locales;
+    protected $localeSites;
 
     /**
      * @var array
@@ -26,12 +26,12 @@ class LanguageSwitcher extends AbstractHelper
     protected $localeLabels;
 
     /**
-     * @param array $locales
+     * @param array $localeSites
      * @param array $localeLabels
      */
-    public function __construct(array $locales, array $localeLabels)
+    public function __construct(array $localeSites, array $localeLabels)
     {
-        $this->locales = $locales;
+        $this->localeSites = $localeSites;
         $this->localeLabels = $localeLabels;
     }
 
@@ -43,11 +43,7 @@ class LanguageSwitcher extends AbstractHelper
      */
     public function __invoke($partialName = null)
     {
-        if (empty($this->locales)) {
-            return '';
-        }
-
-        $locales = array_filter($this->locales);
+        $locales = $this->localeSites;
         if (count($locales) <= 1) {
             return '';
         }
@@ -65,6 +61,7 @@ class LanguageSwitcher extends AbstractHelper
         // item pool, etc.
         $params = $view->params();
         $controller = $params->fromRoute('__CONTROLLER__');
+
         $data = [];
         if ($controller === 'Page') {
             $api = $view->api();
@@ -125,6 +122,7 @@ class LanguageSwitcher extends AbstractHelper
             [
                 'site' => $site,
                 'locales' => $data,
+                'locale_labels' => $this->localeLabels,
             ]
         );
     }

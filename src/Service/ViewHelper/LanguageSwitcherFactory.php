@@ -37,20 +37,20 @@ SQL;
         /* @var \Doctrine\DBAL\Connection $connection */
         $connection = $services->get('Omeka\Connection');
         $connection->setFetchMode(\PDO::FETCH_KEY_PAIR);
-        $locales = $connection->fetchAll($sql, $bind);
+        $localeSites = $connection->fetchAll($sql, $bind);
+        $localeSites = array_filter($localeSites);
 
         if (extension_loaded('intl')) {
             $localeLabels = [];
-            foreach (array_filter($locales) as $localeId) {
+            foreach ($localeSites as $localeId) {
                 $localeLabels[$localeId] = \Locale::getDisplayName($localeId, $localeId);
             }
         } else {
-            $localeLabels = array_filter($localeId);
-            $localeLabels = array_combine($localeLabels, $localeLabels);
+            $localeLabels = array_combine($localeSites, $localeSites);
         }
 
         return new LanguageSwitcher(
-            $locales,
+            $localeSites,
             $localeLabels
         );
     }

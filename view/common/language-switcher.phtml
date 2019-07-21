@@ -3,6 +3,7 @@
  * @var \Zend\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation $site
  * @var array $locales
+ * @var array $locale_labels
  */
 
 ?>
@@ -13,9 +14,9 @@
             <?php $country = $this->localeToCountry($locale['locale']); ?>
             <li>
                 <?php if ($currentLocale == $locale['locale']): ?>
-                    <span class="active flag-icon flag-icon-<?php echo strtolower($country); ?>"></span>
+                    <span class="active flag-icon flag-icon-<?= strtolower($country) ?>"></span>
                 <?php else: ?>
-                    <a href="<?php echo $locale['url']; ?>" title="<?php echo $locale['locale_label']; ?>"><span class="flag-icon flag-icon-<?php echo strtolower($country); ?>"></span></a>
+                    <a href="<?= $locale['url'] ?>" title="<?= $locale['locale_label'] ?>"><span class="flag-icon flag-icon-<?= strtolower($country) ?>"></span></a>
                 <?php endif; ?>
             </li>
         <?php endforeach; ?>
