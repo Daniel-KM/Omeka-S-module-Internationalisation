@@ -23,6 +23,7 @@ return [
     'view_helpers' => [
         'invokables' => [
             'localeToCountry' => View\Helper\LocaleToCountry::class,
+            'localeValue' => View\Helper\LocaleValue::class,
         ],
         'factories' => [
             'languageSwitcher' => Service\ViewHelper\LanguageSwitcherFactory::class,
