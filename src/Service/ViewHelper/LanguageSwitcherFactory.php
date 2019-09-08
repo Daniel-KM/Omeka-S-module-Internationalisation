@@ -17,11 +17,16 @@ class LanguageSwitcherFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        // TODO The visibility may be a little more complex with some modules.
+        /** @var \Zend\Authentication\AuthenticationService $auth */
         $auth = $services->get('Omeka\AuthenticationService');
-        $isPublic = !$auth->hasIdentity();
+        if ($auth->hasIdentity()) {
+            $role = $auth->getIdentity()->getRole();
+            $isPublic = $role === 'guest';
+        } else {
+            $isPublic = true;
+        }
 
-        // TODO Filter empty locale directly? Not currently, in order to manage complex cases.
+        // Filter empty locale directly? Not here, in order to manage complex cases.
         $sql = <<<SQL
 SELECT site.slug AS site_slug, REPLACE(site_setting.value, '"', "") AS localeId
 FROM site_setting
