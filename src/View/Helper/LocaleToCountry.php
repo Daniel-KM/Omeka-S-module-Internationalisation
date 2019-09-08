@@ -45,12 +45,14 @@ class LocaleToCountry extends AbstractHelper
      */
     public function __invoke($locale)
     {
-        if (strlen($locale) == 2 && isset($this->countriesByLocale[$locale])) {
-            return $this->countriesByLocale[$locale];
+        if (strlen($locale) == 2) {
+            return isset($this->countriesByLocale[$locale])
+                ? $this->countriesByLocale[$locale]
+                : '';
         }
 
         $matches = [];
-        if (preg_match('/[a-z]{2}_([A-Z]{2})/', $locale, $matches)) {
+        if (preg_match('/^[a-z]+(?:_|-)([A-Z]+)$/i', $locale, $matches)) {
             return $matches[1];
         }
 
