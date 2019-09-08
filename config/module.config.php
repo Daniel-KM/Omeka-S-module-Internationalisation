@@ -26,6 +26,7 @@ return [
             'localeValue' => View\Helper\LocaleValue::class,
         ],
         'factories' => [
+            'languageIso' => Service\ViewHelper\LanguageIsoFactory::class,
             'languageSwitcher' => Service\ViewHelper\LanguageSwitcherFactory::class,
         ],
     ],

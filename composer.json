@@ -1,10 +1,8 @@
 {
-    "config": {
-        "vendor-dir": "vendor/asset"
-    },
     "require": {
-        "slowprog/composer-copy-file": "~0.3",
-        "components/flag-icon-css": "^3.3"
+        "components/flag-icon-css": "^3.3",
+        "daniel-km/simple-iso-639-3": "^1.0",
+        "slowprog/composer-copy-file": "~0.3"
     },
     "scripts": {
         "post-install-cmd": [
@@ -16,7 +14,7 @@
     },
     "extra": {
         "copy-file": {
-            "vendor/asset/components/flag-icon-css": "asset/vendor/flag-icon-css/"
+            "vendor/components/flag-icon-css": "asset/vendor/flag-icon-css/"
         }
     }
 }

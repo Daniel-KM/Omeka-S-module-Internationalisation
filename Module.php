@@ -11,6 +11,7 @@ use Generic\AbstractModule;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\Mvc\MvcEvent;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Module extends AbstractModule
 {
@@ -35,6 +36,20 @@ class Module extends AbstractModule
                 [\LanguageSwitcher\Api\Adapter\SitePageRelationAdapter::class],
                 ['search', 'read']
             );
+    }
+
+    public function install(ServiceLocatorInterface $serviceLocator)
+    {
+        $vendor = __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
+        if (!file_exists($vendor)) {
+            $t = $serviceLocator->get('MvcTranslator');
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException(
+                $t->translate('The composer vendor is not ready.') // @translate
+                . ' ' . $t->translate('See module’s installation documentation.') // @translate
+            );
+        }
+
+        parent::install($serviceLocator);
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
