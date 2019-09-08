@@ -1,0 +1,35 @@
+<?php
+namespace LanguageSwitcher\Form;
+
+use Omeka\Form\Element\RestoreTextarea;
+use Zend\Form\Fieldset;
+
+class SettingsFieldset extends Fieldset
+{
+    protected $label = 'Language Switcher'; // @translate
+
+    public function init()
+    {
+        // See \LanguageSwitcher\Module::handleMainSettings().
+        $this
+            ->setAttribute('id', 'languageswitcher')
+            ->add([
+                    'name' => 'languageswitcher_site_groups',
+                    'type' => RestoreTextarea::class,
+                    'options' => [
+                        'label' => 'Site groups', // @translate
+                        'info' => 'Group some sites with a different language so they can be managed together as a whole. Set all site slugs by group, one by line, with or without comma separator.', // @translate
+                        'restoreButtonText' => 'Remove all groups', // @translate
+                    ],
+                    'restoreButtonText' => 'Remove all groups', // @translate
+                    'attributes' => [
+                        'id' => 'languageswitcher_site_groups',
+                        'placeholder' => 'my-site-fra my-site-rus my-site-way
+my-exhibit-fra my-exhibit-rus
+other-exhibit-fra other-exhibit-rus',
+                        'rows' => 10,
+                    ],
+            ])
+        ;
+    }
+}

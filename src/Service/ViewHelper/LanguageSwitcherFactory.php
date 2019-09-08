@@ -56,7 +56,8 @@ SQL;
 
         return new LanguageSwitcher(
             $localeSites,
-            $localeLabels
+            $localeLabels,
+            $services->get('Omeka\Settings')->get('languageswitcher_site_groups', [])
         );
     }
 }

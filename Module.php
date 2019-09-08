@@ -72,18 +72,30 @@ class Module extends AbstractModule
             'api.update.post',
             [$this, 'handleApiUpdatePostPage']
         );
+
+        $sharedEventManager->attach(
+            \Omeka\Form\SettingForm::class,
+            'form.add_elements',
+            [$this, 'handleMainSettings']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Form\SettingForm::class,
+            'form.add_input_filters',
+            [$this, 'handleMainSettingsFilters']
+        );
     }
 
     public function handleViewLayoutPublic(Event $event)
     {
         $view = $event->getTarget();
-        if ($view->params()->fromRoute('__ADMIN__')) {
+        if (!$view->status()->isSiteRequest()) {
             return;
         }
 
+        $assetUrl = $view->getHelperPluginManager()->get('assetUrl');
         $view->headLink()
-            ->appendStylesheet($view->assetUrl('css/language-switcher.css', 'LanguageSwitcher'))
-            ->appendStylesheet($view->assetUrl('vendor/flag-icon-css/css/flag-icon.min.css', 'LanguageSwitcher'));
+            ->appendStylesheet($assetUrl('css/language-switcher.css', 'LanguageSwitcher'))
+            ->appendStylesheet($assetUrl('vendor/flag-icon-css/css/flag-icon.min.css', 'LanguageSwitcher'));
     }
 
     public function filterJsonLd(Event $event)
@@ -182,5 +194,139 @@ SQL;
         }
         $sql = rtrim($sql, ',');
         $connection->exec($sql);
+    }
+
+    public function handleMainSettings(Event $event)
+    {
+        parent::handleMainSettings($event);
+
+        $services = $this->getServiceLocator();
+
+        $space = strtolower(__NAMESPACE__);
+
+        $api = $services->get('Omeka\ApiManager');
+        $sites = $api
+            ->search('sites', ['sort_by' => 'slug', 'sort_order' => 'asc'], ['returnScalar' => 'slug'])
+            ->getContent();
+
+        $siteGroups = $this->listSiteGroups();
+        $siteGroupsString = '';
+        foreach ($siteGroups as $group) {
+            if ($group) {
+                $siteGroupsString .= implode(' ', $group) . "\n";
+            }
+        }
+        $siteGroupsString = trim($siteGroupsString);
+
+        /**
+         * @var \Omeka\Form\Element\RestoreTextarea $siteGroupsElement
+         * @var \LanguageSwitcher\Form\SettingsFieldset $fieldset
+         */
+        $form = $event->getTarget();
+        $fieldset = $form->get($space);
+        $siteGroupsElement = $fieldset
+            ->get('languageswitcher_site_groups');
+        $siteGroupsElement
+            ->setValue($siteGroupsString)
+            ->setRestoreButtonText('Remove all groups') // @translate
+            ->setRestoreValue(implode("\n", $sites));
+    }
+
+    public function handleMainSettingsFilters(Event $event)
+    {
+        $event->getParam('inputFilter')
+            ->get('languageswitcher')
+            ->add([
+                'name' => 'languageswitcher_site_groups',
+                'required' => false,
+                'filters' => [
+                    [
+                        'name' => \Zend\Filter\Callback::class,
+                        'options' => [
+                            'callback' => [$this, 'filterSiteGroups'],
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
+    public function filterSiteGroups($groups)
+    {
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+
+        $siteList = [];
+
+        $sites = $api
+            ->search('sites', ['sort_by' => 'slug', 'sort_order' => 'asc'], ['returnScalar' => 'slug'])
+            ->getContent();
+        $sites = array_combine($sites, $sites);
+
+        $groups = str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], $groups);
+        $groups = array_filter(array_map('trim', explode("\n", $groups)));
+        foreach ($groups as $group) {
+            $group = array_unique(array_filter(array_map('trim', explode(' ', str_replace(',', ' ', $group)))));
+            $group = array_intersect($group, $sites);
+            if (count($group) > 1) {
+                sort($group, SORT_NATURAL);
+                foreach ($group as $site) {
+                    $siteList[$site] = $group;
+                    unset($sites[$site]);
+                }
+            }
+        }
+
+        ksort($siteList, SORT_NATURAL);
+        return $siteList;
+    }
+
+    /**
+     * Clean and list groups, even with one site.
+     *
+     * @return array[]
+     */
+    protected function listSiteGroups()
+    {
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        $settings = $services->get('Omeka\Settings');
+
+        $siteGroups = $settings->get('languageswitcher_site_groups') ?: [];
+
+        $sites = $api
+            ->search('sites', ['sort_by' => 'slug', 'sort_order' => 'asc'], ['returnScalar' => 'slug'])
+            ->getContent();
+        $sites = array_combine($sites, $sites);
+
+        // Clean sites.
+        ksort($siteGroups, SORT_NATURAL);
+        $siteGroups = array_filter(array_map(function($group) use ($sites) {
+            $v = array_intersect($group, $sites);
+            if (count($v) <= 1) {
+                return [];
+            }
+            sort($v, SORT_NATURAL);
+            return $v;
+        }, array_intersect_key($siteGroups, $sites)));
+
+        // Remove sites that belongs to a group and append them.
+        $remaining = array_map(function($site) {
+            return [$site];
+        }, $sites);
+
+        $result = $siteGroups;
+        foreach ($result as $site => $group) {
+            unset($remaining[$site]);
+            $remaining = array_diff_key($remaining, array_flip($group));
+            if (isset($siteGroups[$site])) {
+                foreach ($group as $siteInGroup) {
+                    if ($siteInGroup !== $site) {
+                        unset($siteGroups[$siteInGroup]);
+                    }
+                }
+            }
+        }
+
+        return $siteGroups + $remaining;
     }
 }

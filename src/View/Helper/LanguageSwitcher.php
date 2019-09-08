@@ -21,18 +21,29 @@ class LanguageSwitcher extends AbstractHelper
     protected $localeSites;
 
     /**
+     * Associative array of the locale id and the locale locale.
+     *
      * @var array
      */
     protected $localeLabels;
 
     /**
+     * Associative array of all site that belongs to a group.
+     *
+     * @var array
+     */
+    protected $siteGroups;
+
+    /**
      * @param array $localeSites
      * @param array $localeLabels
+     * @param array $siteGroups
      */
-    public function __construct(array $localeSites, array $localeLabels)
+    public function __construct(array $localeSites, array $localeLabels, array $siteGroups)
     {
         $this->localeSites = $localeSites;
         $this->localeLabels = $localeLabels;
+        $this->siteGroups = $siteGroups;
     }
 
     /**
@@ -43,15 +54,24 @@ class LanguageSwitcher extends AbstractHelper
      */
     public function __invoke($partialName = null)
     {
-        $locales = $this->localeSites;
-        if (count($locales) <= 1) {
-            return '';
-        }
-
         $view = $this->getView();
 
         $site = $view->vars()->site;
         if (empty($site)) {
+            return '';
+        }
+
+        // Only translate sites that are in a group.
+        $currentSiteSlug = $site->slug();
+        if (!isset($this->siteGroups[$currentSiteSlug])) {
+            return '';
+        }
+        $siteGroup = $this->siteGroups[$currentSiteSlug];
+
+        // Only translate sites that have at least two locales.
+        // This is automatically managed since siteGroups list only them.
+        $locales = array_intersect_key($this->localeSites, array_flip($siteGroup));
+        if (count($locales) <= 1) {
             return '';
         }
 
@@ -60,10 +80,10 @@ class LanguageSwitcher extends AbstractHelper
         // No check is done: we suppose that the translated sites have the same
         // item pool, etc.
         $params = $view->params();
-        $controller = $params->fromRoute('__CONTROLLER__');
+        $controller = $params->fromRoute('__CONTROLLER__') ?: $params->fromRoute('controller');
 
         $data = [];
-        if ($controller === 'Page') {
+        if ($controller === 'Page' || $controller === 'Omeka\Controller\Site\Page') {
             $api = $view->api();
             $pageSlug = $params->fromRoute('page-slug');
             $page = $api
@@ -91,6 +111,8 @@ class LanguageSwitcher extends AbstractHelper
                 $relatedPages[$siteSlug] = $related->slug();
             }
 
+            // Display a link to all site of the group, even if the locale is
+            // not translated (it should).
             foreach ($locales as $siteSlug => $localeId) {
                 $url = isset($relatedPages[$siteSlug])
                     ? $urlHelper(null, ['site-slug' => $siteSlug, 'page-slug' => $relatedPages[$siteSlug]], true)

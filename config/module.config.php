@@ -31,6 +31,9 @@ return [
         ],
     ],
     'form_elements' => [
+        'invokables' => [
+            Form\SettingsFieldset::class => Form\SettingsFieldset::class,
+        ],
         'factories' => [
             \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
@@ -47,5 +50,8 @@ return [
         ],
     ],
     'languageswitcher' => [
+        'settings' => [
+            'languageswitcher_site_groups' => [],
+        ],
     ],
 ];
