@@ -327,6 +327,24 @@ SQL;
             }
         }
 
+        // If the main site is in a group, put the group as first for a better
+        // display.
+        $mainSite = $settings->get('default_site');
+        if ($mainSite) {
+            try {
+                $mainSite = $api->read('sites', $mainSite)->getContent()->slug();
+                if (!isset($remaining[$mainSite])) {
+                    foreach ($siteGroups as $site => $group) {
+                        if (in_array($mainSite, $group)) {
+                            $siteGroups = [$site => $group] + $siteGroups;
+                            break;
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+            }
+        }
+
         return $siteGroups + $remaining;
     }
 }
