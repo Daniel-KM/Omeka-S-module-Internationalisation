@@ -7,66 +7,15 @@ between sites pages, when the sites are managed by language.
 This module provides the same features than the [Omeka Classic] plugins [MultiLanguage]
 and [Locale Switcher].
 
+Important: the module has been renamed [Internationalisation].
+
 
 Installation
 ------------
 
-This module requires the module [`Generic`] installed first.
-
-The module uses external libraries, so use the release zip to install it, or use
-and init the source.
-
-See general end user documentation for [installing a module].
-
-* From the zip
-
-Download the last release [`LanguageSwitcher.zip`] from the list of releases (the
-master does not contain the dependency), and uncompress it in the `modules`
-directory.
-
-* From the source and for development
-
-If the module was installed from the source, rename the name of the folder of
-the module to `LanguageSwitcher`, go to the root of the module, and run:
-
-```
-composer install
-```
-
-
-Usage
------
-
-First, in admin board, set the locale setting for all sites. It allows to set
-the language of all pages.
-
-Second, make the relations between translated pages. For that purpose, there is
-a new field to fill in the site page: the pages that are a translation of the
-current page. So select the related pages and translate them.
-
-It’s important to set relations for all pages, else the language switcher will
-display a "page doesn’t exist" error if the user browse to it. Furthemore, it is
-recommended to use all the same settings, item pools, themes, rights, etc. for
-all related sites so the visitor can browse smoothly.
-
-In the case where the page is not yet translated, and you want to avoid an
-error, you can create a page with the block "Simple Page", that is available in
-the module [Next], and that display the same content than the specified page.
-
-Then, in public front-end, the visitor can switch between sites via a flag.
-
-**Important**: the language switcher is not added automatically to the theme. So
-add the view helper somewhere in the file `layout.phtml`, generally in the
-header:
-
-```
-<?php echo $this->languageSwitcher(); ?>
-<?php // Or better, to make the theme more generic and resilient in case of an upgrade: ?>
-<?php if ($this->getHelperPluginManager()->has('languageSwitcher')) echo $this->languageSwitcher(); ?>
-```
-
-The partial `common/language-switcher.phtml` view can be themed: simply copy it
-in your theme and customize it.
+Warning: install module [Internationalisation]. Since the old module uses the
+same code, there is no other change to do: simply remove this last before 
+installing the new module.
 
 
 TODO
@@ -138,6 +87,7 @@ Copyright
 
 
 [Language Switcher]: https://github.com/Daniel-KM/Omeka-S-module-LanguageSwitcher
+[Internationalisation]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation
 [Omeka S]: https://omeka.org/s
 [MultiLanguage]: https://github.com/patrickmj/multilanguage
 [Locale Switcher]: https://github.com/Daniel-KM/Omeka-plugin-LocaleSwitcher
