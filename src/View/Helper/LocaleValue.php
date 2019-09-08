@@ -1,5 +1,5 @@
 <?php
-namespace LanguageSwitcher\View\Helper;
+namespace Internationalisation\View\Helper;
 
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Zend\View\Helper\AbstractHelper;

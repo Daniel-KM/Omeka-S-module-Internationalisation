@@ -1,8 +1,8 @@
 <?php
-namespace LanguageSwitcher\Service\Form;
+namespace Internationalisation\Service\Form;
 
+use Internationalisation\Form\SitePageForm;
 use Interop\Container\ContainerInterface;
-use LanguageSwitcher\Form\SitePageForm;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 class SitePageFormFactory implements FactoryInterface

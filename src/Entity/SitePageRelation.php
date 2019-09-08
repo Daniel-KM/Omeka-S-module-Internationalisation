@@ -27,7 +27,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace LanguageSwitcher\Entity;
+namespace Internationalisation\Entity;
 
 use Omeka\Entity\AbstractEntity;
 use Omeka\Entity\SitePage;
@@ -70,7 +70,7 @@ class SitePageRelation extends AbstractEntity
 
     /**
      * @param SitePage $page
-     * @return \LanguageSwitcher\Entity\SitePageRelation
+     * @return \Internationalisation\Entity\SitePageRelation
      */
     public function setPage(SitePage $page)
     {
@@ -88,7 +88,7 @@ class SitePageRelation extends AbstractEntity
 
     /**
      * @param SitePage $sitePage
-     * @return \LanguageSwitcher\Entity\SitePageRelation
+     * @return \Internationalisation\Entity\SitePageRelation
      */
     public function setRelatedPage(SitePage $relatedPage)
     {

@@ -1,5 +1,5 @@
 <?php
-namespace LanguageSwitcher\Form\Element;
+namespace Internationalisation\Form\Element;
 
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Api\Representation\SiteRepresentation;

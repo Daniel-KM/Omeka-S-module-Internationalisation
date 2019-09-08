@@ -1,8 +1,8 @@
 <?php
-namespace LanguageSwitcher\Service\ViewHelper;
+namespace Internationalisation\Service\ViewHelper;
 
+use Internationalisation\View\Helper\LanguageSwitcher;
 use Interop\Container\ContainerInterface;
-use LanguageSwitcher\View\Helper\LanguageSwitcher;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
@@ -57,7 +57,7 @@ SQL;
         return new LanguageSwitcher(
             $localeSites,
             $localeLabels,
-            $services->get('Omeka\Settings')->get('languageswitcher_site_groups', [])
+            $services->get('Omeka\Settings')->get('internationalisation_site_groups', [])
         );
     }
 }

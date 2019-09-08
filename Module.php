@@ -1,5 +1,5 @@
 <?php
-namespace LanguageSwitcher;
+namespace Internationalisation;
 
 if (!class_exists(\Generic\AbstractModule::class)) {
     require file_exists(dirname(__DIR__) . '/Generic/AbstractModule.php')
@@ -33,7 +33,7 @@ class Module extends AbstractModule
         $acl
             ->allow(
                 null,
-                [\LanguageSwitcher\Api\Adapter\SitePageRelationAdapter::class],
+                [\Internationalisation\Api\Adapter\SitePageRelationAdapter::class],
                 ['search', 'read']
             );
     }
@@ -94,8 +94,8 @@ class Module extends AbstractModule
 
         $assetUrl = $view->getHelperPluginManager()->get('assetUrl');
         $view->headLink()
-            ->appendStylesheet($assetUrl('css/language-switcher.css', 'LanguageSwitcher'))
-            ->appendStylesheet($assetUrl('vendor/flag-icon-css/css/flag-icon.min.css', 'LanguageSwitcher'));
+            ->appendStylesheet($assetUrl('css/language-switcher.css', 'Internationalisation'))
+            ->appendStylesheet($assetUrl('vendor/flag-icon-css/css/flag-icon.min.css', 'Internationalisation'));
     }
 
     public function filterJsonLd(Event $event)
@@ -116,7 +116,7 @@ class Module extends AbstractModule
                 ? $relation->page()->getReference()
                 : $related->getReference();
         }, $relations);
-        $jsonLd['o-module-language-switcher:related_page'] = $relations;
+        $jsonLd['o-module-internationalisation:related_page'] = $relations;
         $event->setParam('jsonLd', $jsonLd);
     }
 
@@ -134,7 +134,7 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $pageId = $response->getContent()->getId();
 
-        $selected = $request->getValue('o-module-language-switcher:related_page', []);
+        $selected = $request->getValue('o-module-internationalisation:related_page', []);
         $selected = array_map('intval', $selected);
 
         // The page cannot be related to itself.
@@ -220,12 +220,12 @@ SQL;
 
         /**
          * @var \Omeka\Form\Element\RestoreTextarea $siteGroupsElement
-         * @var \LanguageSwitcher\Form\SettingsFieldset $fieldset
+         * @var \Internationalisation\Form\SettingsFieldset $fieldset
          */
         $form = $event->getTarget();
         $fieldset = $form->get($space);
         $siteGroupsElement = $fieldset
-            ->get('languageswitcher_site_groups');
+            ->get('internationalisation_site_groups');
         $siteGroupsElement
             ->setValue($siteGroupsString)
             ->setRestoreButtonText('Remove all groups') // @translate
@@ -235,9 +235,9 @@ SQL;
     public function handleMainSettingsFilters(Event $event)
     {
         $event->getParam('inputFilter')
-            ->get('languageswitcher')
+            ->get('internationalisation')
             ->add([
-                'name' => 'languageswitcher_site_groups',
+                'name' => 'internationalisation_site_groups',
                 'required' => false,
                 'filters' => [
                     [
@@ -291,7 +291,7 @@ SQL;
         $api = $services->get('Omeka\ApiManager');
         $settings = $services->get('Omeka\Settings');
 
-        $siteGroups = $settings->get('languageswitcher_site_groups') ?: [];
+        $siteGroups = $settings->get('internationalisation_site_groups') ?: [];
 
         $sites = $api
             ->search('sites', ['sort_by' => 'slug', 'sort_order' => 'asc'], ['returnScalar' => 'slug'])

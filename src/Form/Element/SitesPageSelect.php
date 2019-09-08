@@ -1,5 +1,5 @@
 <?php
-namespace LanguageSwitcher\Form\Element;
+namespace Internationalisation\Form\Element;
 
 class SitesPageSelect extends AbstractGroupBySiteSelect
 {

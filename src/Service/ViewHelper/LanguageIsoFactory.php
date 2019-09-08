@@ -1,8 +1,8 @@
 <?php
-namespace LanguageSwitcher\Service\ViewHelper;
+namespace Internationalisation\Service\ViewHelper;
 
+use Internationalisation\View\Helper\LanguageIso;
 use Interop\Container\ContainerInterface;
-use LanguageSwitcher\View\Helper\LanguageIso;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**

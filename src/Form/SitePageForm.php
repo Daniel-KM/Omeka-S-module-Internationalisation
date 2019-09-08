@@ -1,7 +1,7 @@
 <?php
-namespace LanguageSwitcher\Form;
+namespace Internationalisation\Form;
 
-use LanguageSwitcher\Form\Element\SitesPageSelect;
+use Internationalisation\Form\Element\SitesPageSelect;
 
 class SitePageForm extends \Omeka\Form\SitePageForm
 {
@@ -11,14 +11,14 @@ class SitePageForm extends \Omeka\Form\SitePageForm
 
         if (!$this->getOption('addPage')) {
             $this->add([
-                'name' => 'o-module-language-switcher:related_page',
+                'name' => 'o-module-internationalisation:related_page',
                 'type' => SitesPageSelect::class,
                 'options' => [
                     'label' => 'Translations', // @translate
                     'info' => 'The selected pages are translations of the current page. The language switcher displays only one related page by site.', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'o-module-language-switcher:related_page',
+                    'id' => 'o-module-internationalisation:related_page',
                     'required' => false,
                     'multiple' => true,
                     'class' => 'chosen-select',
@@ -29,17 +29,17 @@ class SitePageForm extends \Omeka\Form\SitePageForm
 
         $inputFilter = $this->getInputFilter();
         $inputFilter->add([
-            'name' => 'o-module-language-switcher:related_page',
+            'name' => 'o-module-internationalisation:related_page',
             'required' => false,
         ]);
     }
 
     public function setData($data)
     {
-        if (isset($data['o-module-language-switcher:related_page'])
-            && is_array($data['o-module-language-switcher:related_page'])
+        if (isset($data['o-module-internationalisation:related_page'])
+            && is_array($data['o-module-internationalisation:related_page'])
         ) {
-            $data['o-module-language-switcher:related_page'] = array_map(function ($relatedPage) {
+            $data['o-module-internationalisation:related_page'] = array_map(function ($relatedPage) {
                 return is_numeric($relatedPage)
                     ? $relatedPage
                     : (is_array($relatedPage)
@@ -47,7 +47,7 @@ class SitePageForm extends \Omeka\Form\SitePageForm
                         : (is_object($relatedPage)
                             ? $relatedPage->id()
                             : null));
-            }, $data['o-module-language-switcher:related_page']);
+            }, $data['o-module-internationalisation:related_page']);
         }
 
         return parent::setData($data);

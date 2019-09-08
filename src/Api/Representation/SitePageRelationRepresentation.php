@@ -1,5 +1,5 @@
 <?php
-namespace LanguageSwitcher\Api\Representation;
+namespace Internationalisation\Api\Representation;
 
 use Omeka\Api\Representation\AbstractEntityRepresentation;
 
@@ -7,19 +7,19 @@ class SitePageRelationRepresentation extends AbstractEntityRepresentation
 {
     public function getControllerName()
     {
-        return 'language-switcher';
+        return 'internationalisation';
     }
 
     public function getJsonLdType()
     {
-        return 'o-module-language-switcher:SitePageRelation';
+        return 'o-module-internationalisation:SitePageRelation';
     }
 
     public function getJsonLd()
     {
         return [
             'o:page' => $this->page()->getReference(),
-            'o-module-language-switcher:related_page' => $this->relatedPage()->getReference(),
+            'o-module-internationalisation:related_page' => $this->relatedPage()->getReference(),
         ];
     }
 

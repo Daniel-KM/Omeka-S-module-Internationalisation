@@ -1,8 +1,8 @@
 <?php
-namespace LanguageSwitcher\Service\Form\Element;
+namespace Internationalisation\Service\Form\Element;
 
 use Interop\Container\ContainerInterface;
-use LanguageSwitcher\Form\Element\SitesPageSelect;
+use Internationalisation\Form\Element\SitesPageSelect;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 class SitesPageSelectFactory implements FactoryInterface

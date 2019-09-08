@@ -1,20 +1,20 @@
 <?php
-namespace LanguageSwitcher\Form;
+namespace Internationalisation\Form;
 
 use Omeka\Form\Element\RestoreTextarea;
 use Zend\Form\Fieldset;
 
 class SettingsFieldset extends Fieldset
 {
-    protected $label = 'Language Switcher'; // @translate
+    protected $label = 'Internationalisation'; // @translate
 
     public function init()
     {
-        // See \LanguageSwitcher\Module::handleMainSettings().
+        // See \Internationalisation\Module::handleMainSettings().
         $this
-            ->setAttribute('id', 'languageswitcher')
+            ->setAttribute('id', 'internationalisation')
             ->add([
-                    'name' => 'languageswitcher_site_groups',
+                    'name' => 'internationalisation_site_groups',
                     'type' => RestoreTextarea::class,
                     'options' => [
                         'label' => 'Site groups', // @translate
@@ -23,7 +23,7 @@ class SettingsFieldset extends Fieldset
                     ],
                     'restoreButtonText' => 'Remove all groups', // @translate
                     'attributes' => [
-                        'id' => 'languageswitcher_site_groups',
+                        'id' => 'internationalisation_site_groups',
                         'placeholder' => 'my-site-fra my-site-rus my-site-way
 my-exhibit-fra my-exhibit-rus
 other-exhibit-fra other-exhibit-rus',

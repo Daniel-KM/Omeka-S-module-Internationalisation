@@ -9,7 +9,7 @@
 ?>
 <?php if ($locales): ?>
     <?php $currentLocale = $this->siteSetting('locale') ?: 'en_US'; ?>
-    <ul class="locale-switcher">
+    <ul class="language-switcher">
         <?php foreach ($locales as $locale): ?>
             <?php $country = $this->localeToCountry($locale['locale']); ?>
             <li>

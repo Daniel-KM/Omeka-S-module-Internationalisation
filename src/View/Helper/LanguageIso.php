@@ -1,5 +1,5 @@
 <?php
-namespace LanguageSwitcher\View\Helper;
+namespace Internationalisation\View\Helper;
 
 use Iso639p3;
 use Zend\View\Helper\AbstractHelper;

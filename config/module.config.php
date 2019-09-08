@@ -1,5 +1,5 @@
 <?php
-namespace LanguageSwitcher;
+namespace Internationalisation;
 
 return [
     'api_adapters' => [
@@ -49,9 +49,9 @@ return [
             ],
         ],
     ],
-    'languageswitcher' => [
+    'internationalisation' => [
         'settings' => [
-            'languageswitcher_site_groups' => [],
+            'internationalisation_site_groups' => [],
         ],
     ],
 ];

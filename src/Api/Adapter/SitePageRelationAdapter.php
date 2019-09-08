@@ -1,5 +1,5 @@
 <?php
-namespace LanguageSwitcher\Api\Adapter;
+namespace Internationalisation\Api\Adapter;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -28,24 +28,24 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
 
     public function getRepresentationClass()
     {
-        return \LanguageSwitcher\Api\Representation\SitePageRelationRepresentation::class;
+        return \Internationalisation\Api\Representation\SitePageRelationRepresentation::class;
     }
 
     public function getEntityClass()
     {
-        return \LanguageSwitcher\Entity\SitePageRelation::class;
+        return \Internationalisation\Entity\SitePageRelation::class;
     }
 
     public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore)
     {
-        /** @var \LanguageSwitcher\Entity\SitePageRelation $entity */
+        /** @var \Internationalisation\Entity\SitePageRelation $entity */
         $data = $request->getContent();
         if (Request::CREATE === $request->getOperation()) {
             $sitePageAdapter = $this->getAdapter('site_pages');
             $page = $sitePageAdapter->findEntity($data['o:page']['o:id']);
-            $relatedPage = $sitePageAdapter->findEntity($data['o-module-language-switcher:related_page']['o:id']);
+            $relatedPage = $sitePageAdapter->findEntity($data['o-module-internationalisation:related_page']['o:id']);
             // Useless, but cleaner.
-            if ($data['o:page']['o:id'] > $data['o-module-language-switcher:related_page']['o:id']) {
+            if ($data['o:page']['o:id'] > $data['o-module-internationalisation:related_page']['o:id']) {
                 $entity
                     ->setPage($relatedPage)
                     ->setRelatedPage($page);
@@ -60,14 +60,14 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
 
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
     {
-        /** @var \LanguageSwitcher\Entity\SitePageRelation $entity */
+        /** @var \Internationalisation\Entity\SitePageRelation $entity */
         $page = $entity->getPage();
         $relatedPage = $entity->getRelatedPage();
         if (!$page) {
             $errorStore->addError('o:page', 'A relation between pages must have a page.'); // @translate
         }
         if (!$relatedPage) {
-            $errorStore->addError('o-module-language-switcher:related_page', 'A relation between pages must have a related page.'); // @translate
+            $errorStore->addError('o-module-internationalisation:related_page', 'A relation between pages must have a related page.'); // @translate
         } elseif ($page && $page->getId() === $relatedPage->getId()) {
             $errorStore->addError('o:page', 'The page and the related page of a relation between pages must be different.'); // @translate
         }
