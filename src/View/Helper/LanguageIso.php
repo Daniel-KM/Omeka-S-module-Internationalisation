@@ -14,9 +14,9 @@ class LanguageIso extends AbstractHelper
      * @param string $language
      * @return self|string If language doesn't exist, an empty string is returned.
      */
-    public function __invoke($language = '')
+    public function __invoke($language = null)
     {
-        return empty($language)
+        return is_null($language)
             ? $this
             : Iso639p3::code($language);
     }
