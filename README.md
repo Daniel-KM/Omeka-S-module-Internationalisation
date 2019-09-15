@@ -42,11 +42,15 @@ is to manage sites by group, each of them (sites) with a specific language. So
 even if you have multiple sites, you can translate them all and keep them
 separately by group of sites.
 
-First, in site admin board, set the locale setting for all sites you want to
-translate. It allows to set the language of all pages.
+1. In site admin board
 
-Second, in main settings, set the group of sites, . For example if you have a main
-site and three exhibits, or four sites for different libraries:
+Set the locale setting for all sites you want to translate. It allows to set the
+language of all pages.
+
+2. In main settings
+
+Set the groups of all sites that will be translated. For example if you have a
+main site and three exhibits, or four sites for different libraries:
 
 ```
 my-site-fra, my-site-way, my-site-rus
@@ -54,14 +58,14 @@ my-exhibit-fra, my-exhibit-rus
 other-exhibit-fra, other-exhibit-rus
 fourth-site
 ```
+Here, the first site is available in three languages, the second and third ones
+in two languages and the last is not translated (and can be omitted).
 
-Here, the first site is available in three languages, the second and third in
-two languages and the last is not translated.
+3. In site pages
 
-Third, make the relations between translated pages in each group of sites. For
-that purpose, there is a new field to fill in the site page: the pages that are
-a translation of the current page. So select the related pages and translate
-them.
+Make the relations between translated pages in each group of sites. For that
+purpose, there is a new field to fill in the site page: the pages that are a
+translation of the current page. So select the related pages and translate them.
 
 It’s important to set relations for all pages, else the language switcher will
 display a "page doesn’t exist" error if the user browse to it. Furthemore, it is
@@ -80,7 +84,7 @@ Then, in public front-end, the visitor can switch between sites via a flag.
 add the view helper somewhere in the file `layout.phtml`, generally in the
 header:
 
-```
+```php
 <?php echo $this->languageSwitcher(); ?>
 <?php // Or better, to make the theme more generic and resilient in case of an upgrade: ?>
 <?php if ($this->getHelperPluginManager()->has('languageSwitcher')) echo $this->languageSwitcher(); ?>
