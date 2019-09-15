@@ -49,7 +49,28 @@ class Module extends AbstractModule
             );
         }
 
-        parent::install($serviceLocator);
+        // If the old module LanguageSwitcher is installedi, uninstall it, but
+        // keep relations.
+
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $serviceLocator->get('Omeka\ModuleManager');
+        $module = $moduleManager->getModule('LanguageSwitcher');
+        if ($module) {
+            $connection = $serviceLocator->get('Omeka\Connection');
+
+            $sql = 'CREATE TABLE site_page_relation_backup AS SELECT * FROM site_page_relation;';
+            $connection->exec($sql);
+            $moduleManager->uninstall($module);
+
+            parent::install($serviceLocator);
+
+            $sql = 'INSERT site_page_relation SELECT * FROM site_page_relation_backup;';
+            $connection->exec($sql);
+            $sql = 'DROP TABLE site_page_relation_backup;';
+            $connection->exec($sql);
+        } else {
+            parent::install($serviceLocator);
+        }
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
