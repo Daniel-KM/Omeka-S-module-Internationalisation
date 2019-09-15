@@ -33,10 +33,16 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\SettingsFieldset::class => Form\SettingsFieldset::class,
+            Form\SimplePageFieldset::class => Form\SimplePageFieldset::class,
         ],
         'factories' => [
             \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
+        ],
+    ],
+    'block_layouts' => [
+        'factories' => [
+            'simplePage' => Service\BlockLayout\SimplePageFactory::class,
         ],
     ],
     'translator' => [
@@ -52,6 +58,9 @@ return [
     'internationalisation' => [
         'settings' => [
             'internationalisation_site_groups' => [],
+        ],
+        'simplePage' => [
+            'page' => null,
         ],
     ],
 ];
