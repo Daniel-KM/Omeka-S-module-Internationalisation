@@ -321,7 +321,7 @@ SQL;
 
         // Clean sites.
         ksort($siteGroups, SORT_NATURAL);
-        $siteGroups = array_filter(array_map(function($group) use ($sites) {
+        $siteGroups = array_filter(array_map(function ($group) use ($sites) {
             $v = array_intersect($group, $sites);
             if (count($v) <= 1) {
                 return [];
@@ -331,7 +331,7 @@ SQL;
         }, array_intersect_key($siteGroups, $sites)));
 
         // Remove sites that belongs to a group and append them.
-        $remaining = array_map(function($site) {
+        $remaining = array_map(function ($site) {
             return [$site];
         }, $sites);
 

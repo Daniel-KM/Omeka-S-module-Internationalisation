@@ -10,7 +10,7 @@ use Zend\View\Helper\AbstractHelper;
  * @todo Override the method value() to display the title and the description in the language of the user.
  * Warning: the privacy of each property should be checked.
  */
- class LocaleValue extends AbstractHelper
+class LocaleValue extends AbstractHelper
 {
     /**
      * Get the values in the site language, or a fallback.

@@ -4,7 +4,7 @@ namespace Internationalisation\View\Helper;
 use Iso639p3;
 use Zend\View\Helper\AbstractHelper;
 
- class LanguageIso extends AbstractHelper
+class LanguageIso extends AbstractHelper
 {
     /**
      * Get a normalized three letters language code from a two or three letters
@@ -30,7 +30,7 @@ use Zend\View\Helper\AbstractHelper;
      * @param string $language
      * @return string If language doesn't exist, an empty string is returned.
      */
-    function code($language)
+    public function code($language)
     {
         return Iso639p3::code($language);
     }
@@ -42,7 +42,7 @@ use Zend\View\Helper\AbstractHelper;
      * @param string $language
      * @return string
      */
-    static function code3letters($language)
+    public static function code3letters($language)
     {
         return Iso639p3::code3letters($language);
     }
@@ -56,7 +56,7 @@ use Zend\View\Helper\AbstractHelper;
      * @param string $language
      * @return string If language doesn't exist, an empty string is returned.
      */
-    static function code2letters($language)
+    public static function code2letters($language)
     {
         return Iso639p3::code2letters($language);
     }
@@ -68,7 +68,7 @@ use Zend\View\Helper\AbstractHelper;
      * @param string $language
      * @return string If language doesn't exist, an empty string is returned.
      */
-    static function name($language)
+    public static function name($language)
     {
         return Iso639p3::name($language);
     }
@@ -80,7 +80,7 @@ use Zend\View\Helper\AbstractHelper;
      * @param string $language
      * @return string If language doesn't exist, an empty string is returned.
      */
-    static function englishName($language)
+    public static function englishName($language)
     {
         return Iso639p3::englishName($language);
     }
@@ -95,7 +95,7 @@ use Zend\View\Helper\AbstractHelper;
      * @param string $language
      * @return string If language doesn't exist, an empty string is returned.
      */
-    static function englishInvertedName($language)
+    public static function englishInvertedName($language)
     {
         return Iso639p3::englishInvertedName($language);
     }
