@@ -116,6 +116,12 @@ class SimplePage extends AbstractBlockLayout
         ]);
     }
 
+    public function getFulltextText(PhpRenderer $view, SitePageBlockRepresentation $block)
+    {
+        // TODO Many blocks are not indexed. Why indexing them in simple pages?
+        return strip_tags($this->render($view, $block));
+    }
+
     /**
      * Recursively check if a simple page belongs to itself via recursive blocks.
      *
