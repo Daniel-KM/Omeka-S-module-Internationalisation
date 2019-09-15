@@ -1,0 +1,140 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-16 00:00+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: Module.php:47
+msgid "The composer vendor is not ready."
+msgstr ""
+
+#: Module.php:48
+msgid "See module’s installation documentation."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:486
+#, php-format
+msgid "This module requires the module \"%s\"."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:506
+#, php-format
+msgid "This module requires modules \"%s\"."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:574
+#, php-format
+msgid ""
+"The module \"%s\" was automatically deactivated because the dependencies are "
+"unavailable."
+msgstr ""
+
+#: src/Site/BlockLayout/SimplePage.php:86
+msgid "Choose any page from any site."
+msgstr ""
+
+#: src/Site/BlockLayout/SimplePage.php:87
+msgid ""
+"If a page of a private site is selected, it will be hidden on the public "
+"side."
+msgstr ""
+
+#: src/Site/BlockLayout/SimplePage.php:88
+msgid "The current page and recursive pages are forbidden."
+msgstr ""
+
+#: Module.php:252 src/Form/SettingsFieldset.php:22
+#: src/Form/SettingsFieldset.php:24
+msgid "Remove all groups"
+msgstr ""
+
+#: src/Form/SimplePageFieldset.php:16
+msgid ""
+"Private sites are marked with a \"*\". If a private page is selected, it "
+"will be hidden on the public site. The current page and recursive pages are "
+"forbidden."
+msgstr ""
+
+#: src/Form/SitePageForm.php:17
+msgid "Translations"
+msgstr ""
+
+#: src/Form/SitePageForm.php:18
+msgid ""
+"The selected pages will be translations of the current page within a site "
+"group, that must be defined. The language switcher displays only one related "
+"page by site."
+msgstr ""
+
+#: src/Form/SitePageForm.php:27
+msgid "Select translations of this page…"
+msgstr ""
+
+#: src/Form/Element/AbstractGroupBySiteSelect.php:168
+msgid "[No site]"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:9
+msgid "Internationalisation"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:20
+msgid "Site groups"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:21
+msgid ""
+"Group some sites with a different language so they can be managed together "
+"as a whole. Set all site slugs by group, one by line, with or without comma "
+"separator."
+msgstr ""
+
+#: src/Api/Adapter/SitePageRelationAdapter.php:67
+msgid "A relation between pages must have a page."
+msgstr ""
+
+#: src/Api/Adapter/SitePageRelationAdapter.php:70
+msgid "A relation between pages must have a related page."
+msgstr ""
+
+#: src/Api/Adapter/SitePageRelationAdapter.php:72
+msgid ""
+"The page and the related page of a relation between pages must be different."
+msgstr ""
+
+#: src/Site/BlockLayout/SimplePage.php:31
+msgid "Simple page"
+msgstr ""
+
+#: src/Site/BlockLayout/SimplePage.php:39
+msgid "A page should be selected to create a simple page."
+msgstr ""
+
+#: src/Site/BlockLayout/SimplePage.php:44
+msgid "A simple page cannot be inside itself."
+msgstr ""
+
+#: src/Site/BlockLayout/SimplePage.php:52
+#: src/Site/BlockLayout/SimplePage.php:58
+msgid "A simple page cannot use a page that uses it recursively as a block."
+msgstr ""
+
+#: src/Site/BlockLayout/SimplePage.php:103
+#, php-format
+msgid ""
+"Simple page block #%d of page \"%s\" of site \"%s\" should be updated: it "
+"refers to a removed page."
+msgstr ""
