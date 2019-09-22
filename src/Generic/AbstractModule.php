@@ -190,7 +190,15 @@ abstract class AbstractModule extends \Omeka\Module\AbstractModule
         /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $services->get('Omeka\Connection');
         $sql = file_get_contents($filepath);
-        return $connection->exec($sql);
+
+        // Use single statements for execution.
+        // See core commit #2689ce92f.
+        $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
+        foreach ($sqls as $sql) {
+            $result = $connection->exec($sql);
+        }
+
+        return $result;
     }
 
     /**
@@ -587,7 +595,7 @@ abstract class AbstractModule extends \Omeka\Module\AbstractModule
      * @param string $string
      * @return array
      */
-    protected function stringToList($string)
+    public function stringToList($string)
     {
         return array_filter(array_map('trim', explode("\n", $this->fixEndOfLine($string))));
     }

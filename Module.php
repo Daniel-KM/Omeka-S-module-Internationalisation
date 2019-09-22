@@ -283,8 +283,7 @@ SQL;
             ->getContent();
         $sites = array_combine($sites, $sites);
 
-        $groups = str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], $groups);
-        $groups = array_filter(array_map('trim', explode("\n", $groups)));
+        $groups = $this->stringToList($groups);
         foreach ($groups as $group) {
             $group = array_unique(array_filter(array_map('trim', explode(' ', str_replace(',', ' ', $group)))));
             $group = array_intersect($group, $sites);
