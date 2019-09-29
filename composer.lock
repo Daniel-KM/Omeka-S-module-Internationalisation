@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "68a7d822c29adc06757368e54f34819e",
+    "content-hash": "dd5e503930f26628571eeb7bdc4ca263",
     "packages": [
         {
             "name": "components/flag-icon-css",
-            "version": "3.3.0",
+            "version": "3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lipis/flag-icon-css.git",
-                "reference": "b35a579e58c7fdc7c7358d1c4daade7887dc91eb"
+                "reference": "3b6b30073bafe944ea7021b89588dab7818e8aee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lipis/flag-icon-css/zipball/b35a579e58c7fdc7c7358d1c4daade7887dc91eb",
-                "reference": "b35a579e58c7fdc7c7358d1c4daade7887dc91eb",
+                "url": "https://api.github.com/repos/lipis/flag-icon-css/zipball/3b6b30073bafe944ea7021b89588dab7818e8aee",
+                "reference": "3b6b30073bafe944ea7021b89588dab7818e8aee",
                 "shasum": ""
             },
             "type": "component",
@@ -42,7 +42,39 @@
                 }
             ],
             "description": "CSS for vector based country flags",
-            "time": "2019-02-24T11:00:49+00:00"
+            "time": "2019-09-20T09:14:38+00:00"
+        },
+        {
+            "name": "daniel-km/simple-iso-639-3",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Daniel-KM/Simple-ISO-639-3.git",
+                "reference": "1c41349ff7d0ead41e634dfc2357f58b4eac2458"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Daniel-KM/Simple-ISO-639-3/zipball/1c41349ff7d0ead41e634dfc2357f58b4eac2458",
+                "reference": "1c41349ff7d0ead41e634dfc2357f58b4eac2458",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "CECILL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Berthereau",
+                    "email": "daniel.packagist@berthereau.net"
+                }
+            ],
+            "description": "Convert two and three letters language codes and names from official standard sources.",
+            "keywords": [
+                "iso 639",
+                "language code"
+            ],
+            "time": "2019-09-29T22:00:00+00:00"
         },
         {
             "name": "slowprog/composer-copy-file",
