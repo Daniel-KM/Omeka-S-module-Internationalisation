@@ -244,14 +244,14 @@ abstract class AbstractModule extends \Omeka\Module\AbstractModule
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings\Site');
         $api = $services->get('Omeka\ApiManager');
-        $sites = $api->search('sites')->getContent();
-        foreach ($sites as $site) {
-            $settings->setTargetId($site->id());
+        $ids = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+        foreach ($ids as $id) {
+            $settings->setTargetId($id);
             $this->manageAnySettings(
                 $settings,
                 $settingsType,
                 $process,
-                isset($values[$site->id()]) ? $values[$site->id()] : []
+                isset($values[$id]) ? $values[$id] : []
             );
         }
     }
@@ -273,14 +273,14 @@ abstract class AbstractModule extends \Omeka\Module\AbstractModule
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings\User');
         $api = $services->get('Omeka\ApiManager');
-        $users = $api->search('users')->getContent();
-        foreach ($users as $user) {
-            $settings->setTargetId($user->id());
+        $ids = $api->search('users', [], ['returnScalar' => 'id'])->getContent();
+        foreach ($ids as $id) {
+            $settings->setTargetId($id);
             $this->manageAnySettings(
                 $settings,
                 $settingsType,
                 $process,
-                isset($values[$user->id()]) ? $values[$user->id()] : []
+                isset($values[$id]) ? $values[$id] : []
             );
         }
     }
