@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-16 00:00+0200\n"
+"POT-Creation-Date: 2019-09-30 00:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,17 +25,17 @@ msgstr ""
 msgid "See module’s installation documentation."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:486
+#: src/Generic/AbstractModule.php:494
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:506
+#: src/Generic/AbstractModule.php:514
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:574
+#: src/Generic/AbstractModule.php:582
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -56,7 +56,7 @@ msgstr ""
 msgid "The current page and recursive pages are forbidden."
 msgstr ""
 
-#: Module.php:252 src/Form/SettingsFieldset.php:22
+#: Module.php:511 src/Form/SettingsFieldset.php:22
 #: src/Form/SettingsFieldset.php:24
 msgid "Remove all groups"
 msgstr ""
@@ -87,7 +87,7 @@ msgstr ""
 msgid "[No site]"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:9
+#: src/Form/SettingsFieldset.php:9 src/Form/SiteSettingsFieldset.php:15
 msgid "Internationalisation"
 msgstr ""
 
@@ -100,6 +100,63 @@ msgid ""
 "Group some sites with a different language so they can be managed together "
 "as a whole. Set all site slugs by group, one by line, with or without comma "
 "separator."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:23
+msgid "All values"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:24
+msgid "All values, with language of the site first"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:25
+msgid "Only values with the language of the site"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:26
+msgid "Only values with the language of the site, with iso fallback"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:27
+msgid "Only values with the language of the site, with custom fallback"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:30
+msgid ""
+"Display only the values in the specified language. It applies only for "
+"properties that contains at least one value with a language. The option can "
+"be overridden in the theme."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:33
+msgid ""
+"Display only the values in the specified language. This option is available "
+"only when the site has a language."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:41
+msgid "Language of values"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:55
+msgid "Custom language fallbacks"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:56
+msgid ""
+"Specify values to display when a property has no value with the language of "
+"the site. Set one language code by line."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:71
+msgid "Required languages"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:72
+msgid ""
+"Specify values to display in all cases. Values without language are "
+"displayed in all cases. Set one language code by line."
 msgstr ""
 
 #: src/Api/Adapter/SitePageRelationAdapter.php:67
