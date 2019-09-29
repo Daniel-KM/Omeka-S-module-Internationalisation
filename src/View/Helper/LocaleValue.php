@@ -5,7 +5,7 @@ use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Zend\View\Helper\AbstractHelper;
 
 /**
- * @todo Use a filter (rep.value.html or rep.resource.display_values) to display the good locale anywhere, even in admin.
+ * @todo Use a filter (rep.value.html or rep.resource.display_values, entity level) to display the good locale anywhere, even in admin.
  * @todo Override the method value() with a new option for language fallback.
  * @todo Override the method value() to display the title and the description in the language of the user.
  * Warning: the privacy of each property should be checked.
@@ -13,21 +13,24 @@ use Zend\View\Helper\AbstractHelper;
 class LocaleValue extends AbstractHelper
 {
     /**
-     * Get the values in the site language, or a fallback.
+     * Get the values in the site or specified languages, or a fallback.
      *
      * @see \Omeka\Api\Representation\AbstractResourceEntityRepresentation::value()
+     *
+     * @todo Manage internationalisation settings of the site.
      *
      * @param AbstractResourceEntityRepresentation $resource
      * @param string $term The prefix:local_part
      * @param array $options
-     * - type: (null) Get values of this type only. Valid types are "literal",
-     *   "uri", and "resource". Returns all types by default.
+     * - type: (null) Get values of this type or these types only. Default valid
+     *   types are "literal", "uri", "resource", "resource:item",
+     *   "resource:media", and "resource:itemset. Returns all types by default.
      * - all: (false) If true, returns all values that match criteria. If false,
      *   returns the first matching value.
      * - default: (null) Default value if no values match criteria. Returns null
      *   by default.
-     * - lang: (null) Get values of this language only. Returns values of all
-     *   languages by default.
+     * - lang: (null) Get values of this language or these languages only.
+     *   Returns values of all languages by default.
      * - fallbacks: (array) Ordered list of fallbacks for the language. An empty
      *   string is a fallback for values without language.
      * @return \Omeka\Api\Representation\ValueRepresentation|\Omeka\Api\Representation\ValueRepresentation[]|mixed
@@ -56,43 +59,55 @@ class LocaleValue extends AbstractHelper
         $values = $values[$term]['values'];
 
         // Match only the representations that fit all the criteria.
-        $optionType = !is_null($options['type']);
-        $optionLang = !is_null($options['lang']);
-
-        // Order values by language.
-        if ($optionLang && $options['fallbacks']) {
-            $valuesByLang = [];
-            foreach ($values as $value) {
-                if ($optionType && $value->type() !== $options['type']) {
-                    continue;
-                }
-                $valuesByLang[$value->lang()][] = $value;
-            }
-
-            if (isset($valuesByLang[$options['lang']])) {
-                $matchingValues = $valuesByLang[$options['lang']];
-            } else {
-                // Keep only values with fallbacks and order them by fallbacks,
-                // and take only the first not empty.
-                $fallbacks = array_fill_keys($options['fallbacks'], null);
-                $matchingValues = array_filter(
-                    array_replace(
-                        $fallbacks,
-                        array_intersect_key($valuesByLang, $fallbacks)
-                    )
-                );
-                $matchingValues = $matchingValues ? reset($matchingValues) : [];
-            }
-        } elseif ($optionType || $optionLang) {
+        $optionType = !empty($options['type']);
+        $optionLang = !empty($options['lang']);
+        if ($optionType || $optionLang) {
             $matchingValues = [];
-            foreach ($values as $value) {
-                if ($optionType && $value->type() !== $options['type']) {
-                    continue;
+            // Prepare options for quicker match.
+            // Note: isset() is quicker than in_array(), even with small arrays.
+            if ($optionType) {
+                $types = is_array($options['type']) ? $options['type'] : [$options['type']];
+                $types = array_fill_keys($types, true);
+            }
+            if ($optionLang) {
+                $langs = is_array($options['lang']) ? $options['lang'] : [$options['lang']];
+                $langs = array_fill_keys($langs, true);
+            }
+
+            // Order values by language.
+            if ($optionLang && $options['fallbacks']) {
+                $fallbacks = is_array($options['fallbacks']) ? $options['fallbacks'] : [$options['fallbacks']];
+                $fallbacks = array_fill_keys(array_filter($fallbacks), true);
+                $fallbacks[''] = true;
+
+                // Keep only values with lang and fallbacks and order them by langs
+                // and fallbacks directly.
+                $valuesByLang = array_fill_keys(array_keys($langs + $fallbacks), []);
+                foreach ($values as $value) {
+                    if ($optionType && !isset($types[$value->type()])) {
+                        continue;
+                    }
+                    $valuesByLang[$value->lang()][] = $value;
                 }
-                if ($optionLang && $value->lang() !== $options['lang']) {
-                    continue;
+                $valuesByLang = array_filter($valuesByLang);
+
+                $matchingValues = array_intersect_key($valuesByLang, $langs);
+                if (count($matchingValues)) {
+                    $matchingValues = array_merge(...array_values($matchingValues));
+                } else {
+                    $matchingValues = array_intersect_key($valuesByLang, $fallbacks);
+                    $matchingValues = $matchingValues ? reset($matchingValues) : [];
                 }
-                $matchingValues[] = $value;
+            } else {
+                foreach ($values as $value) {
+                    if ($optionType && !isset($types[$value->type()])) {
+                        continue;
+                    }
+                    if ($optionLang && !isset($langs[$value->lang()])) {
+                        continue;
+                    }
+                    $matchingValues[] = $value;
+                }
             }
         } else {
             $matchingValues = $values;
