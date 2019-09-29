@@ -1,6 +1,8 @@
 <?php
 namespace Internationalisation\View\Helper;
 
+require_once dirname(dirname(dirname(__DIR__))) . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
+
 use Iso639p3;
 use Zend\View\Helper\AbstractHelper;
 

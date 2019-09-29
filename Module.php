@@ -3,7 +3,7 @@ namespace Internationalisation;
 
 if (!class_exists(\Generic\AbstractModule::class)) {
     require file_exists(dirname(__DIR__) . '/Generic/AbstractModule.php')
-       ? dirname(__DIR__) . '/Generic/AbstractModule.php'
+        ? dirname(__DIR__) . '/Generic/AbstractModule.php'
         : __DIR__ . '/src/Generic/AbstractModule.php';
 }
 
@@ -81,6 +81,27 @@ class Module extends AbstractModule
             [$this, 'handleViewLayoutPublic']
         );
 
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\ItemRepresentation::class,
+            'rep.resource.display_values',
+            [$this, 'handleResourceDisplayValues']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\ItemSetRepresentation::class,
+            'rep.resource.display_values',
+            [$this, 'handleResourceDisplayValues']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\MediaRepresentation::class,
+            'rep.resource.display_values',
+            [$this, 'handleResourceDisplayValues']
+        );
+        $sharedEventManager->attach(
+            \Annotate\Api\Representation\AnnotationRepresentation::class,
+            'rep.resource.display_values',
+            [$this, 'handleResourceDisplayValues']
+        );
+
         // Add the related pages to the representation of the pages.
         $sharedEventManager->attach(
             \Omeka\Api\Representation\SitePageRepresentation::class,
@@ -104,6 +125,16 @@ class Module extends AbstractModule
             'form.add_input_filters',
             [$this, 'handleMainSettingsFilters']
         );
+        $sharedEventManager->attach(
+            \Omeka\Form\SiteSettingsForm::class,
+            'form.add_elements',
+            [$this, 'handleSiteSettings']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Form\SiteSettingsForm::class,
+            'form.add_input_filters',
+            [$this, 'handleSiteSettingsFilters']
+        );
     }
 
     public function handleViewLayoutPublic(Event $event)
@@ -117,6 +148,98 @@ class Module extends AbstractModule
         $view->headLink()
             ->appendStylesheet($assetUrl('css/language-switcher.css', 'Internationalisation'))
             ->appendStylesheet($assetUrl('vendor/flag-icon-css/css/flag-icon.min.css', 'Internationalisation'));
+    }
+
+    public function handleResourceDisplayValues(Event $event)
+    {
+        $services = $this->getServiceLocator();
+        $status = $services->get('Omeka\Status');
+        if (!$status->isSiteRequest()) {
+            return;
+        }
+
+        /** @var \Omeka\Settings\SiteSettings $siteSettings */
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $locale = $siteSettings->get('locale');
+        if (empty($locale)) {
+            return;
+        }
+
+        $options = $event->getParam('options');
+
+        $displayValues = isset($options['display_values'])
+            ? $options['display_values']
+            : $siteSettings->get('internationalisation_display_values', 'all');
+        if ($displayValues === 'all') {
+            return;
+        }
+
+        // Check if the property has at least one language (not creator, identifier, etc.).
+        /** @var \Omeka\Api\Representation\ValueRepresentation[] $valueRepresentations */
+        $hasLanguage = function(array $valueRepresentations) {
+            foreach ($valueRepresentations as $valueRepresentation) {
+                if ($valueRepresentation->lang()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        if ($displayValues !== 'site_lang') {
+            $fallbacks = isset($options['fallbacks'])
+                ? $options['fallbacks']
+                : $siteSettings->get('internationalisation_fallbacks', []);
+            array_unshift($fallbacks, $locale);
+            // Add a fallback for values without language in all cases.
+            // TODO Set an option for fallbacks to values without language?
+            $fallbacks[] = '';
+            $fallbacks = array_fill_keys(array_unique($fallbacks), null);
+        }
+
+        $values = $event->getParam('values');
+        foreach ($values as /* $term => */ &$valueInfo) {
+            if (!$hasLanguage($valueInfo['values'])) {
+                continue;
+            }
+
+            switch ($displayValues) {
+                case 'site_lang':
+                    $valueInfo['values'] = array_filter($valueInfo['values'], function($v) use ($locale) {
+                        return $v->lang() === $locale;
+                    });
+                    break;
+
+                case 'site_fallback':
+                    $valuesByLang = [];
+                    foreach ($valueInfo['values'] as $value) {
+                        $valuesByLang[$value->lang()][] = $value;
+                    }
+
+                    // Keep only values with fallbacks and order them by fallbacks,
+                    // and take only the first not empty.
+                    $matchingValues = array_filter(
+                        array_replace(
+                            $fallbacks,
+                            array_intersect_key($valuesByLang, $fallbacks)
+                        )
+                    );
+                    $valueInfo['values'] = $matchingValues ? reset($matchingValues) : [];
+                    break;
+
+                case 'all_ordered':
+                    $valuesByLang = [];
+                    foreach ($valueInfo['values'] as $value) {
+                        $valuesByLang[$value->lang()][] = $value;
+                    }
+                    $valueInfo['values'] = array_filter(array_replace($fallbacks, $valuesByLang));
+                    break;
+
+                default:
+                    return;
+            }
+        }
+
+        $event->setParam('values', $values);
     }
 
     public function filterJsonLd(Event $event)
@@ -265,6 +388,46 @@ SQL;
                         'name' => \Zend\Filter\Callback::class,
                         'options' => [
                             'callback' => [$this, 'filterSiteGroups'],
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
+    public function handleSiteSettings(Event $event)
+    {
+        parent::handleSiteSettings($event);
+
+        $services = $this->getServiceLocator();
+
+        $space = strtolower(__NAMESPACE__);
+
+        $settings = $services->get('Omeka\Settings\Site');
+        $list = $settings->get('internationalisation_fallbacks') ?: [];
+
+        /**
+         * @var \Omeka\Form\Element\RestoreTextarea $siteGroupsElement
+         * @var \Internationalisation\Form\SettingsFieldset $fieldset
+         */
+        $fieldset = $event->getTarget()
+            ->get($space);
+        $fieldset
+            ->get('internationalisation_fallbacks')
+            ->setValue(implode("\n", $list));
+    }
+
+    public function handleSiteSettingsFilters(Event $event)
+    {
+        $inputFilter = $event->getParam('inputFilter');
+        $inputFilter->get('internationalisation')
+            ->add([
+                'name' => 'internationalisation_fallbacks',
+                'required' => false,
+                'filters' => [
+                    [
+                        'name' => \Zend\Filter\Callback::class,
+                        'options' => [
+                            'callback' => [$this, 'stringToList'],
                         ],
                     ],
                 ],

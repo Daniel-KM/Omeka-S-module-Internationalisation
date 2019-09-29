@@ -36,8 +36,9 @@ return [
             Form\SimplePageFieldset::class => Form\SimplePageFieldset::class,
         ],
         'factories' => [
-            \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
+            Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
+            \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
         ],
     ],
     'block_layouts' => [
@@ -58,6 +59,10 @@ return [
     'internationalisation' => [
         'settings' => [
             'internationalisation_site_groups' => [],
+        ],
+        'site_settings' => [
+            'internationalisation_display_values' => 'all',
+            'internationalisation_fallbacks' => [],
         ],
         'simplePage' => [
             'page' => null,
