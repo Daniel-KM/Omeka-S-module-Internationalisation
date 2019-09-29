@@ -33,6 +33,8 @@ the module to `Internationalisation`, go to the root of the module, and run:
 composer install
 ```
 
+**Important**: Read below to display all translations for interface and metadata.
+
 
 Usage
 -----
@@ -45,7 +47,9 @@ separately by group of sites.
 1. In site admin board
 
 Set the locale setting for all sites you want to translate. It allows to set the
-language of all pages.
+language of all pages. Furthermore, set the options you want for the display of
+the values of internationalised properties of the resources in the section
+Internationalisation.
 
 2. In main settings
 
@@ -80,7 +84,13 @@ all the sites too (about, terms and conditions…).
 
 Then, in public front-end, the visitor can switch between sites via a flag.
 
-**Important**: the language switcher is not added automatically to the theme. So
+
+Integration of the module
+-------------------------
+
+### Interface
+
+The language switcher is not added automatically to the theme. So you need to
 add the view helper somewhere in the file `layout.phtml`, generally in the
 header:
 
@@ -93,12 +103,63 @@ header:
 The partial `common/language-switcher.phtml` view can be themed: simply copy it
 in your theme and customize it.
 
+### Properties
+
+The display of the translated properties requires some manual changes to be
+displayed. There are two ways to get translated properties: the first one
+requires to add five lines of code in the core, the second one implies many
+changes in the theme, Only one of them is needed, so choose the one according to
+your needs.
+
+#### Modification of the core
+
+Insert this snippet line 279 (Omeka S version 1.4) in [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]:
+```php
+        ...
+        $this->values = $sortedValues + $values;
+
+        // Added code for module Internationalisation 3.2.0 and above.
+        $eventManager = $this->getEventManager();
+        $args = $eventManager->prepareArgs(['values' => $this->values]);
+        $eventManager->trigger('rep.resource.values', $this, $args);
+        $this->values = $args['values'];
+
+        return $this->values;
+    }
+```
+
+By this way, the internationalised values will be used anywhere in front-end.
+
+#### Modification in the theme
+
+Each time that the theme displays a value or a list of values of a resource, the
+code should use the helper `localeValue()`. This is the case in many places:
+
+```php
+// Replace:
+echo $item->value('dcterms:title');
+// By:
+$localeValue = $this->plugin('localeValue');
+echo $localeValue($item, 'dcterms:title'));
+
+// To replace with $localeValue().
+echo $item->displayTitle();
+echo $item->displayDescription();
+
+// To replace by a manual hyperlink.
+echo $item->linkPretty();
+```
+
+Only the method `$resource->displayValues()` is automatically managed.
+
+Note that the template `common/resource-values.phtml` may need to be updated,
+because with some settings, all values of a property can be removed.
+
 
 TODO
 ----
 
 - Return original page when it is not translated in a site, instead of an error.
-- Add options to manage multilanguage property values (various ways).
 - Add links for easier browsing between translated pages.
 - Add a button to duplicate a site (item pool, pages and navigation, relations).
 - Add a button to duplicate a page or to append blocks of a page to another one.
@@ -175,7 +236,7 @@ This module was built for the site [Watau], that will be released soon.
 [`Generic`]: https://github.com/Daniel-KM/Omeka-S-module-Generic
 [`Internationalisation.zip`]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/releases
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
-[Next]: https://github.com/Daniel-KM/Omeka-S-module-Next
+[`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
