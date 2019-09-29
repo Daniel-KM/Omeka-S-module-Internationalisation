@@ -46,9 +46,8 @@ class SiteSettingsFieldset extends Fieldset
                     'id' => 'internationalisation_display_values',
                     'class' => 'chosen-select',
                 ],
-            ]);
+            ])
 
-        $this
             ->add([
                 'name' => 'internationalisation_fallbacks',
                 'type' => Element\Textarea::class,
@@ -62,6 +61,21 @@ class SiteSettingsFieldset extends Fieldset
 fra
 fre
 fr'
+                ],
+            ])
+
+            ->add([
+                'name' => 'internationalisation_required_languages',
+                'type' => Element\Textarea::class,
+                'options' => [
+                    'label' => 'Required languages', // @translate
+                    'info' => 'Specify values to display in all cases. Values without language are displayed in all cases. Set one language code by line.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'internationalisation_required_languages',
+                    'placeholder' => 'apy
+way
+fra'
                 ],
             ]);
     }

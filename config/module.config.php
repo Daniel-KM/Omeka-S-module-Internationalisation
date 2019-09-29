@@ -63,6 +63,7 @@ return [
         'site_settings' => [
             'internationalisation_display_values' => 'all',
             'internationalisation_fallbacks' => [],
+            'internationalisation_required_languages' => [],
         ],
         'simplePage' => [
             'page' => null,

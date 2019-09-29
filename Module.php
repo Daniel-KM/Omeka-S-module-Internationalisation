@@ -158,9 +158,9 @@ class Module extends AbstractModule
             return;
         }
 
-        /** @var \Omeka\Settings\SiteSettings $siteSettings */
-        $siteSettings = $services->get('Omeka\Settings\Site');
-        $locale = $siteSettings->get('locale');
+        /** @var \Omeka\Settings\SiteSettings $settings */
+        $settings = $services->get('Omeka\Settings\Site');
+        $locale = $settings->get('locale');
         if (empty($locale)) {
             return;
         }
@@ -169,7 +169,7 @@ class Module extends AbstractModule
 
         $displayValues = isset($options['display_values'])
             ? $options['display_values']
-            : $siteSettings->get('internationalisation_display_values', 'all');
+            : $settings->get('internationalisation_display_values', 'all');
         if ($displayValues === 'all') {
             return;
         }
@@ -186,16 +186,22 @@ class Module extends AbstractModule
         };
 
         // Prepare the locales.
+        $requiredLanguages = isset($options['required_languages'])
+            ? $options['required_languages']
+            : $settings->get('internationalisation_required_languages', []);
+
         switch ($displayValues) {
             case 'site_fallback':
             case 'all_ordered':
-                $fallbacks = isset($options['fallbacks'])
+                $fallbacks = [$locale];
+                $fallbacks += isset($options['fallbacks'])
                     ? $options['fallbacks']
-                    : $siteSettings->get('internationalisation_fallbacks', []);
-                array_unshift($fallbacks, $locale);
-                // Add a fallback for values without language in all cases.
-                // TODO Set an option for fallbacks to values without language?
+                    : $settings->get('internationalisation_fallbacks', []);
+                $fallbacks += $requiredLanguages;
                 $fallbacks = array_fill_keys(array_unique(array_filter($fallbacks)), null);
+                // Add a fallback for values without language in all cases,
+                // because in many cases default language is not set.
+                // TODO Set an option to not fallback to values without language?
                 $fallbacks[''] = null;
                 break;
 
@@ -203,11 +209,15 @@ class Module extends AbstractModule
                 require_once 'vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
                 $fallbacks = [$locale];
                 $fallbacks += \Iso639p3::codes($locale);
+                $fallbacks += $requiredLanguages;
                 $fallbacks = array_fill_keys(array_unique(array_filter($fallbacks)), null);
                 $fallbacks[''] = null;
                 break;
 
             case 'site_lang':
+                $fallbacks = [$locale] + $requiredLanguages;
+                $fallbacks = array_fill_keys(array_unique(array_filter($fallbacks)), null);
+                $fallbacks[''] = null;
                 break;
 
             default:
@@ -223,8 +233,8 @@ class Module extends AbstractModule
 
             switch ($displayValues) {
                 case 'site_lang':
-                    $valueInfo['values'] = array_filter($valueInfo['values'], function($v) use ($locale) {
-                        return $v->lang() === $locale;
+                    $valueInfo['values'] = array_filter($valueInfo['values'], function($v) use ($fallbacks) {
+                        return isset($fallbacks[$v->lang()]);
                     });
                     break;
 
@@ -423,7 +433,6 @@ SQL;
         $space = strtolower(__NAMESPACE__);
 
         $settings = $services->get('Omeka\Settings\Site');
-        $list = $settings->get('internationalisation_fallbacks') ?: [];
 
         /**
          * @var \Omeka\Form\Element\RestoreTextarea $siteGroupsElement
@@ -431,8 +440,13 @@ SQL;
          */
         $fieldset = $event->getTarget()
             ->get($space);
+        $list = $settings->get('internationalisation_fallbacks') ?: [];
         $fieldset
             ->get('internationalisation_fallbacks')
+            ->setValue(implode("\n", $list));
+        $list = $settings->get('internationalisation_required_languages') ?: [];
+        $fieldset
+            ->get('internationalisation_required_languages')
             ->setValue(implode("\n", $list));
     }
 
@@ -442,6 +456,18 @@ SQL;
         $inputFilter->get('internationalisation')
             ->add([
                 'name' => 'internationalisation_fallbacks',
+                'required' => false,
+                'filters' => [
+                    [
+                        'name' => \Zend\Filter\Callback::class,
+                        'options' => [
+                            'callback' => [$this, 'stringToList'],
+                        ],
+                    ],
+                ],
+            ])
+            ->add([
+                'name' => 'internationalisation_required_languages',
                 'required' => false,
                 'filters' => [
                     [

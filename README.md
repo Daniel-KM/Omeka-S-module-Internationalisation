@@ -101,8 +101,10 @@ TODO
 - Add options to manage multilanguage property values (various ways).
 - Add links for easier browsing between translated pages.
 - Add a button to duplicate a site (item pool, pages and navigation, relations).
-- Add a button to apply settings of another site (except language).
-- Add automatic setection of the site with the browser language.
+- Add a button to duplicate a page or to append blocks of a page to another one.
+- Add a button to apply settings of another site (except translatable content).
+- Add automatic selection of the site with the browser language.
+- Manage sites by group instead of sync manually.
 
 
 Warning
