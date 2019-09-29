@@ -44,7 +44,7 @@ class LanguageIso extends AbstractHelper
      * @param string $language
      * @return string
      */
-    public static function code3letters($language)
+    public function code3letters($language)
     {
         return Iso639p3::code3letters($language);
     }
@@ -58,9 +58,27 @@ class LanguageIso extends AbstractHelper
      * @param string $language
      * @return string If language doesn't exist, an empty string is returned.
      */
-    public static function code2letters($language)
+    public function code2letters($language)
     {
         return Iso639p3::code2letters($language);
+    }
+
+    /**
+     * Get all variant codes of a language (generally only one, except some
+     * languages).
+     *
+     * Examples: fr_FR => [fr, fra, fre]; or Français => [fr, fra, fre].
+     *
+     * @uses Iso639p3::codes()
+     * @param string $language
+     * @return array
+     */
+    function codes($language)
+    {
+        $code = self::code($language);
+        return $code
+            ? array_keys(self::CODES, $code)
+            : [];
     }
 
     /**
@@ -70,7 +88,7 @@ class LanguageIso extends AbstractHelper
      * @param string $language
      * @return string If language doesn't exist, an empty string is returned.
      */
-    public static function name($language)
+    public function name($language)
     {
         return Iso639p3::name($language);
     }
@@ -82,7 +100,7 @@ class LanguageIso extends AbstractHelper
      * @param string $language
      * @return string If language doesn't exist, an empty string is returned.
      */
-    public static function englishName($language)
+    public function englishName($language)
     {
         return Iso639p3::englishName($language);
     }
@@ -97,7 +115,7 @@ class LanguageIso extends AbstractHelper
      * @param string $language
      * @return string If language doesn't exist, an empty string is returned.
      */
-    public static function englishInvertedName($language)
+    public function englishInvertedName($language)
     {
         return Iso639p3::englishInvertedName($language);
     }
