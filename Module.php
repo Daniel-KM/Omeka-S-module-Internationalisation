@@ -165,7 +165,11 @@ class Module extends AbstractModule
             return;
         }
 
-        $options = $event->getParam('options');
+        $options = $event->getParam('options', []) + [
+            'display_values' => null,
+            'fallbacks' => [],
+            'required_languages' => [],
+        ];
 
         $displayValues = isset($options['display_values'])
             ? $options['display_values']
@@ -174,22 +178,15 @@ class Module extends AbstractModule
             return;
         }
 
-        // Check if the property has at least one language (not creator, identifier, etc.).
-        /** @var \Omeka\Api\Representation\ValueRepresentation[] $valueRepresentations */
-        $hasLanguage = function(array $valueRepresentations) {
-            foreach ($valueRepresentations as $valueRepresentation) {
-                if ($valueRepresentation->lang()) {
-                    return true;
-                }
-            }
-            return false;
-        };
+        $requiredLanguages = isset($options['required_languages'])
+            ? $options['required_languages']
+            : $settings->get('internationalisation_required_languages', []);
 
         // Prepare the locales.
         $locales = [$locale];
         switch ($displayValues) {
-            case 'site_fallback':
             case 'all_ordered':
+            case 'site_fallback':
                 $locales += isset($options['fallbacks'])
                     ? $options['fallbacks']
                     : $settings->get('internationalisation_fallbacks', []);
@@ -207,54 +204,54 @@ class Module extends AbstractModule
                 return;
         }
 
-        $requiredLanguages = isset($options['required_languages'])
-            ? $options['required_languages']
-            : $settings->get('internationalisation_required_languages', []);
         $locales += $requiredLanguages;
-        $locales = array_fill_keys(array_unique(array_filter($locales)), null);
+        $locales = array_fill_keys(array_unique(array_filter($locales)), []);
         // Add a fallback for values without language in all cases,
         // because in many cases default language is not set.
         // TODO Set an option to not fallback to values without language?
-        $locales[''] = null;
+        $locales[''] = [];
 
         // Filter appropriate locales for each property when it is localisable.
         $values = $event->getParam('values');
         foreach ($values as /* $term => */ &$valueInfo) {
-            if (!$hasLanguage($valueInfo['values'])) {
+            $valuesByLang = $locales;
+            foreach ($valueInfo['values'] as $value) {
+                $valuesByLang[$value->lang()][] = $value;
+            }
+            $valuesByLang = array_filter($valuesByLang);
+
+            // Check if the property has at least one language (not identifier,
+            // etc.).
+            if (!count($valuesByLang)
+                || (count($valuesByLang) === 1 && isset($valuesByLang['']))
+            ) {
                 continue;
             }
 
             switch ($displayValues) {
                 case 'site_lang':
-                    $valueInfo['values'] = array_filter($valueInfo['values'], function($v) use ($locales) {
-                        return isset($locales[$v->lang()]);
-                    });
+                case 'site_lang_iso':
+                    $vals = array_intersect_key($valuesByLang, $locales);
+                    $valueInfo['values'] = $vals
+                        ? array_merge(...array_values($vals))
+                        : [];
                     break;
 
-                case 'site_lang_iso':
                 case 'site_fallback':
-                    $valuesByLang = [];
-                    foreach ($valueInfo['values'] as $value) {
-                        $valuesByLang[$value->lang()][] = $value;
+                    // Keep only values with fallbacks and take only the first
+                    // non empty and the required ones.
+                    $vals = array_intersect_key($valuesByLang, $locales);
+                    If ($vals) {
+                        $vals = array_slice($vals, 0, 1, true);
                     }
-
-                    // Keep only values with fallbacks and order them by fallbacks,
-                    // and take only the first not empty.
-                    $matchingValues = array_filter(
-                        array_replace(
-                            $locales,
-                            array_intersect_key($valuesByLang, $locales)
-                        )
-                    );
-                    $valueInfo['values'] = $matchingValues ? reset($matchingValues) : [];
+                    $vals += array_intersect_key($valuesByLang, $requiredLanguages);
+                    $valueInfo['values'] = $vals
+                        ? array_merge(...array_values($vals))
+                        : [];
                     break;
 
                 case 'all_ordered':
-                    $valuesByLang = [];
-                    foreach ($valueInfo['values'] as $value) {
-                        $valuesByLang[$value->lang()][] = $value;
-                    }
-                    $valueInfo['values'] = array_filter(array_replace($locales, $valuesByLang));
+                    $valueInfo['values'] = array_merge(...array_values($valuesByLang));
                     break;
 
                 default:
