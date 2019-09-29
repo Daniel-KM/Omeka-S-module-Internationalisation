@@ -186,45 +186,39 @@ class Module extends AbstractModule
         };
 
         // Prepare the locales.
-        $requiredLanguages = isset($options['required_languages'])
-            ? $options['required_languages']
-            : $settings->get('internationalisation_required_languages', []);
-
+        $locales = [$locale];
         switch ($displayValues) {
             case 'site_fallback':
             case 'all_ordered':
-                $fallbacks = [$locale];
-                $fallbacks += isset($options['fallbacks'])
+                $locales += isset($options['fallbacks'])
                     ? $options['fallbacks']
                     : $settings->get('internationalisation_fallbacks', []);
-                $fallbacks += $requiredLanguages;
-                $fallbacks = array_fill_keys(array_unique(array_filter($fallbacks)), null);
-                // Add a fallback for values without language in all cases,
-                // because in many cases default language is not set.
-                // TODO Set an option to not fallback to values without language?
-                $fallbacks[''] = null;
                 break;
 
             case 'site_lang_iso':
                 require_once 'vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
-                $fallbacks = [$locale];
-                $fallbacks += \Iso639p3::codes($locale);
-                $fallbacks += $requiredLanguages;
-                $fallbacks = array_fill_keys(array_unique(array_filter($fallbacks)), null);
-                $fallbacks[''] = null;
+                $locales += \Iso639p3::codes($locale);
                 break;
 
             case 'site_lang':
-                $fallbacks = [$locale] + $requiredLanguages;
-                $fallbacks = array_fill_keys(array_unique(array_filter($fallbacks)), null);
-                $fallbacks[''] = null;
+                // Nothing to do.
                 break;
 
             default:
                 return;
         }
 
-        // Select the appropriate locales for each property when it's localisable.
+        $requiredLanguages = isset($options['required_languages'])
+            ? $options['required_languages']
+            : $settings->get('internationalisation_required_languages', []);
+        $locales += $requiredLanguages;
+        $locales = array_fill_keys(array_unique(array_filter($locales)), null);
+        // Add a fallback for values without language in all cases,
+        // because in many cases default language is not set.
+        // TODO Set an option to not fallback to values without language?
+        $locales[''] = null;
+
+        // Filter appropriate locales for each property when it is localisable.
         $values = $event->getParam('values');
         foreach ($values as /* $term => */ &$valueInfo) {
             if (!$hasLanguage($valueInfo['values'])) {
@@ -233,8 +227,8 @@ class Module extends AbstractModule
 
             switch ($displayValues) {
                 case 'site_lang':
-                    $valueInfo['values'] = array_filter($valueInfo['values'], function($v) use ($fallbacks) {
-                        return isset($fallbacks[$v->lang()]);
+                    $valueInfo['values'] = array_filter($valueInfo['values'], function($v) use ($locales) {
+                        return isset($locales[$v->lang()]);
                     });
                     break;
 
@@ -249,8 +243,8 @@ class Module extends AbstractModule
                     // and take only the first not empty.
                     $matchingValues = array_filter(
                         array_replace(
-                            $fallbacks,
-                            array_intersect_key($valuesByLang, $fallbacks)
+                            $locales,
+                            array_intersect_key($valuesByLang, $locales)
                         )
                     );
                     $valueInfo['values'] = $matchingValues ? reset($matchingValues) : [];
@@ -261,7 +255,7 @@ class Module extends AbstractModule
                     foreach ($valueInfo['values'] as $value) {
                         $valuesByLang[$value->lang()][] = $value;
                     }
-                    $valueInfo['values'] = array_filter(array_replace($fallbacks, $valuesByLang));
+                    $valueInfo['values'] = array_filter(array_replace($locales, $valuesByLang));
                     break;
 
                 default:
