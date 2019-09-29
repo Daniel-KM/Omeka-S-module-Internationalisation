@@ -62,6 +62,7 @@ return [
         ],
         'site_settings' => [
             'internationalisation_display_values' => 'all',
+            'internationalisation_iso_codes' => [],
             'internationalisation_fallbacks' => [],
             'internationalisation_required_languages' => [],
         ],

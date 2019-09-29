@@ -196,8 +196,7 @@ class Module extends AbstractModule
                 break;
 
             case 'site_lang_iso':
-                require_once 'vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
-                $locales += \Iso639p3::codes($locale);
+                $locales += $settings->get('internationalisation_iso_codes', []);
                 break;
 
             case 'site_lang':
@@ -442,6 +441,23 @@ SQL;
         $fieldset
             ->get('internationalisation_required_languages')
             ->setValue(implode("\n", $list));
+
+        // For performance, save iso codes when choice is "site_lang_iso".
+        // It's not possible to save it simply after validation, so add it here,
+        // since the form is always reloaded after submission.
+        $displayValues = $settings->get('internationalisation_display_values', 'all');
+        if ($displayValues !== 'site_lang_iso') {
+            return;
+        }
+
+        $locale = $settings->get('locale');
+        if (empty($locale)) {
+            return;
+        }
+
+        require_once 'vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
+        $locales = \Iso639p3::codes($locale);
+        $settings->set('internationalisation_iso_codes', $locales);
     }
 
     public function handleSiteSettingsFilters(Event $event)
