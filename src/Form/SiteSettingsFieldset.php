@@ -60,7 +60,7 @@ class SiteSettingsFieldset extends Fieldset
                     'placeholder' => 'way
 fra
 fre
-fr'
+fr',
                 ],
             ])
 
@@ -75,7 +75,7 @@ fr'
                     'id' => 'internationalisation_required_languages',
                     'placeholder' => 'apy
 way
-fra'
+fra',
                 ],
             ]);
     }

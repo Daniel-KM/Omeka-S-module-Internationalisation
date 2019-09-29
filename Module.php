@@ -357,7 +357,7 @@ class Module extends AbstractModule
                     // Keep only values with fallbacks and take only the first
                     // non empty and the required ones.
                     $vals = array_intersect_key($valuesByLang, $locales);
-                    If ($vals) {
+                    if ($vals) {
                         $vals = array_slice($vals, 0, 1, true);
                     }
                     $vals += array_intersect_key($valuesByLang, $requiredLanguages);

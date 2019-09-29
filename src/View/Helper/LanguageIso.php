@@ -73,7 +73,7 @@ class LanguageIso extends AbstractHelper
      * @param string $language
      * @return array
      */
-    function codes($language)
+    public function codes($language)
     {
         $code = self::code($language);
         return $code
