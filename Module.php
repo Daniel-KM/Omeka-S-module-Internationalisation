@@ -185,17 +185,36 @@ class Module extends AbstractModule
             return false;
         };
 
-        if ($displayValues !== 'site_lang') {
-            $fallbacks = isset($options['fallbacks'])
-                ? $options['fallbacks']
-                : $siteSettings->get('internationalisation_fallbacks', []);
-            array_unshift($fallbacks, $locale);
-            // Add a fallback for values without language in all cases.
-            // TODO Set an option for fallbacks to values without language?
-            $fallbacks[] = '';
-            $fallbacks = array_fill_keys(array_unique($fallbacks), null);
+        // Prepare the locales.
+        switch ($displayValues) {
+            case 'site_fallback':
+            case 'all_ordered':
+                $fallbacks = isset($options['fallbacks'])
+                    ? $options['fallbacks']
+                    : $siteSettings->get('internationalisation_fallbacks', []);
+                array_unshift($fallbacks, $locale);
+                // Add a fallback for values without language in all cases.
+                // TODO Set an option for fallbacks to values without language?
+                $fallbacks = array_fill_keys(array_unique(array_filter($fallbacks)), null);
+                $fallbacks[''] = null;
+                break;
+
+            case 'site_lang_iso':
+                require_once 'vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
+                $fallbacks = [$locale];
+                $fallbacks += \Iso639p3::codes($locale);
+                $fallbacks = array_fill_keys(array_unique(array_filter($fallbacks)), null);
+                $fallbacks[''] = null;
+                break;
+
+            case 'site_lang':
+                break;
+
+            default:
+                return;
         }
 
+        // Select the appropriate locales for each property when it's localisable.
         $values = $event->getParam('values');
         foreach ($values as /* $term => */ &$valueInfo) {
             if (!$hasLanguage($valueInfo['values'])) {
@@ -209,6 +228,7 @@ class Module extends AbstractModule
                     });
                     break;
 
+                case 'site_lang_iso':
                 case 'site_fallback':
                     $valuesByLang = [];
                     foreach ($valueInfo['values'] as $value) {

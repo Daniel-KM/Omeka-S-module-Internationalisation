@@ -23,13 +23,14 @@ class SiteSettingsFieldset extends Fieldset
                 'all' => 'All values', // @translate
                 'all_ordered' => 'All values, with language of the site first', // @translate
                 'site_lang' => 'Only values with the language of the site', // @translate
-                'site_fallback' => 'Only values with the language of the site, with fallback', // @translate
+                'site_lang_iso' => 'Only values with the language of the site, with iso fallback', // @translate
+                'site_fallback' => 'Only values with the language of the site, with custom fallback', // @translate
                 // 'user_defined' => 'User choice in the public front-end (if theme allows it)', // @translate
             ];
-            $info = 'Display only the values in the language of the site. It applies only for properties that contains at least one value with a language. The option can be overridden in the theme'; // @translate
+            $info = 'Display only the values in the specified language. It applies only for properties that contains at least one value with a language. The option can be overridden in the theme.'; // @translate
         } else {
             $valueOptions = [];
-            $info = 'Display only the values in the language of the site. This option is available only when the site has a language.'; // @translate
+            $info = 'Display only the values in the specified language. This option is available only when the site has a language.'; // @translate
         }
 
         $this
@@ -52,7 +53,7 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'internationalisation_fallbacks',
                 'type' => Element\Textarea::class,
                 'options' => [
-                    'label' => 'Language fallbacks', // @translate
+                    'label' => 'Custom language fallbacks', // @translate
                     'info' => 'Specify values to display when a property has no value with the language of the site. Set one language code by line.', // @translate
                 ],
                 'attributes' => [
