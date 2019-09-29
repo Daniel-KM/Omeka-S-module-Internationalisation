@@ -81,6 +81,29 @@ class Module extends AbstractModule
             [$this, 'handleViewLayoutPublic']
         );
 
+        // Handle order of values according to settings.
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\ItemRepresentation::class,
+            'rep.resource.values',
+            [$this, 'handleResourceValues']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\ItemSetRepresentation::class,
+            'rep.resource.values',
+            [$this, 'handleResourceValues']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\MediaRepresentation::class,
+            'rep.resource.values',
+            [$this, 'handleResourceValues']
+        );
+        $sharedEventManager->attach(
+            \Annotate\Api\Representation\AnnotationRepresentation::class,
+            'rep.resource.values',
+            [$this, 'handleResourceValues']
+        );
+
+        // Handle filter of values according to settings.
         $sharedEventManager->attach(
             \Omeka\Api\Representation\ItemRepresentation::class,
             'rep.resource.display_values',
@@ -150,6 +173,83 @@ class Module extends AbstractModule
             ->appendStylesheet($assetUrl('vendor/flag-icon-css/css/flag-icon.min.css', 'Internationalisation'));
     }
 
+    /**
+     * Order values of each properties according to settings.
+     *
+     * @param Event $event
+     */
+    public function handleResourceValues(Event $event)
+    {
+        // Currently limited to public front-end.
+        // TODO In admin, use the user settings or add some main settings.
+        $services = $this->getServiceLocator();
+        $status = $services->get('Omeka\Status');
+        if (!$status->isSiteRequest()) {
+            return;
+        }
+
+        /** @var \Omeka\Settings\SiteSettings $settings */
+        $settings = $services->get('Omeka\Settings\Site');
+        $locale = $settings->get('locale');
+        if (empty($locale)) {
+            return;
+        }
+
+        $displayValues = $settings->get('internationalisation_display_values', 'all');
+        if ($displayValues === 'all') {
+            return;
+        }
+
+        // Prepare the locales.
+        $locales = [$locale];
+        switch ($displayValues) {
+            case 'site_lang_iso':
+                $locales += $settings->get('internationalisation_iso_codes', []);
+                break;
+
+            case 'site_fallback':
+            case 'all_ordered':
+                $locales += $settings->get('internationalisation_fallbacks', []);
+                break;
+
+            case 'site_lang':
+                // Nothing to do.
+                break;
+
+            default:
+                return;
+        }
+
+        $requiredLanguages = $settings->get('internationalisation_required_languages', []);
+        $locales += $requiredLanguages;
+        $locales = array_fill_keys(array_unique(array_filter($locales)), []);
+
+        // Add a fallback for values without language in all cases,
+        // because in many cases default language is not set.
+        // TODO Set an option to not fallback to values without language?
+        $locales[''] = [];
+
+        // Order values for each property according to settings.
+        $values = $event->getParam('values');
+        foreach ($values as /* $term => */ &$valueInfo) {
+            $valuesByLang = $locales;
+            foreach ($valueInfo['values'] as $value) {
+                $valuesByLang[$value->lang()][] = $value;
+            }
+            $valuesByLang = array_filter($valuesByLang);
+            $valueInfo['values'] = $valuesByLang
+                ? array_merge(...array_values($valuesByLang))
+                : [];
+        }
+
+        $event->setParam('values', $values);
+    }
+
+    /**
+     * Filter values of each properties according to settings.
+     *
+     * @param Event $event
+     */
     public function handleResourceDisplayValues(Event $event)
     {
         $services = $this->getServiceLocator();
@@ -164,6 +264,8 @@ class Module extends AbstractModule
         if (empty($locale)) {
             return;
         }
+
+        // Note: the values are already ordered by lang in previous event.
 
         $options = $event->getParam('options', []) + [
             'display_values' => null,
@@ -186,6 +288,19 @@ class Module extends AbstractModule
         $locales = [$locale];
         switch ($displayValues) {
             case 'all_ordered':
+                $fallbacks = isset($options['fallbacks'])
+                    ? $options['fallbacks']
+                    : $settings->get('internationalisation_fallbacks', []);
+                // Don't process if passed options are the same.
+                $isProcessed = $options['display_values'] === $displayValues
+                    && $options['required_languages'] === $requiredLanguages
+                    && $options['fallbacks'] === $fallbacks;
+                if ($isProcessed) {
+                    return;
+                }
+                $locales += $fallbacks;
+                break;
+
             case 'site_fallback':
                 $locales += isset($options['fallbacks'])
                     ? $options['fallbacks']
@@ -214,6 +329,7 @@ class Module extends AbstractModule
         // Filter appropriate locales for each property when it is localisable.
         $values = $event->getParam('values');
         foreach ($values as /* $term => */ &$valueInfo) {
+            // TODO This loop is already done in previous event. Cache result?
             $valuesByLang = $locales;
             foreach ($valueInfo['values'] as $value) {
                 $valuesByLang[$value->lang()][] = $value;
