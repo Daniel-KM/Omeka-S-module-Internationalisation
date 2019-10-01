@@ -29,7 +29,9 @@ class SiteSettingsFieldset extends Fieldset
             ];
             $info = 'Display only the values in the specified language. It applies only for properties that contains at least one value with a language. The option can be overridden in the theme.'; // @translate
         } else {
-            $valueOptions = [];
+            $valueOptions = [
+                'all' => 'All values', // @translate
+            ];
             $info = 'Display only the values in the specified language. This option is available only when the site has a language.'; // @translate
         }
 
