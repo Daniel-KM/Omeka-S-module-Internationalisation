@@ -66,8 +66,10 @@ return [
             'internationalisation_fallbacks' => [],
             'internationalisation_required_languages' => [],
         ],
-        'simplePage' => [
-            'page' => null,
+        'block_settings' => [
+            'simplePage' => [
+                'page' => null,
+            ],
         ],
     ],
 ];
