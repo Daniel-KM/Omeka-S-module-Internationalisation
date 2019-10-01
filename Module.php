@@ -174,7 +174,7 @@ class Module extends AbstractModule
     }
 
     /**
-     * Order values of each properties according to settings.
+     * Order values of each property according to settings.
      *
      * @param Event $event
      */
@@ -246,7 +246,7 @@ class Module extends AbstractModule
     }
 
     /**
-     * Filter values of each properties according to settings.
+     * Filter values of each property according to settings.
      *
      * @param Event $event
      */
