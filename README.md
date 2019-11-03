@@ -111,7 +111,7 @@ requires to add five lines of code in the core, the second one implies many
 changes in the theme, Only one of them is needed, so choose the one according to
 your needs.
 
-#### Modification of the core
+#### Modification of the core (for Omeka <= 2.0.2)
 
 Insert this snippet line 279 (Omeka S version 1.4) in [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]:
 ```php
@@ -130,7 +130,7 @@ Insert this snippet line 279 (Omeka S version 1.4) in [`application/src/Api/Repr
 
 By this way, the internationalised values will be used anywhere in front-end.
 
-#### Modification in the theme
+#### Modification in the theme (useless for Omeka > 2.0.2)
 
 Each time that the theme displays a value or a list of values of a resource, the
 code should use the helper `localeValue()`. This is the case in many places:
