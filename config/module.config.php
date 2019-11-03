@@ -30,6 +30,11 @@ return [
             'languageSwitcher' => Service\ViewHelper\LanguageSwitcherFactory::class,
         ],
     ],
+    'block_layouts' => [
+        'factories' => [
+            'simplePage' => Service\BlockLayout\SimplePageFactory::class,
+        ],
+    ],
     'form_elements' => [
         'invokables' => [
             Form\SettingsFieldset::class => Form\SettingsFieldset::class,
@@ -39,11 +44,6 @@ return [
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
             \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
-        ],
-    ],
-    'block_layouts' => [
-        'factories' => [
-            'simplePage' => Service\BlockLayout\SimplePageFactory::class,
         ],
     ],
     'translator' => [
