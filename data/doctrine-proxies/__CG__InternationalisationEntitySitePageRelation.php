@@ -64,10 +64,10 @@ class SitePageRelation extends \Internationalisation\Entity\SitePageRelation imp
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'page', 'relatedPage'];
+            return ['__isInitialized__', 'id', 'page', 'relatedPage'];
         }
 
-        return ['__isInitialized__', 'page', 'relatedPage'];
+        return ['__isInitialized__', 'id', 'page', 'relatedPage'];
     }
 
     /**
@@ -178,6 +178,10 @@ class SitePageRelation extends \Internationalisation\Entity\SitePageRelation imp
      */
     public function getId()
     {
+        if ($this->__isInitialized__ === false) {
+            return (int)  parent::getId();
+        }
+
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getId', []);
 

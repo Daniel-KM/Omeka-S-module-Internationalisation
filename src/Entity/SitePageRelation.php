@@ -34,12 +34,34 @@ use Omeka\Entity\SitePage;
 
 /**
  * @Entity
+ * @Table(
+ *     uniqueConstraints={
+ *         @UniqueConstraint(
+ *             name="site_page_relation_idx",
+ *             columns={
+ *                 "page_id",
+ *                 "related_page_id"
+ *             }
+ *         )
+ *     }
+ * )
  */
 class SitePageRelation extends AbstractEntity
 {
     /**
-     * @var \Omeka\Entity\SitePage
+     * @var int
+     *
+     * This id is required, because Doctrine 2.6 doesn't manage composite primary key.
+     * @see https://github.com/doctrine/orm/issues/6333
+     *
      * @Id
+     * @Column(type="integer")
+     * @GeneratedValue
+     */
+    protected $id;
+
+    /**
+     * @var \Omeka\Entity\SitePage
      * @ManyToOne(
      *     targetEntity="\Omeka\Entity\SitePage"
      * )
@@ -52,7 +74,6 @@ class SitePageRelation extends AbstractEntity
 
     /**
      * @var \Omeka\Entity\SitePage
-     * @Id
      * @ManyToOne(
      *     targetEntity="\Omeka\Entity\SitePage"
      * )
@@ -65,7 +86,7 @@ class SitePageRelation extends AbstractEntity
 
     public function getId()
     {
-        return $this->page->getId() . '_' . $this->relatedPage->getId();
+        return $this->id;
     }
 
     /**

@@ -32,3 +32,18 @@ if (version_compare($oldVersion, '3.2.0', '<')) {
             $config[$space]['site_settings']['internationalisation_required_languages']);
     }
 }
+
+if (version_compare($oldVersion, '3.2.4', '<')) {
+    $sql = <<<SQL
+ ALTER TABLE site_page_relation DROP PRIMARY KEY;
+ ALTER TABLE site_page_relation ADD id INT AUTO_INCREMENT NOT NULL UNIQUE FIRST;
+ CREATE UNIQUE INDEX site_page_relation_idx ON site_page_relation (page_id, related_page_id);
+ ALTER TABLE site_page_relation ADD PRIMARY KEY (id);
+SQL;
+    // Use single statements for execution.
+    // See core commit #2689ce92f.
+    $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
+    foreach ($sqls as $sql) {
+        $connection->exec($sql);
+    }
+}

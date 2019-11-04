@@ -11,7 +11,6 @@ use Generic\AbstractModule;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Module extends AbstractModule
 {
@@ -38,38 +37,16 @@ class Module extends AbstractModule
             );
     }
 
-    public function install(ServiceLocatorInterface $serviceLocator)
+    protected function preInstall()
     {
         $vendor = __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
         if (!file_exists($vendor)) {
-            $t = $serviceLocator->get('MvcTranslator');
+            $services = $this->getServiceLocator();
+            $t = $services->get('MvcTranslator');
             throw new \Omeka\Module\Exception\ModuleCannotInstallException(
                 $t->translate('The composer vendor is not ready.') // @translate
-                . ' ' . $t->translate('See module’s installation documentation.') // @translate
+                    . ' ' . $t->translate('See module’s installation documentation.') // @translate
             );
-        }
-
-        // If the old module LanguageSwitcher is installedi, uninstall it, but
-        // keep relations.
-
-        /** @var \Omeka\Module\Manager $moduleManager */
-        $moduleManager = $serviceLocator->get('Omeka\ModuleManager');
-        $module = $moduleManager->getModule('LanguageSwitcher');
-        if ($module) {
-            $connection = $serviceLocator->get('Omeka\Connection');
-
-            $sql = 'CREATE TABLE site_page_relation_backup AS SELECT * FROM site_page_relation;';
-            $connection->exec($sql);
-            $moduleManager->uninstall($module);
-
-            parent::install($serviceLocator);
-
-            $sql = 'INSERT site_page_relation SELECT * FROM site_page_relation_backup;';
-            $connection->exec($sql);
-            $sql = 'DROP TABLE site_page_relation_backup;';
-            $connection->exec($sql);
-        } else {
-            parent::install($serviceLocator);
         }
     }
 
@@ -457,7 +434,7 @@ SQL;
 
         // Add all pairs.
         $sql = <<<SQL
-INSERT INTO site_page_relation
+INSERT INTO site_page_relation (page_id, related_page_id)
 VALUES
 SQL;
 
