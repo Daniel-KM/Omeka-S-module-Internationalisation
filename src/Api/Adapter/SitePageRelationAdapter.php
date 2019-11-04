@@ -235,6 +235,9 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         $countQb = clone $qb;
         $countQb->select('1')->resetDQLPart('orderBy');
         $countPaginator = new Paginator($countQb, false);
+        // @see https://stackoverflow.com/questions/36199027/not-all-identifier-properties-can-be-found-in-the-resultsetmapping
+        // @see https://github.com/doctrine/orm/issues/2596
+        $countPaginator->setUseOutputWalkers(false);
 
         // Add the ORDER BY clause. Always sort by entity ID in addition to any
         // sorting the adapters add.
