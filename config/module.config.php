@@ -46,6 +46,11 @@ return [
             \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
         ],
     ],
+    'controller_plugins' => [
+        'factories' => [
+            'listSiteGroups' => Service\ControllerPlugin\ListSiteGroupsFactory::class,
+        ],
+    ],
     'translator' => [
         'translation_file_patterns' => [
             [
