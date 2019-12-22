@@ -2,6 +2,14 @@
 namespace Internationalisation;
 
 return [
+    'listeners' => [
+        Mvc\MvcListeners::class,
+    ],
+    'service_manager' => [
+        'invokables' => [
+            Mvc\MvcListeners::class => Mvc\MvcListeners::class,
+        ],
+    ],
     'api_adapters' => [
         'invokables' => [
             'site_page_relations' => Api\Adapter\SitePageRelationAdapter::class,
