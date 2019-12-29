@@ -160,6 +160,7 @@ class Module extends AbstractModule
         // Currently limited to public front-end.
         // TODO In admin, use the user settings or add some main settings.
         $services = $this->getServiceLocator();
+        /** @var \Omeka\Mvc\Status $status */
         $status = $services->get('Omeka\Status');
         if (!$status->isSiteRequest()) {
             return;
@@ -167,7 +168,14 @@ class Module extends AbstractModule
 
         /** @var \Omeka\Settings\SiteSettings $settings */
         $settings = $services->get('Omeka\Settings\Site');
-        $locale = $settings->get('locale');
+
+        // FIXME Remove the exception that occurs with background job and api during update: job seems to set status as site.
+        try {
+            $locale = $settings->get('locale');
+        } catch (\Exception $e) {
+            // Probably background process.
+            return;
+        }
         if (empty($locale)) {
             return;
         }
