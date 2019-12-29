@@ -243,6 +243,6 @@ This module was built for the site [Watau], that will be released soon.
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
 [flag icons]: https://github.com/lipis/flag-icon-css
-[Watau]: https://watau.org
+[Watau]: https://watau.fr
 [BibLibre]: https://github.com/BibLibre
 [Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
