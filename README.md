@@ -108,10 +108,13 @@ in your theme and customize it.
 The display of the translated properties requires some manual changes to be
 displayed. There are two ways to get translated properties: the first one
 requires to add five lines of code in the core, the second one implies many
-changes in the theme, Only one of them is needed, so choose the one according to
-your needs.
+changes in the theme. Only one of them is needed, so choose the one according to
+your needs. Note that the method `displayTitle()` cannot be used to get the
+translated title in Omeka 2.
 
-#### Modification of the core (for Omeka <= 2.0.2)
+#### Via the core
+
+##### Modification of the core (for Omeka <= 2.0.2)
 
 Insert this snippet line 279 (Omeka S version 1.4) in [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]:
 ```php
@@ -130,7 +133,35 @@ Insert this snippet line 279 (Omeka S version 1.4) in [`application/src/Api/Repr
 
 By this way, the internationalised values will be used anywhere in front-end.
 
-#### Modification in the theme (useless for Omeka > 2.0.2)
+##### Modification of the core (for Omeka >= 2.0)
+
+Include patch [#1495] in the same file [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]:
+
+```php
+    public function displayTitle($default = null)
+    {
+        $template = $this->resourceTemplate();
+        if ($template && $template->titleProperty()) {
+            $title = $this->value($template->titleProperty()->term());
+            if (null !== $title) {
+                return $title;
+            }
+        }
+
+        if ($default === null) {
+            $translator = $this->getServiceLocator()->get('MvcTranslator');
+            $default = $translator->translate('[Untitled]');
+        }
+
+        return (string) $this->value('dcterms:title', [
+            'default' => $default,
+        ]);
+    }
+```
+
+#### Via the theme
+
+##### Modification in the theme (Omeka <= 2.0.2 ; all versions for the title)
 
 Each time that the theme displays a value or a list of values of a resource, the
 code should use the helper `localeValue()`. This is the case in many places:
@@ -140,7 +171,7 @@ code should use the helper `localeValue()`. This is the case in many places:
 echo $item->value('dcterms:title');
 // By:
 $localeValue = $this->plugin('localeValue');
-echo $localeValue($item, 'dcterms:title'));
+echo $localeValue($item, 'dcterms:title');
 
 // To replace with $localeValue().
 echo $item->displayTitle();
@@ -154,6 +185,7 @@ Only the method `$resource->displayValues()` is automatically managed.
 
 Note that the template `common/resource-values.phtml` may need to be updated,
 because with some settings, all values of a property can be removed.
+
 
 ### API
 
@@ -172,7 +204,7 @@ TODO
 ----
 
 - Return original page when it is not translated in a site, instead of an error.
-- Fix $resource->displayTitle()
+- Fix $resource->displayTitle() ([#1495])
 - Add links for easier browsing between translated pages.
 - Add a button to duplicate a site (item pool, pages and navigation, relations).
 - Add a button to duplicate a page or to append blocks of a page to another one.
@@ -254,6 +286,8 @@ This module was built for [Watau].
 [`Internationalisation.zip`]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/releases
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
+[`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L489
+[#1495]: https://github.com/omeka/omeka-s/pull/1495/files
 [ApiInfo]: https://github.com/Daniel-KM/Omeka-S-module-ApiInfo
 [Next]: https://github.com/Daniel-KM/Omeka-S-module-Next
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/issues
