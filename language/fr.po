@@ -1,0 +1,230 @@
+# Copyright (C) YEAR THE PACKAGE’S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Daniel Berthereau <Daniel.github@Berthereau.net>, 2020.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-30 00:00+0200\n"
+"PO-Revision-Date: 2020-01-06 00:00+0100\n"
+"Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
+"Language-Team: French <kde-i18n-doc@kde.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 2.2.4\n"
+
+#: Module.php:47
+msgid "The composer vendor is not ready."
+msgstr "Le dossier /vendor de composer n’est pas prêt."
+
+#: Module.php:48
+msgid "See module’s installation documentation."
+msgstr "Consulter la documentation d’installation du module."
+
+#: src/Generic/AbstractModule.php:494
+#, php-format
+msgid "This module requires the module \"%s\"."
+msgstr "Ce module requiert le module \"%s\"."
+
+#: src/Generic/AbstractModule.php:514
+#, php-format
+msgid "This module requires modules \"%s\"."
+msgstr "Ce module requiert les modules \"%s\"."
+
+#: src/Generic/AbstractModule.php:582
+#, php-format
+msgid ""
+"The module \"%s\" was automatically deactivated because the dependencies are "
+"unavailable."
+msgstr ""
+"Le module %s\" a été automatiquement désactivé car ses dépendances ne sont "
+"plus disponibles."
+
+#: src/Site/BlockLayout/SimplePage.php:86
+msgid "Choose any page from any site."
+msgstr "Choisir une page de n’importe quel site."
+
+#: src/Site/BlockLayout/SimplePage.php:87
+msgid ""
+"If a page of a private site is selected, it will be hidden on the public "
+"side."
+msgstr ""
+"Si une page d’un site privé est choisie, elle sera cachée dans la partie "
+"publique."
+
+#: src/Site/BlockLayout/SimplePage.php:88
+msgid "The current page and recursive pages are forbidden."
+msgstr ""
+"La page en cours ou qui se trouve récursivement dans une autre page ne peut "
+"être choisie."
+
+#: Module.php:511 src/Form/SettingsFieldset.php:22
+#: src/Form/SettingsFieldset.php:24
+msgid "Remove all groups"
+msgstr "Supprimer tous les groupes"
+
+#: src/Form/SimplePageFieldset.php:16
+msgid ""
+"Private sites are marked with a \"*\". If a private page is selected, it "
+"will be hidden on the public site. The current page and recursive pages are "
+"forbidden."
+msgstr ""
+"Les sites privés sont indiqués avec une \"*\". Si une page privée est "
+"choisie, elle sera cachée au public. La page courante et les pages qui la "
+"contiennent récursivement sont interdites."
+
+#: src/Form/SitePageForm.php:17
+msgid "Translations"
+msgstr "Traductions"
+
+#: src/Form/SitePageForm.php:18
+msgid ""
+"The selected pages will be translations of the current page within a site "
+"group, that must be defined. The language switcher displays only one related "
+"page by site."
+msgstr ""
+"Les pages choisies seront des traductions de la page courante à l’intérieur "
+"du groupe de sites, qui doit être défini. Le sélecteur de langue affiche "
+"seulement une page liée par site."
+
+#: src/Form/SitePageForm.php:27
+msgid "Select translations of this page…"
+msgstr "Choisir les traductions de cette page…"
+
+#: src/Form/Element/AbstractGroupBySiteSelect.php:168
+msgid "[No site]"
+msgstr "[Aucun site]"
+
+#: src/Form/SettingsFieldset.php:9 src/Form/SiteSettingsFieldset.php:15
+msgid "Internationalisation"
+msgstr "Internationalisation"
+
+#: src/Form/SettingsFieldset.php:20
+msgid "Site groups"
+msgstr "Groupes de sites"
+
+#: src/Form/SettingsFieldset.php:21
+msgid ""
+"Group some sites with a different language so they can be managed together "
+"as a whole. Set all site slugs by group, one by line, with or without comma "
+"separator."
+msgstr ""
+"Permet de grouper plusieurs sites avec une langue différente de façon à les "
+"gérer ensemble. Indiquer tous les chemins des sites, un par ligne avec un "
+"espace ou une virgule pour les séparer."
+
+#: src/Form/SiteSettingsFieldset.php:23
+msgid "All values"
+msgstr "Toutes les valeurs"
+
+#: src/Form/SiteSettingsFieldset.php:24
+msgid "All values, with language of the site first"
+msgstr "Toutes les valeurs, avec le language du site en premier"
+
+#: src/Form/SiteSettingsFieldset.php:25
+msgid "Only values with the language of the site"
+msgstr "Seulement les valeurs correspondant à la langue du site"
+
+#: src/Form/SiteSettingsFieldset.php:26
+msgid "Only values with the language of the site, with iso fallback"
+msgstr ""
+"Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
+"ayant les codes iso correspondant"
+
+#: src/Form/SiteSettingsFieldset.php:27
+msgid "Only values with the language of the site, with custom fallback"
+msgstr ""
+"Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
+"ayant les langues ci-dessous"
+
+#: src/Form/SiteSettingsFieldset.php:30
+msgid ""
+"Display only the values in the specified language. It applies only for "
+"properties that contains at least one value with a language. The option can "
+"be overridden in the theme."
+msgstr ""
+"Afficher seulement les valeurs dans la langue choisie. Cela s’applique "
+"seulement aux propriétés qui contiennent au moins une valeur avec une "
+"langue. Cette option peut être contournée par le thème."
+
+#: src/Form/SiteSettingsFieldset.php:33
+msgid ""
+"Display only the values in the specified language. This option is available "
+"only when the site has a language."
+msgstr ""
+"Afficher seulement les valeurs dans la langue choisie. Cette option est "
+"disponible seulement si le site a une langue."
+
+#: src/Form/SiteSettingsFieldset.php:41
+msgid "Language of values"
+msgstr "Langue des valeurs"
+
+#: src/Form/SiteSettingsFieldset.php:55
+msgid "Custom language fallbacks"
+msgstr "Langues de repli"
+
+#: src/Form/SiteSettingsFieldset.php:56
+msgid ""
+"Specify values to display when a property has no value with the language of "
+"the site. Set one language code by line."
+msgstr ""
+"Indique les valeurs à afficher quand une propriété n’a pas de valeur dans la "
+"langue du site. Indiquer une langue par ligne."
+
+#: src/Form/SiteSettingsFieldset.php:71
+msgid "Required languages"
+msgstr "Langues obligatoires"
+
+#: src/Form/SiteSettingsFieldset.php:72
+msgid ""
+"Specify values to display in all cases. Values without language are "
+"displayed in all cases. Set one language code by line."
+msgstr ""
+"Indique les valeurs à afficher dans tous les cas. Les valeurs sans langue "
+"sont affichées dans tous les cas. Indiquer un code de langue par ligne."
+
+#: src/Api/Adapter/SitePageRelationAdapter.php:67
+msgid "A relation between pages must have a page."
+msgstr "Une relation entre des pages doit avoir une page."
+
+#: src/Api/Adapter/SitePageRelationAdapter.php:70
+msgid "A relation between pages must have a related page."
+msgstr "Une relation entre pages doit avoir une page liée."
+
+#: src/Api/Adapter/SitePageRelationAdapter.php:72
+msgid ""
+"The page and the related page of a relation between pages must be different."
+msgstr ""
+"La page et la page liée d’une relation entre pages doivent être différentes."
+
+#: src/Site/BlockLayout/SimplePage.php:31
+msgid "Simple page"
+msgstr "Page simple"
+
+#: src/Site/BlockLayout/SimplePage.php:39
+msgid "A page should be selected to create a simple page."
+msgstr "Une page doit être sélectionnée pour créer une page simple."
+
+#: src/Site/BlockLayout/SimplePage.php:44
+msgid "A simple page cannot be inside itself."
+msgstr "Une page simple ne peut pas être à l’intérieur d’elle-même."
+
+#: src/Site/BlockLayout/SimplePage.php:52
+#: src/Site/BlockLayout/SimplePage.php:58
+msgid "A simple page cannot use a page that uses it recursively as a block."
+msgstr ""
+"Une page simple ne peut pas utiliser une page qui l’utilise récursivement à "
+"l’intérieur d’un bloc."
+
+#: src/Site/BlockLayout/SimplePage.php:103
+#, php-format
+msgid ""
+"Simple page block #%d of page \"%s\" of site \"%s\" should be updated: it "
+"refers to a removed page."
+msgstr ""
+"Le bloc Page simple #%d de la page \"%s\" du site \"%s\" doit être mis à "
+"jour : il renvoie à une page supprimée."
