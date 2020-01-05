@@ -11,7 +11,7 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 Installation
 ------------
 
-This module requires the module [`Generic`] installed first.
+This module may use the optional module [`Generic`] if installed.
 
 The module uses external libraries, so use the release zip to install it, or use
 and init the source.
@@ -155,17 +155,34 @@ Only the method `$resource->displayValues()` is automatically managed.
 Note that the template `common/resource-values.phtml` may need to be updated,
 because with some settings, all values of a property can be removed.
 
+### API
+
+To get the list of all the translations of the interface, you can use the module
+[ApiInfo] and go to https://example.org/api/infos/translations?locale=fr.
+
+For a better output (or for people who don’t have a json viewer integrated to
+browser), you can add "&pretty_print=1" to the url. For a still better output,
+you can use the module [Next] that doesn’t escape unicode characters by default
+(waiting for upstream pull request [omeka/omeka-s#1493]).
+
+Note that Omeka doesn’t separate admin and public strings.
+
 
 TODO
 ----
 
 - Return original page when it is not translated in a site, instead of an error.
+- Fix $resource->displayTitle()
 - Add links for easier browsing between translated pages.
 - Add a button to duplicate a site (item pool, pages and navigation, relations).
 - Add a button to duplicate a page or to append blocks of a page to another one.
 - Add a button to apply settings of another site (except translatable content).
 - Add automatic selection of the site with the browser language.
 - Manage sites by group instead of sync manually.
+- Add a view to display all the languages that are used.
+- Add a bulk edit to normalize all languages, so fallbacks won't be necessary in
+  most of the cases.
+- Add a view to manage fallbacks (site settings?).
 
 
 Warning
@@ -222,9 +239,9 @@ The [flag icons] are released under the MIT license.
 Copyright
 ---------
 
-This module was built for the site [Watau], that will be released soon.
+This module was built for [Watau].
 
-* Copyright Daniel Berthereau, 2019 (see [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2019-2020 (see [Daniel-KM] on GitHub)
 * Copyright BibLibre, 2017 (see [BibLibre] on Github), for the switcher
 
 
@@ -237,6 +254,8 @@ This module was built for the site [Watau], that will be released soon.
 [`Internationalisation.zip`]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/releases
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
+[ApiInfo]: https://github.com/Daniel-KM/Omeka-S-module-ApiInfo
+[Next]: https://github.com/Daniel-KM/Omeka-S-module-Next
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
