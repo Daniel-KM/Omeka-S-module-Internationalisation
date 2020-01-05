@@ -8,10 +8,32 @@ use Zend\View\Helper\AbstractHelper;
  * @todo Use a filter (rep.value.html or rep.resource.display_values, entity level) to display the good locale anywhere, even in admin.
  * @todo Override the method value() with a new option for language fallback.
  * @todo Override the method value() to display the title and the description in the language of the user.
+ * @todo Override the method title() to display the title in the selected language.
+ *
  * Warning: the privacy of each property should be checked.
  */
 class LocaleValue extends AbstractHelper
 {
+    /**
+     * @var array
+     */
+    protected $defaultLocales;
+
+    /**
+     * @var array
+     */
+    protected $defaultFallbacks;
+
+    /**
+     * @param string $defaultLocale
+     * @param array $defaultFallbacks
+     */
+    public function __construct($defaultLocale, array $defaultFallbacks)
+    {
+        $this->defaultLocale = $defaultLocale ? [$defaultLocale] : [];
+        $this->defaultFallbacks = $defaultFallbacks;
+    }
+
     /**
      * Get the values in the site or specified languages, or a fallback.
      *
@@ -30,9 +52,11 @@ class LocaleValue extends AbstractHelper
      * - default: (null) Default value if no values match criteria. Returns null
      *   by default.
      * - lang: (null) Get values of this language or these languages only.
-     *   Returns values of all languages by default.
+     *   Returns values of all languages by default. If true, use the locale of
+     *   the site and its fallbacks.
      * - fallbacks: (array) Ordered list of fallbacks for the language. An empty
-     *   string is a fallback for values without language.
+     *   string is a fallback for values without language. When lang is true,
+     *   this option is skipped in order to use the site settings.
      * @return \Omeka\Api\Representation\ValueRepresentation|\Omeka\Api\Representation\ValueRepresentation[]|mixed
      */
     public function __invoke(AbstractResourceEntityRepresentation $resource, $term, array $options = [])
@@ -70,7 +94,12 @@ class LocaleValue extends AbstractHelper
                 $types = array_fill_keys($types, true);
             }
             if ($optionLang) {
-                $langs = is_array($options['lang']) ? $options['lang'] : [$options['lang']];
+                if ($options['lang'] === true) {
+                    $langs = $this->defaultLocale;
+                    $options['fallbacks'] = $this->defaultFallbacks;
+                } else {
+                    $langs = is_array($options['lang']) ? $options['lang'] : [$options['lang']];
+                }
                 $langs = array_fill_keys($langs, true);
             }
 

@@ -31,11 +31,11 @@ return [
     'view_helpers' => [
         'invokables' => [
             'localeToCountry' => View\Helper\LocaleToCountry::class,
-            'localeValue' => View\Helper\LocaleValue::class,
         ],
         'factories' => [
             'languageIso' => Service\ViewHelper\LanguageIsoFactory::class,
             'languageSwitcher' => Service\ViewHelper\LanguageSwitcherFactory::class,
+            'localeValue' => Service\ViewHelper\LocaleValueFactory::class,
         ],
     ],
     'block_layouts' => [
