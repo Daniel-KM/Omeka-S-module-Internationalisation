@@ -8,6 +8,7 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use Generic\AbstractModule;
+use Omeka\Settings\SiteSettings;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\Mvc\MvcEvent;
@@ -151,7 +152,7 @@ class Module extends AbstractModule
     }
 
     /**
-     * Order values of each property according to settings.
+     * Order values of each property according to settings, without filtering.
      *
      * @param Event $event
      */
@@ -171,48 +172,15 @@ class Module extends AbstractModule
 
         // FIXME Remove the exception that occurs with background job and api during update: job seems to set status as site.
         try {
-            $locale = $settings->get('locale');
+            $locales = $settings->get('internationalisation_locales', []);
         } catch (\Exception $e) {
             // Probably background process.
             return;
         }
-        if (empty($locale)) {
+
+        if (empty($locales)) {
             return;
         }
-
-        $displayValues = $settings->get('internationalisation_display_values', 'all');
-        if ($displayValues === 'all') {
-            return;
-        }
-
-        // Prepare the locales.
-        $locales = [$locale];
-        switch ($displayValues) {
-            case 'site_iso':
-                $locales += $settings->get('internationalisation_iso_codes', []);
-                break;
-
-            case 'site_fallback':
-            case 'all_site':
-                $locales += $settings->get('internationalisation_fallbacks', []);
-                break;
-
-            case 'site':
-                // Nothing to do.
-                break;
-
-            default:
-                return;
-        }
-
-        $requiredLanguages = $settings->get('internationalisation_required_languages', []);
-        $locales += $requiredLanguages;
-        $locales = array_fill_keys(array_unique(array_filter($locales)), []);
-
-        // Add a fallback for values without language in all cases,
-        // because in many cases default language is not set.
-        // TODO Set an option to not fallback to values without language?
-        $locales[''] = [];
 
         // Order values for each property according to settings.
         $values = $event->getParam('values');
@@ -233,6 +201,8 @@ class Module extends AbstractModule
     /**
      * Filter values of each property according to settings.
      *
+     * Note: the values are already ordered by language in previous event.
+     *
      * @param Event $event
      */
     public function handleResourceDisplayValues(Event $event)
@@ -250,66 +220,18 @@ class Module extends AbstractModule
             return;
         }
 
-        // Note: the values are already ordered by lang in previous event.
-
-        $options = $event->getParam('options', []) + [
-            'display_values' => null,
-            'fallbacks' => [],
-            'required_languages' => [],
-        ];
-
-        $displayValues = isset($options['display_values'])
-            ? $options['display_values']
-            : $settings->get('internationalisation_display_values', 'all');
+        $displayValues = $settings->get('internationalisation_display_values', 'all');
         if ($displayValues === 'all') {
             return;
         }
 
-        $requiredLanguages = isset($options['required_languages'])
-            ? $options['required_languages']
-            : $settings->get('internationalisation_required_languages', []);
-
-        // Prepare the locales.
-        $locales = [$locale];
-        switch ($displayValues) {
-            case 'all_site':
-                $fallbacks = isset($options['fallbacks'])
-                    ? $options['fallbacks']
-                    : $settings->get('internationalisation_fallbacks', []);
-                // Don't process if passed options are the same.
-                $isProcessed = $options['display_values'] === $displayValues
-                    && $options['required_languages'] === $requiredLanguages
-                    && $options['fallbacks'] === $fallbacks;
-                if ($isProcessed) {
-                    return;
-                }
-                $locales += $fallbacks;
-                break;
-
-            case 'site_fallback':
-                $locales += isset($options['fallbacks'])
-                    ? $options['fallbacks']
-                    : $settings->get('internationalisation_fallbacks', []);
-                break;
-
-            case 'site_iso':
-                $locales += $settings->get('internationalisation_iso_codes', []);
-                break;
-
-            case 'site':
-                // Nothing to do.
-                break;
-
-            default:
-                return;
+        $locales = $settings->get('internationalisation_locales', []);
+        if (empty($locales)) {
+            return;
         }
 
-        $locales += $requiredLanguages;
-        $locales = array_fill_keys(array_unique(array_filter($locales)), []);
-        // Add a fallback for values without language in all cases,
-        // because in many cases default language is not set.
-        // TODO Set an option to not fallback to values without language?
-        $locales[''] = [];
+        // $fallbacks = $settings->get('internationalisation_fallbacks', []);
+        $requiredLanguages = $settings->get('internationalisation_required_languages', []);
 
         // Filter appropriate locales for each property when it is localisable.
         $values = $event->getParam('values');
@@ -542,22 +464,64 @@ SQL;
             ->get('internationalisation_required_languages')
             ->setValue(implode("\n", $list));
 
-        // For performance, save iso codes when choice is "site_iso".
-        // It's not possible to save it simply after validation, so add it here,
-        // since the form is always reloaded after submission.
-        $displayValues = $settings->get('internationalisation_display_values', 'all');
-        if ($displayValues !== 'site_iso') {
-            return;
-        }
+        $this->prepareSiteLocales($settings);
+    }
 
+    /**
+     * For performance, save ordered locales and iso codes when needed.
+     *
+     * It's not possible to save it simply after validation, so add it here,
+     * since the form is always reloaded after submission.
+     *
+     * @param SiteSettings $settings
+     */
+    protected function prepareSiteLocales(SiteSettings $settings)
+    {
         $locale = $settings->get('locale');
-        if (empty($locale)) {
+        if (!$locale) {
+            $settings->set('internationalisation_locales', []);
             return;
         }
 
-        require_once 'vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
-        $locales = \Iso639p3::codes($locale);
-        $settings->set('internationalisation_iso_codes', $locales);
+        $displayValues = $settings->get('internationalisation_display_values', 'all');
+        if ($displayValues === 'all') {
+            $settings->set('internationalisation_locales', []);
+            return;
+        }
+
+        // Prepare the locales.
+        $locales = [$locale];
+        switch ($displayValues) {
+            case 'site_iso':
+                require_once __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
+                $locales += \Iso639p3::codes($locale);
+                break;
+
+            case 'site_fallback':
+                $locales += $settings->get('internationalisation_fallbacks', []);
+                break;
+
+            case 'all_site':
+            case 'site':
+                // Nothing to do.
+                break;
+
+            default:
+                $settings->set('internationalisation_display_values', 'all');
+                $settings->set('internationalisation_locales', []);
+                return;
+        }
+
+        $requiredLanguages = $settings->get('internationalisation_required_languages', []);
+        $locales += $requiredLanguages;
+        $locales = array_fill_keys(array_unique(array_filter($locales)), []);
+
+        // Add a fallback for values without language in all cases,
+        // because in many cases default language is not set.
+        // TODO Set an option to not fallback to values without language?
+        $locales[''] = [];
+
+        $settings->set('internationalisation_locales', $locales);
     }
 
     public function handleSiteSettingsFilters(Event $event)

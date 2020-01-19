@@ -59,11 +59,21 @@ WHERE `id` = "internationalisation_display_values"
 UPDATE site_setting SET value = '"site_iso"'
 WHERE `id` = "internationalisation_display_values"
     AND `value` = '"site_lang_iso"';
+DELETE FROM site_setting
+WHERE `id` = "internationalisation_iso_codes";
 SQL;
     // Use single statements for execution.
     // See core commit #2689ce92f.
     $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
     foreach ($sqls as $sql) {
         $connection->exec($sql);
+    }
+
+    $settings = $services->get('Omeka\Settings\Site');
+    $api = $services->get('Omeka\ApiManager');
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $settings->setTargetId($siteId);
+        $this->prepareSiteLocales($settings);
     }
 }
