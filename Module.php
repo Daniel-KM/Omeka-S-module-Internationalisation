@@ -17,6 +17,11 @@ class Module extends AbstractModule
 {
     const NAMESPACE = __NAMESPACE__;
 
+    /**
+     * @var array
+     */
+    protected $cacheLocaleValues = [];
+
     public function onBootstrap(MvcEvent $event)
     {
         parent::onBootstrap($event);
@@ -182,14 +187,18 @@ class Module extends AbstractModule
             return;
         }
 
+        $resourceId = $event->getTarget()->id();
+        $this->cacheLocaleValues[$resourceId] = [];
+
         // Order values for each property according to settings.
         $values = $event->getParam('values');
-        foreach ($values as /* $term => */ &$valueInfo) {
+        foreach ($values as $term => &$valueInfo) {
             $valuesByLang = $locales;
             foreach ($valueInfo['values'] as $value) {
                 $valuesByLang[$value->lang()][] = $value;
             }
             $valuesByLang = array_filter($valuesByLang);
+            $this->cacheLocaleValues[$resourceId][$term] = $valuesByLang;
             $valueInfo['values'] = $valuesByLang
                 ? array_merge(...array_values($valuesByLang))
                 : [];
@@ -221,7 +230,7 @@ class Module extends AbstractModule
         }
 
         $displayValues = $settings->get('internationalisation_display_values', 'all');
-        if ($displayValues === 'all') {
+        if (in_array($displayValues, ['all', 'all_site'])) {
             return;
         }
 
@@ -230,18 +239,15 @@ class Module extends AbstractModule
             return;
         }
 
+        $resourceId = $event->getTarget()->id();
+
         // $fallbacks = $settings->get('internationalisation_fallbacks', []);
         $requiredLanguages = $settings->get('internationalisation_required_languages', []);
 
         // Filter appropriate locales for each property when it is localisable.
         $values = $event->getParam('values');
-        foreach ($values as /* $term => */ &$valueInfo) {
-            // TODO This loop is already done in previous event. Cache result?
-            $valuesByLang = $locales;
-            foreach ($valueInfo['values'] as $value) {
-                $valuesByLang[$value->lang()][] = $value;
-            }
-            $valuesByLang = array_filter($valuesByLang);
+        foreach ($values as $term => &$valueInfo) {
+            $valuesByLang = $this->cacheLocaleValues[$resourceId][$term];
 
             // Check if the property has at least one language (not identifier,
             // etc.).
@@ -271,10 +277,6 @@ class Module extends AbstractModule
                     $valueInfo['values'] = $vals
                         ? array_merge(...array_values($vals))
                         : [];
-                    break;
-
-                case 'all_site':
-                    $valueInfo['values'] = array_merge(...array_values($valuesByLang));
                     break;
 
                 default:
