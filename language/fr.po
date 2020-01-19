@@ -123,7 +123,7 @@ msgstr "Toutes les valeurs"
 
 #: src/Form/SiteSettingsFieldset.php:24
 msgid "All values, with language of the site first"
-msgstr "Toutes les valeurs, avec le language du site en premier"
+msgstr "Toutes les valeurs, avec la langue du site en premier"
 
 #: src/Form/SiteSettingsFieldset.php:25
 msgid "Only values with the language of the site"
