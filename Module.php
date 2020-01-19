@@ -64,6 +64,28 @@ class Module extends AbstractModule
             [$this, 'handleViewLayoutPublic']
         );
 
+        // Handle translated title.
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\ItemRepresentation::class,
+            'rep.resource.title',
+            [$this, 'handleResourceTitle']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\ItemSetRepresentation::class,
+            'rep.resource.title',
+            [$this, 'handleResourceTitle']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\MediaRepresentation::class,
+            'rep.resource.title',
+            [$this, 'handleResourceTitle']
+        );
+        $sharedEventManager->attach(
+            \Annotate\Api\Representation\AnnotationRepresentation::class,
+            'rep.resource.title',
+            [$this, 'handleResourceTitle']
+        );
+
         // Handle order of values according to settings.
         $sharedEventManager->attach(
             \Omeka\Api\Representation\ItemRepresentation::class,
@@ -157,37 +179,51 @@ class Module extends AbstractModule
     }
 
     /**
+     * Manage internationalisation of the title.
+     *
+     * @param Event $event
+     */
+    public function handleResourceTitle(Event $event)
+    {
+        $locales = $this->getLocales();
+        if (!$locales) {
+            return;
+        }
+
+        // When we want a translated title, we don’t care of the existing title.
+        // Just get the title via value(), that takes care of the language.
+        // Similar logic can be found in \Omeka\Api\Representation\AbstractResourceEntityRepresentation::displayDescription()
+        $resource = $event->getTarget();
+        $template = $resource->resourceTemplate();
+        if ($template && $template->titleProperty()) {
+            $title = $resource->value($template->titleProperty()->term());
+            if ($title !== null) {
+                $title = $resource->value('dcterms:title');
+            }
+        } else {
+            $title = $resource->value('dcterms:title');
+        }
+
+        $event->setParam('title', $title);
+    }
+
+    /**
      * Order values of each property according to settings, without filtering.
      *
      * @param Event $event
      */
     public function handleResourceValues(Event $event)
     {
-        // Currently limited to public front-end.
-        // TODO In admin, use the user settings or add some main settings.
-        $services = $this->getServiceLocator();
-        /** @var \Omeka\Mvc\Status $status */
-        $status = $services->get('Omeka\Status');
-        if (!$status->isSiteRequest()) {
-            return;
-        }
-
-        /** @var \Omeka\Settings\SiteSettings $settings */
-        $settings = $services->get('Omeka\Settings\Site');
-
-        // FIXME Remove the exception that occurs with background job and api during update: job seems to set status as site.
-        try {
-            $locales = $settings->get('internationalisation_locales', []);
-        } catch (\Exception $e) {
-            // Probably background process.
-            return;
-        }
-
-        if (empty($locales)) {
+        $locales = $this->getLocales();
+        if (!$locales) {
             return;
         }
 
         $resourceId = $event->getTarget()->id();
+        if (isset($this->cacheLocaleValues[$resourceId])) {
+            return $this->cacheLocaleValues[$resourceId];
+        }
+
         $this->cacheLocaleValues[$resourceId] = [];
 
         // Order values for each property according to settings.
@@ -216,26 +252,18 @@ class Module extends AbstractModule
      */
     public function handleResourceDisplayValues(Event $event)
     {
-        $services = $this->getServiceLocator();
-        $status = $services->get('Omeka\Status');
-        if (!$status->isSiteRequest()) {
+        $locales = $this->getLocales();
+        if (!$locales) {
             return;
         }
+
+        $services = $this->getServiceLocator();
 
         /** @var \Omeka\Settings\SiteSettings $settings */
         $settings = $services->get('Omeka\Settings\Site');
-        $locale = $settings->get('locale');
-        if (empty($locale)) {
-            return;
-        }
 
         $displayValues = $settings->get('internationalisation_display_values', 'all');
         if (in_array($displayValues, ['all', 'all_site', 'all_iso', 'all_fallback'])) {
-            return;
-        }
-
-        $locales = $settings->get('internationalisation_locales', []);
-        if (empty($locales)) {
             return;
         }
 
@@ -589,5 +617,39 @@ SQL;
 
         ksort($siteList, SORT_NATURAL);
         return $siteList;
+    }
+
+    /**
+     * List locales according to the request.
+     *
+     * @return array
+     */
+    protected function getLocales()
+    {
+        static $locales;
+
+        if (is_null($locales)) {
+            $locales = [];
+
+            // Currently limited to public front-end.
+            // TODO In admin, use the user settings or add some main settings.
+            $services = $this->getServiceLocator();
+
+            /** @var \Omeka\Mvc\Status $status */
+            $status = $services->get('Omeka\Status');
+            if ($status->isSiteRequest()) {
+                /** @var \Omeka\Settings\SiteSettings $settings */
+                $settings = $services->get('Omeka\Settings\Site');
+
+                // FIXME Remove the exception that occurs with background job and api during update: job seems to set status as site.
+                try {
+                    $locales = $settings->get('internationalisation_locales', []);
+                } catch (\Exception $e) {
+                    // Probably a background process.
+                }
+            }
+        }
+
+        return $locales;
     }
 }
