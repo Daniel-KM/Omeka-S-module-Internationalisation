@@ -22,6 +22,8 @@ class SiteSettingsFieldset extends Fieldset
             $valueOptions = [
                 'all' => 'All values', // @translate
                 'all_site' => 'All values, with language of the site first', // @translate
+                'all_site_iso' => 'All values, with language of the site or iso fallback first', // @translate
+                'all_site_fallback' => 'All values, with language of the site or custom fallback first', // @translate
                 'site' => 'Only values with the language of the site', // @translate
                 'site_iso' => 'Only values with the language of the site, with iso fallback', // @translate
                 'site_fallback' => 'Only values with the language of the site, with custom fallback', // @translate

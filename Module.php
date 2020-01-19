@@ -230,7 +230,7 @@ class Module extends AbstractModule
         }
 
         $displayValues = $settings->get('internationalisation_display_values', 'all');
-        if (in_array($displayValues, ['all', 'all_site'])) {
+        if (in_array($displayValues, ['all', 'all_site', 'all_iso', 'all_fallback'])) {
             return;
         }
 
@@ -496,6 +496,7 @@ SQL;
         // Prepare the locales.
         $locales = [$locale];
         switch ($displayValues) {
+            case 'all_site_iso':
             case 'site_iso':
                 require_once __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
                 $isoCodes = \Iso639p3::codes($locale);
@@ -503,6 +504,7 @@ SQL;
                 $locales += $isoCodes;
                 break;
 
+            case 'all_fallback':
             case 'site_fallback':
                 $locales += $settings->get('internationalisation_fallbacks', []);
                 break;
