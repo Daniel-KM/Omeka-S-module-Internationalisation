@@ -59,8 +59,6 @@ WHERE `id` = "internationalisation_display_values"
 UPDATE site_setting SET value = '"site_iso"'
 WHERE `id` = "internationalisation_display_values"
     AND `value` = '"site_lang_iso"';
-DELETE FROM site_setting
-WHERE `id` = "internationalisation_iso_codes";
 SQL;
     // Use single statements for execution.
     // See core commit #2689ce92f.

@@ -79,6 +79,8 @@ return [
             'internationalisation_required_languages' => [],
             // Settings without form, automatically prepared when the form is saved.
             'internationalisation_locales' => [],
+            // Kept for compatibility for Omeka < 2.1 (direct helper).
+            'internationalisation_iso_codes' => [],
         ],
         'block_settings' => [
             'simplePage' => [

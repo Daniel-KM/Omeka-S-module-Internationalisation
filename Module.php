@@ -477,6 +477,8 @@ SQL;
      */
     protected function prepareSiteLocales(SiteSettings $settings)
     {
+        $settings->set('internationalisation_iso_codes', []);
+
         $locale = $settings->get('locale');
         if (!$locale) {
             $settings->set('internationalisation_locales', []);
@@ -494,7 +496,9 @@ SQL;
         switch ($displayValues) {
             case 'site_iso':
                 require_once __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
-                $locales += \Iso639p3::codes($locale);
+                $isoCodes = \Iso639p3::codes($locale);
+                $settings->set('internationalisation_iso_codes', $isoCodes);
+                $locales += $isoCodes;
                 break;
 
             case 'site_fallback':
