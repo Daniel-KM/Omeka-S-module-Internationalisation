@@ -47,3 +47,23 @@ SQL;
         $connection->exec($sql);
     }
 }
+
+if (version_compare($oldVersion, '3.2.7', '<')) {
+    $sql = <<<SQL
+UPDATE site_setting SET value = '"all_site"'
+WHERE `id` = "internationalisation_display_values"
+    AND `value` = '"all_ordered"';
+UPDATE site_setting SET value = '"site"'
+WHERE `id` = "internationalisation_display_values"
+    AND `value` = '"site_lang"';
+UPDATE site_setting SET value = '"site_iso"'
+WHERE `id` = "internationalisation_display_values"
+    AND `value` = '"site_lang_iso"';
+SQL;
+    // Use single statements for execution.
+    // See core commit #2689ce92f.
+    $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
+    foreach ($sqls as $sql) {
+        $connection->exec($sql);
+    }
+}

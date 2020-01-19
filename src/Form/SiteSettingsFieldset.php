@@ -21,9 +21,9 @@ class SiteSettingsFieldset extends Fieldset
         if ($locale) {
             $valueOptions = [
                 'all' => 'All values', // @translate
-                'all_ordered' => 'All values, with language of the site first', // @translate
-                'site_lang' => 'Only values with the language of the site', // @translate
-                'site_lang_iso' => 'Only values with the language of the site, with iso fallback', // @translate
+                'all_site' => 'All values, with language of the site first', // @translate
+                'site' => 'Only values with the language of the site', // @translate
+                'site_iso' => 'Only values with the language of the site, with iso fallback', // @translate
                 'site_fallback' => 'Only values with the language of the site, with custom fallback', // @translate
                 // 'user_defined' => 'User choice in the public front-end (if theme allows it)', // @translate
             ];

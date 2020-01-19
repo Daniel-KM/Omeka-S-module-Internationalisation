@@ -22,7 +22,7 @@ class LocaleValueFactory implements FactoryInterface
         $locale = $settings->get('locale');
 
         $displayValues = $settings->get('internationalisation_display_values', 'all');
-        if ($displayValues === 'site_lang_iso') {
+        if ($displayValues === 'site_iso') {
             $fallbacks = $settings->get('internationalisation_iso_codes', []);
         } elseif ($displayValues === 'site_fallback') {
             $fallbacks = $settings->get('internationalisation_fallbacks', []);

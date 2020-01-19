@@ -188,16 +188,16 @@ class Module extends AbstractModule
         // Prepare the locales.
         $locales = [$locale];
         switch ($displayValues) {
-            case 'site_lang_iso':
+            case 'site_iso':
                 $locales += $settings->get('internationalisation_iso_codes', []);
                 break;
 
             case 'site_fallback':
-            case 'all_ordered':
+            case 'all_site':
                 $locales += $settings->get('internationalisation_fallbacks', []);
                 break;
 
-            case 'site_lang':
+            case 'site':
                 // Nothing to do.
                 break;
 
@@ -272,7 +272,7 @@ class Module extends AbstractModule
         // Prepare the locales.
         $locales = [$locale];
         switch ($displayValues) {
-            case 'all_ordered':
+            case 'all_site':
                 $fallbacks = isset($options['fallbacks'])
                     ? $options['fallbacks']
                     : $settings->get('internationalisation_fallbacks', []);
@@ -292,11 +292,11 @@ class Module extends AbstractModule
                     : $settings->get('internationalisation_fallbacks', []);
                 break;
 
-            case 'site_lang_iso':
+            case 'site_iso':
                 $locales += $settings->get('internationalisation_iso_codes', []);
                 break;
 
-            case 'site_lang':
+            case 'site':
                 // Nothing to do.
                 break;
 
@@ -330,8 +330,8 @@ class Module extends AbstractModule
             }
 
             switch ($displayValues) {
-                case 'site_lang':
-                case 'site_lang_iso':
+                case 'site':
+                case 'site_iso':
                     $vals = array_intersect_key($valuesByLang, $locales);
                     $valueInfo['values'] = $vals
                         ? array_merge(...array_values($vals))
@@ -351,7 +351,7 @@ class Module extends AbstractModule
                         : [];
                     break;
 
-                case 'all_ordered':
+                case 'all_site':
                     $valueInfo['values'] = array_merge(...array_values($valuesByLang));
                     break;
 
@@ -542,11 +542,11 @@ SQL;
             ->get('internationalisation_required_languages')
             ->setValue(implode("\n", $list));
 
-        // For performance, save iso codes when choice is "site_lang_iso".
+        // For performance, save iso codes when choice is "site_iso".
         // It's not possible to save it simply after validation, so add it here,
         // since the form is always reloaded after submission.
         $displayValues = $settings->get('internationalisation_display_values', 'all');
-        if ($displayValues !== 'site_lang_iso') {
+        if ($displayValues !== 'site_iso') {
             return;
         }
 
