@@ -1,7 +1,6 @@
 <?php
 namespace Internationalisation\View\Helper;
 
-use Omeka\Settings\SiteSettings;
 use Zend\View\Helper\AbstractHelper;
 
 /**
@@ -36,22 +35,15 @@ class LanguageSwitcher extends AbstractHelper
     protected $siteGroups;
 
     /**
-     * @var SiteSettings
-     */
-    protected $siteSettings;
-
-    /**
      * @param array $localeSites
      * @param array $localeLabels
      * @param array $siteGroups
-     * @param SiteSettings $siteSettings
      */
-    public function __construct(array $localeSites, array $localeLabels, array $siteGroups, SiteSettings $siteSettings)
+    public function __construct(array $localeSites, array $localeLabels, array $siteGroups)
     {
         $this->localeSites = $localeSites;
         $this->localeLabels = $localeLabels;
         $this->siteGroups = $siteGroups;
-        $this->siteSettings = $siteSettings;
     }
 
     /**
@@ -144,33 +136,52 @@ class LanguageSwitcher extends AbstractHelper
             // Require module Search >= 3.5.12.
             && $pageSlug = $params->fromRoute('page-slug')
         ) {
+            // It's not possible to use siteSettings for another site from the view. See git history.
+
             // TODO Save all the relations between search pages in a setting to avoid to prepare it each time.
             $api = $view->api();
-            $siteSettings = $this->siteSettings;
+            $connection = $site->getServiceLocator()->get('Omeka\Connection');
+            $connection->setFetchMode(\PDO::FETCH_KEY_PAIR);
+            $searchPageIdsBySite = $connection->fetchAll('SELECT `site_id`, `value` FROM `site_setting` WHERE `id` = "search_pages";');
+            $searchPageIdsBySite = array_map(function ($v) {
+                return json_decode($v, true);
+            }, $searchPageIdsBySite);
+            $mainSearchPageIdBySite = $connection->fetchAll('SELECT `site_id`, `value` FROM `site_setting` WHERE `id` = "search_main_page";');
+            $mainSearchPageIdBySite = array_map(function ($v) {
+                return json_decode($v, true);
+            }, $mainSearchPageIdBySite);
+
+            $query = $params->fromQuery();
 
             $searchPageId = $params->fromRoute('id');
             foreach ($locales as $siteSlug => $localeId) {
+                $url = null;
                 // Option "returnScalar" is not available with view helper api.
                 $relatedSite = $api->searchOne('sites', ['slug' => $siteSlug])->getContent();
                 if (!$relatedSite) {
                     continue;
                 }
 
-                $siteSettings->setTargetId($relatedSite->id());
-                $searchPageIds = $siteSettings->get('search_pages', []);
-                // If the related site has this search engine, use it.
-                if (in_array($searchPageId, $searchPageIds)) {
-                    $url = $urlHelper(null, ['site-slug' => $siteSlug], true);
+                $relatedSiteId = $relatedSite->id();
+                $searchPageIds = empty($searchPageIdsBySite[$relatedSiteId]) ? [] : $searchPageIdsBySite[$relatedSiteId];
+
+                if ($searchPageIds) {
+                    // If the related site has this search engine, use it.
+                    if (in_array($searchPageId, $searchPageIds)) {
+                        $url = $urlHelper(null, ['site-slug' => $siteSlug], ['query' => $query], true);
+                    }
+                    // Else use the main search engine of this related site.
+                    elseif (isset($mainSearchPageIdBySite[$relatedSiteId])) {
+                        $searchPageId = $mainSearchPageIdBySite[$relatedSiteId];
+                        $url = $urlHelper('search-page-' . $searchPageId, ['site-slug' => $siteSlug], ['query' => $query], true);
+                    }
                 }
-                // Else use the main search engine of this related site.
-                elseif ($searchPageIds) {
-                    $searchPageId = $siteSettings->get('search_main_page', reset($searchPageIds));
-                    $url = $urlHelper('search-page-' . $searchPageId, ['site-slug' => $siteSlug], true);
+
+                // Fallback to the item browse page (so the result pages instead of the search page).
+                if (empty($url)) {
+                    $url = $urlHelper('site/resource', ['site-slug' => $siteSlug, 'controller' => 'item', 'action' => 'browse'], true);
                 }
-                // Else fallback to the item search page.
-                else {
-                    $url = $urlHelper('site/resource', ['site-slug' => $siteSlug, 'controller' => 'item', 'action' => 'search'], true);
-                }
+
                 $data[] = [
                     'site' => $siteSlug,
                     'locale' => $localeId,
@@ -178,9 +189,6 @@ class LanguageSwitcher extends AbstractHelper
                     'url' => $url,
                 ];
             }
-
-            // Reset to the current site to avoid issues.
-            $siteSettings->setTargetId($site->id());
         }
 
         // Manage standard resources pages and other modules pages.

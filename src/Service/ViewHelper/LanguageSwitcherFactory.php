@@ -57,8 +57,7 @@ SQL;
         return new LanguageSwitcher(
             $localeSites,
             $localeLabels,
-            $services->get('Omeka\Settings')->get('internationalisation_site_groups', []),
-            $services->get('Omeka\Settings\Site')
+            $services->get('Omeka\Settings')->get('internationalisation_site_groups', [])
         );
     }
 }
