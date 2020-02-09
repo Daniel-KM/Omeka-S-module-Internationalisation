@@ -1,6 +1,7 @@
 <?php
 namespace Internationalisation\View\Helper;
 
+use Omeka\Settings\SiteSettings;
 use Zend\View\Helper\AbstractHelper;
 
 /**
@@ -35,15 +36,22 @@ class LanguageSwitcher extends AbstractHelper
     protected $siteGroups;
 
     /**
+     * @var SiteSettings
+     */
+    protected $siteSettings;
+
+    /**
      * @param array $localeSites
      * @param array $localeLabels
      * @param array $siteGroups
+     * @param SiteSettings $siteSettings
      */
-    public function __construct(array $localeSites, array $localeLabels, array $siteGroups)
+    public function __construct(array $localeSites, array $localeLabels, array $siteGroups, SiteSettings $siteSettings)
     {
         $this->localeSites = $localeSites;
         $this->localeLabels = $localeLabels;
         $this->siteGroups = $siteGroups;
+        $this->siteSettings = $siteSettings;
     }
 
     /**
@@ -56,6 +64,7 @@ class LanguageSwitcher extends AbstractHelper
     {
         $view = $this->getView();
 
+        /** @var \Omeka\Api\Representation\SiteRepresentation $site */
         $site = $view->vars()->site;
         if (empty($site)) {
             return '';
@@ -83,6 +92,8 @@ class LanguageSwitcher extends AbstractHelper
         $controller = $params->fromRoute('__CONTROLLER__') ?: $params->fromRoute('controller');
 
         $data = [];
+
+        // Manage standard pages.
         if ($controller === 'Page' || $controller === 'Omeka\Controller\Site\Page') {
             $api = $view->api();
             $pageSlug = $params->fromRoute('page-slug');
@@ -126,7 +137,54 @@ class LanguageSwitcher extends AbstractHelper
                     'url' => $url,
                 ];
             }
-        } else {
+        }
+
+        // Manage module Search (that has only one action, but multiple paths).
+        elseif ($controller === 'Search\Controller\IndexController'
+            // Require module Search >= 3.5.12.
+            && $pageSlug = $params->fromRoute('page-slug')
+        ) {
+            // TODO Save all the relations between search pages in a setting to avoid to prepare it each time.
+            $api = $view->api();
+            $siteSettings = $this->siteSettings;
+
+            $searchPageId = $params->fromRoute('id');
+            foreach ($locales as $siteSlug => $localeId) {
+                // Option "returnScalar" is not available with view helper api.
+                $relatedSite = $api->searchOne('sites', ['slug' => $siteSlug])->getContent();
+                if (!$relatedSite) {
+                    continue;
+                }
+
+                $siteSettings->setTargetId($relatedSite->id());
+                $searchPageIds = $siteSettings->get('search_pages', []);
+                // If the related site has this search engine, use it.
+                if (in_array($searchPageId, $searchPageIds)) {
+                    $url = $urlHelper(null, ['site-slug' => $siteSlug], true);
+                }
+                // Else use the main search engine of this related site.
+                elseif ($searchPageIds) {
+                    $searchPageId = $siteSettings->get('search_main_page', reset($searchPageIds));
+                    $url = $urlHelper('search-page-' . $searchPageId, ['site-slug' => $siteSlug], true);
+                }
+                // Else fallback to the item search page.
+                else {
+                    $url = $urlHelper('site/resource', ['site-slug' => $siteSlug, 'controller' => 'item', 'action' => 'search'], true);
+                }
+                $data[] = [
+                    'site' => $siteSlug,
+                    'locale' => $localeId,
+                    'locale_label' => $this->localeLabels[$localeId],
+                    'url' => $url,
+                ];
+            }
+
+            // Reset to the current site to avoid issues.
+            $siteSettings->setTargetId($site->id());
+        }
+
+        // Manage standard resources pages and other modules pages.
+        else {
             foreach ($locales as $siteSlug => $localeId) {
                 $data[] = [
                     'site' => $siteSlug,
