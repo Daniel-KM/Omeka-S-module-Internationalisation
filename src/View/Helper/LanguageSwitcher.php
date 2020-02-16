@@ -11,7 +11,7 @@ class LanguageSwitcher extends AbstractHelper
     /**
      * The default partial view script.
      */
-    const PARTIAL_NAME = 'common/language-switcher';
+    const PARTIAL_NAME = 'common/helper/language-switcher';
 
     /**
      * Associative array of the site slug and the site locale id.
