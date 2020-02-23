@@ -112,9 +112,9 @@ changes in the theme. Only one of them is needed, so choose the one according to
 your needs. Note that the method `displayTitle()` cannot be used to get the
 translated title in Omeka 2.
 
-#### Via the core
+#### Via the core (for Omeka < 2.1)
 
-##### Modification of the core (for Omeka <= 2.0.2)
+##### Modification of the core
 
 Insert this snippet line 279 (Omeka S version 1.4) in [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]:
 ```php
@@ -133,29 +133,21 @@ Insert this snippet line 279 (Omeka S version 1.4) in [`application/src/Api/Repr
 
 By this way, the internationalised values will be used anywhere in front-end.
 
-##### Modification of the core (for Omeka >= 2.0)
+##### Modification of the core (for Omeka >= 2.0 and < 2.1)
 
-Include patch [#1495] in the same file [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]:
+Include patch [#1506] in the same file [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]:
 
 ```php
-    public function displayTitle($default = null)
+    public function title()
     {
-        $template = $this->resourceTemplate();
-        if ($template && $template->titleProperty()) {
-            $title = $this->value($template->titleProperty()->term());
-            if (null !== $title) {
-                return $title;
-            }
-        }
+        return $this->resource->getTitle();
+        $title = $this->resource->getTitle();
 
-        if ($default === null) {
-            $translator = $this->getServiceLocator()->get('MvcTranslator');
-            $default = $translator->translate('[Untitled]');
-        }
+        $eventManager = $this->getEventManager();
+        $args = $eventManager->prepareArgs(['title' => $title]);
+        $eventManager->trigger('rep.resource.title', $this, $args);
 
-        return (string) $this->value('dcterms:title', [
-            'default' => $default,
-        ]);
+        return $args['title'];
     }
 ```
 
@@ -187,7 +179,9 @@ Note that the template `common/resource-values.phtml` may need to be updated,
 because with some settings, all values of a property can be removed.
 
 
-### API
+### API external requests
+
+#### Translations
 
 To get the list of all the translations of the interface, you can use the module
 [ApiInfo] and go to https://example.org/api/infos/translations?locale=fr.
@@ -198,6 +192,13 @@ you can use the module [Next] that doesn’t escape unicode characters by defaul
 (waiting for upstream pull request [omeka/omeka-s#1493]).
 
 Note that Omeka doesn’t separate admin and public strings.
+
+#### Translations of api property labels
+
+To translate the property labels (for example "Title" for dcterms:title), the
+client can add `&ùse_locale=xx_YY` and `&use_template_label=1` to the api
+queries. In such way, the api will response for example French "Auteur" for the
+property "dcterms:creator" on a template "Book").
 
 
 TODO
@@ -287,7 +288,7 @@ This module was built for [Watau].
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L489
-[#1495]: https://github.com/omeka/omeka-s/pull/1495/files
+[#1506]: https://github.com/omeka/omeka-s/pull/1506/files
 [ApiInfo]: https://github.com/Daniel-KM/Omeka-S-module-ApiInfo
 [Next]: https://github.com/Daniel-KM/Omeka-S-module-Next
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/issues
