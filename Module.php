@@ -195,9 +195,9 @@ class Module extends AbstractModule
         // Similar logic can be found in \Omeka\Api\Representation\AbstractResourceEntityRepresentation::displayDescription()
         $resource = $event->getTarget();
         $template = $resource->resourceTemplate();
-        if ($template && $template->titleProperty()) {
-            $title = $resource->value($template->titleProperty()->term());
-            if ($title !== null) {
+        if ($template && $property = $template->titleProperty()) {
+            $title = $resource->value($property->term());
+            if ($title === null) {
                 $title = $resource->value('dcterms:title');
             }
         } else {
