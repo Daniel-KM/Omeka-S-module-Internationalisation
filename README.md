@@ -100,8 +100,9 @@ header:
 <?php if ($this->getHelperPluginManager()->has('languageSwitcher')) echo $this->languageSwitcher(); ?>
 ```
 
-The partial `common/language-switcher.phtml` view can be themed: simply copy it
-in your theme and customize it.
+The partial `common/helper/language-switcher.phtml` view can be themed: simply copy it
+in your theme and customize it. The helper supports options "template" and "locale_as_code".
+Other options are passed to the template.
 
 ### Properties
 
