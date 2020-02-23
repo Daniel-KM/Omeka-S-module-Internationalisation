@@ -49,10 +49,13 @@ class LanguageSwitcher extends AbstractHelper
     /**
      * Render the language switcher.
      *
-     * @param string|null $partialName Name of view script, or a view model
+     * @param array|string|null $options If a string, this is the name of the
+     * view script, or a view model. In array, this is the key 'template'.
+     * Possible options: "template", "locale_as_code". Other options are passed
+     * to the template.
      * @return string
      */
-    public function __invoke($partialName = null)
+    public function __invoke($options = null)
     {
         $view = $this->getView();
 
@@ -203,15 +206,19 @@ class LanguageSwitcher extends AbstractHelper
             }
         }
 
-        $partialName = $partialName ?: self::PARTIAL_NAME;
+        if (empty($options) || is_string($options)) {
+            $options = ['template' => $options, 'locale_as_code' => false];
+        } else {
+            $options += ['template' => null, 'locale_as_code' => false];
+        }
 
-        return $view->partial(
-            $partialName,
-            [
+        $template = $options['template'] ?: self::PARTIAL_NAME;
+        unset($options['template']);
+
+        return $view->partial($template, [
                 'site' => $site,
                 'locales' => $data,
                 'locale_labels' => $this->localeLabels,
-            ]
-        );
+        ] + $options);
     }
 }
