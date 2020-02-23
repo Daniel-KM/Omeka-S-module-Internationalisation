@@ -340,9 +340,12 @@ class Module extends AbstractModule
     /**
      * Translate the property labels according to the locale set in the query.
      *
-     * This filter applies only for the external api request. It allows to get
-     * the translated label of the property.
+     * The aim of this filter is to simplify the processes of external clients.
+     * It applies only for the external api requests. It allows to get the
+     * translated label of the property, or the translated label of the resource
+     * template, if any, without another request and a new process.
      *
+     * @todo Add another argument "use_locale_first" to reorder the values according to the locale.
      * @todo Use the headers, so the client doesn't modify the query (but it is already modified for the authentification).
      *
      * @param Event $event
@@ -352,7 +355,8 @@ class Module extends AbstractModule
         // TODO Use the Zend cache.
         /** @var \Zend\Mvc\I18n\Translator $translator */
         static $translator;
-        static $propertyLabelsTranslations;
+        static $propertyLabels;
+        static $templateLabels = [[]];
 
         $services = $this->getServiceLocator();
 
@@ -365,19 +369,13 @@ class Module extends AbstractModule
 
         /** @var \Zend\Http\Request $request */
         $request = $mvcEvent->getRequest();
-        $locale = $request->getQuery()->get('locale');
-        if (empty($locale) || $locale === 'en_US') {
-            return;
-        }
 
-        // Set the locale.
-        if (is_null($propertyLabelsTranslations)) {
-            $propertyLabelsTranslations = [];
-            if (extension_loaded('intl')) {
-                \Locale::setDefault($locale);
-            }
-            $translator = $services->get('MvcTranslator');
-            $translator->getDelegatedTranslator()->setLocale($locale);
+        // Use "use_locale" instead of "locale" to avoid conflicts with some
+        // possible future api requests.
+        $locale = $request->getQuery()->get('use_locale');
+        $useTemplateLabel = (bool) $request->getQuery()->get('use_template_label');
+        if (!$locale && !$useTemplateLabel) {
+            return;
         }
 
         /**
@@ -386,22 +384,95 @@ class Module extends AbstractModule
          */
         $resource = $event->getTarget();
         $jsonLd = $event->getParam('jsonLd');
-        foreach (array_keys($resource->values()) as $term) {
-            foreach ($jsonLd[$term] as &$value) {
-                // In most of the cases in real data, there is only one value by
-                // property, so it's useless to store the label outside of the
-                // loop, that requires a json conversion or to get the value
-                // representation.
-                $value = json_decode(json_encode($value), true);
-                $label = $value['property_label'];
-                if (!isset($propertyLabelsTranslations[$label])) {
-                    $propertyLabelsTranslations[$label] = $translator->translate($label);
+
+        // Prepare the translator in all cases.
+        if (is_null($propertyLabels)) {
+            $propertyLabels = [];
+            if (extension_loaded('intl')) {
+                \Locale::setDefault($locale);
+            }
+            $translator = $services->get('MvcTranslator');
+        }
+
+        // Set the locale.
+        if ($locale) {
+            $translator->getDelegatedTranslator()->setLocale($locale);
+        }
+
+        // Prepare the template labels.
+        $templateId = 0;
+        if ($useTemplateLabel) {
+            $template = $resource->resourceTemplate();
+            if ($template) {
+                $templateId = $template->id();
+                if (!isset($templateLabels[$templateId])) {
+                    foreach ($template->resourceTemplateProperties() as $templateProperty) {
+                        $label = $templateProperty->alternateLabel();
+                        if (strlen($label)) {
+                            $templateLabels[$templateId][$templateProperty->property()->id()] = $locale
+                                ? $translator->translate($label)
+                                : $label;
+                        }
+                    }
                 }
-                $value['property_label'] = $propertyLabelsTranslations[$label];
+            } elseif (!$locale) {
+                return;
+            }
+        }
+
+        if ($useTemplateLabel && $templateId) {
+            // Process the replacement of the property labels, with or without
+            // locale.
+            foreach (array_keys($resource->values()) as $term) {
+                foreach ($jsonLd[$term] as &$value) {
+                    $value = json_decode(json_encode($value), true);
+                    $propertyId = $value['property_id'];
+                    $label = $value['property_label'];
+                    if (isset($templateLabels[$templateId][$propertyId])) {
+                        $value['property_label'] = $templateLabels[$templateId][$propertyId];
+                    } else {
+                        if (!isset($propertyLabels[$label])) {
+                            $propertyLabels[$label] = $translator->translate($label);
+                        }
+                        $value['property_label'] = $propertyLabels[$label];
+                    }
+                }
+            }
+        } else {
+            // Process the replacement of the property labels without template.
+            foreach (array_keys($resource->values()) as $term) {
+                foreach ($jsonLd[$term] as &$value) {
+                    // In most of the cases in real data, there is only one value by
+                    // property, so it's useless to store the label outside of the
+                    // loop, that requires a json conversion or to get the value
+                    // representation.
+                    $value = json_decode(json_encode($value), true);
+                    $label = $value['property_label'];
+                    if (!isset($propertyLabels[$label])) {
+                        $propertyLabels[$label] = $translator->translate($label);
+                    }
+                    $value['property_label'] = $propertyLabels[$label];
+                }
             }
         }
 
         $event->setParam('jsonLd', $jsonLd);
+    }
+
+    protected function prepareTemplateLabels($template, $locale)
+    {
+        $templateLabels = [];
+        $template = $resource->resourceTemplate();
+        // Prepare the template.
+        $templateId = $template->id();
+        if (!isset($template[$template->id()])) {
+            foreach ($template->resourceTemplateProperties() as $templateProperty) {
+                if ($label = $templateProperty->alternateLabel()) {
+                    $templateLabels[$templateId][$templateProperty->property()->term()] = $label;
+                }
+            }
+        }
+        return $templateLabels;
     }
 
     public function filterJsonLdSitePage(Event $event)
