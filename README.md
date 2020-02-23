@@ -193,9 +193,10 @@ you can use the module [Next] that doesn’t escape unicode characters by defaul
 
 Note that Omeka doesn’t separate admin and public strings.
 
-#### Translations of api property labels
+#### Translations of api properties, resource class and template labels
 
 To translate the property labels (for example "Title" for dcterms:title), the
+resource class label ("Book" for bibo:Book) and the resource template label, the
 client can add `&ùse_locale=xx_YY` and `&use_template_label=1` to the api
 queries. In such way, the api will response for example French "Auteur" for the
 property "dcterms:creator" on a template "Book").
@@ -205,7 +206,6 @@ TODO
 ----
 
 - Return original page when it is not translated in a site, instead of an error.
-- Fix $resource->displayTitle() ([#1495])
 - Add links for easier browsing between translated pages.
 - Add a button to duplicate a site (item pool, pages and navigation, relations).
 - Add a button to duplicate a page or to append blocks of a page to another one.
@@ -216,6 +216,8 @@ TODO
 - Add a bulk edit to normalize all languages, so fallbacks won't be necessary in
   most of the cases.
 - Add a view to manage fallbacks (site settings?).
+- Sort by the translated value.
+- Sort by the translated resource class and template labels.
 
 
 Warning

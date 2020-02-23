@@ -8,6 +8,7 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use Generic\AbstractModule;
+use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Settings\SiteSettings;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
@@ -356,7 +357,9 @@ class Module extends AbstractModule
         /** @var \Zend\Mvc\I18n\Translator $translator */
         static $translator;
         static $propertyLabels;
-        static $templateLabels = [[]];
+        static $templatePropertyLabels = [[]];
+        static $resourceClassLabels = [];
+        static $resourceTemplateLabels = [];
 
         $services = $this->getServiceLocator();
 
@@ -402,19 +405,37 @@ class Module extends AbstractModule
         // Prepare the template labels.
         $templateId = 0;
         if ($useTemplateLabel) {
+            // Resource class and template labels are added too for simplicity.
+            $class = $resource->resourceClass();
+            if ($class) {
+                $classId = $class->id();
+                if (!isset($resourceClassLabels[$classId])) {
+                    $resourceClassLabels[$classId] = $locale
+                        ? $translator->translate($class->label())
+                        : $class->label();
+                }
+                $jsonLd['o:resource_class'] = json_decode(json_encode($jsonLd['o:resource_class']), true);
+                $jsonLd['o:resource_class']['o:label'] = $resourceClassLabels[$classId];
+            }
+
             $template = $resource->resourceTemplate();
             if ($template) {
                 $templateId = $template->id();
-                if (!isset($templateLabels[$templateId])) {
+                if (!isset($templatePropertyLabels[$templateId])) {
+                    $resourceTemplateLabels[$templateId] = $locale
+                        ? $translator->translate($template->label())
+                        : $template->label();
                     foreach ($template->resourceTemplateProperties() as $templateProperty) {
                         $label = $templateProperty->alternateLabel();
                         if (strlen($label)) {
-                            $templateLabels[$templateId][$templateProperty->property()->id()] = $locale
+                            $templatePropertyLabels[$templateId][$templateProperty->property()->id()] = $locale
                                 ? $translator->translate($label)
                                 : $label;
                         }
                     }
                 }
+                $jsonLd['o:resource_template'] = json_decode(json_encode($jsonLd['o:resource_template']), true);
+                $jsonLd['o:resource_template']['o:label'] = $resourceTemplateLabels[$templateId];
             } elseif (!$locale) {
                 return;
             }
@@ -428,8 +449,8 @@ class Module extends AbstractModule
                     $value = json_decode(json_encode($value), true);
                     $propertyId = $value['property_id'];
                     $label = $value['property_label'];
-                    if (isset($templateLabels[$templateId][$propertyId])) {
-                        $value['property_label'] = $templateLabels[$templateId][$propertyId];
+                    if (isset($templatePropertyLabels[$templateId][$propertyId])) {
+                        $value['property_label'] = $templatePropertyLabels[$templateId][$propertyId];
                     } else {
                         if (!isset($propertyLabels[$label])) {
                             $propertyLabels[$label] = $translator->translate($label);
@@ -459,20 +480,20 @@ class Module extends AbstractModule
         $event->setParam('jsonLd', $jsonLd);
     }
 
-    protected function prepareTemplateLabels($template, $locale)
+    protected function prepareTemplateLabels(AbstractResourceEntityRepresentation $resource, $locale)
     {
-        $templateLabels = [];
+        $templatePropertyLabels = [];
         $template = $resource->resourceTemplate();
         // Prepare the template.
         $templateId = $template->id();
         if (!isset($template[$template->id()])) {
             foreach ($template->resourceTemplateProperties() as $templateProperty) {
                 if ($label = $templateProperty->alternateLabel()) {
-                    $templateLabels[$templateId][$templateProperty->property()->term()] = $label;
+                    $templatePropertyLabels[$templateId][$templateProperty->property()->term()] = $label;
                 }
             }
         }
-        return $templateLabels;
+        return $templatePropertyLabels;
     }
 
     public function filterJsonLdSitePage(Event $event)
