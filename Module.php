@@ -130,11 +130,33 @@ class Module extends AbstractModule
             [$this, 'handleResourceDisplayValues']
         );
 
+        // Manage the translation of the property labels.
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\ItemRepresentation::class,
+            'rep.resource.json',
+            [$this, 'filterJsonLdResource']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\ItemSetRepresentation::class,
+            'rep.resource.json',
+            [$this, 'filterJsonLdResource']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Representation\MediaRepresentation::class,
+            'rep.resource.json',
+            [$this, 'filterJsonLdResource']
+        );
+        $sharedEventManager->attach(
+            \Annotate\Api\Representation\AnnotationRepresentation::class,
+            'rep.resource.json',
+            [$this, 'filterJsonLdResource']
+        );
+
         // Add the related pages to the representation of the pages.
         $sharedEventManager->attach(
             \Omeka\Api\Representation\SitePageRepresentation::class,
             'rep.resource.json',
-            [$this, 'filterJsonLd']
+            [$this, 'filterJsonLdSitePage']
         );
 
         $sharedEventManager->attach(
@@ -315,7 +337,74 @@ class Module extends AbstractModule
         $event->setParam('values', $values);
     }
 
-    public function filterJsonLd(Event $event)
+    /**
+     * Translate the property labels according to the locale set in the query.
+     *
+     * This filter applies only for the external api request. It allows to get
+     * the translated label of the property.
+     *
+     * @todo Use the headers, so the client doesn't modify the query (but it is already modified for the authentification).
+     *
+     * @param Event $event
+     */
+    public function filterJsonLdResource(Event $event)
+    {
+        // TODO Use the Zend cache.
+        /** @var \Zend\Mvc\I18n\Translator $translator */
+        static $translator;
+        static $propertyLabelsTranslations;
+
+        $services = $this->getServiceLocator();
+
+        // Process only external api requests.
+        /** @var \Zend\Mvc\MvcEvent $mvcEvent */
+        $mvcEvent = $services->get('Application')->getMvcEvent();
+        if (!$mvcEvent->getRouteMatch()->getParam('__API__')) {
+            return;
+        }
+
+        /** @var \Zend\Http\Request $request */
+        $request = $mvcEvent->getRequest();
+        $locale = $request->getQuery()->get('locale');
+        if (empty($locale) || $locale === 'en_US') {
+            return;
+        }
+
+        // Set the locale.
+        if (is_null($propertyLabelsTranslations)) {
+            $propertyLabelsTranslations = [];
+            if (extension_loaded('intl')) {
+                \Locale::setDefault($locale);
+            }
+            $translator = $services->get('MvcTranslator');
+            $translator->getDelegatedTranslator()->setLocale($locale);
+        }
+
+        /**
+         * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
+         * @var array $jsonLd
+         */
+        $resource = $event->getTarget();
+        $jsonLd = $event->getParam('jsonLd');
+        foreach (array_keys($resource->values()) as $term) {
+            foreach ($jsonLd[$term] as &$value) {
+                // In most of the cases in real data, there is only one value by
+                // property, so it's useless to store the label outside of the
+                // loop, that requires a json conversion or to get the value
+                // representation.
+                $value = json_decode(json_encode($value), true);
+                $label = $value['property_label'];
+                if (!isset($propertyLabelsTranslations[$label])) {
+                    $propertyLabelsTranslations[$label] = $translator->translate($label);
+                }
+                $value['property_label'] = $propertyLabelsTranslations[$label];
+            }
+        }
+
+        $event->setParam('jsonLd', $jsonLd);
+    }
+
+    public function filterJsonLdSitePage(Event $event)
     {
         $page = $event->getTarget();
         $jsonLd = $event->getParam('jsonLd');
