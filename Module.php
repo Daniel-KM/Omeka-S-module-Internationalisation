@@ -366,7 +366,10 @@ class Module extends AbstractModule
         // Process only external api requests.
         /** @var \Zend\Mvc\MvcEvent $mvcEvent */
         $mvcEvent = $services->get('Application')->getMvcEvent();
-        if (!$mvcEvent->getRouteMatch()->getParam('__API__')) {
+        // A check is required on route match to allow background processes.
+        $routeMatch = $mvcEvent->getRouteMatch();
+        // To make
+        if (!$routeMatch || !$routeMatch->getParam('__API__')) {
             return;
         }
 
