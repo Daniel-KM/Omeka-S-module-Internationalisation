@@ -11,6 +11,10 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 Installation
 ------------
 
+It is recommended to install the php extension `intl` to localize some strings,
+in particular dates. It may or may not be installed by default on your server,
+so check the system information in the bottom of the admin board of Omeka.
+
 This module may use the optional module [`Generic`] if installed.
 
 The module uses external libraries, so use the release zip to install it, or use
