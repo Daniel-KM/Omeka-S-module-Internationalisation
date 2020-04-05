@@ -39,7 +39,7 @@ SQL;
             $bind['is_public'] = 1;
         }
 
-        /* @var \Doctrine\DBAL\Connection $connection */
+        /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $services->get('Omeka\Connection');
         $connection->setFetchMode(\PDO::FETCH_KEY_PAIR);
         $localeSites = $connection->fetchAll($sql, $bind);
