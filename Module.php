@@ -713,12 +713,12 @@ SQL;
                 require_once __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
                 $isoCodes = \Iso639p3::codes($locale);
                 $settings->set('internationalisation_iso_codes', $isoCodes);
-                $locales += $isoCodes;
+                $locales = array_merge($locales, $isoCodes);
                 break;
 
             case 'all_fallback':
             case 'site_fallback':
-                $locales += $settings->get('internationalisation_fallbacks', []);
+                $locales = array_merge($locales, $settings->get('internationalisation_fallbacks', []));
                 break;
 
             case 'all_site':
@@ -733,7 +733,7 @@ SQL;
         }
 
         $requiredLanguages = $settings->get('internationalisation_required_languages', []);
-        $locales += $requiredLanguages;
+        $locales = array_merge($locales, $requiredLanguages);
         $locales = array_fill_keys(array_unique(array_filter($locales)), []);
 
         // Add a fallback for values without language in all cases,
