@@ -23,6 +23,13 @@ class Module extends AbstractModule
      */
     protected $cacheLocaleValues = [];
 
+    /**
+     * Sort order of the last select for vocabulary members query.
+     *
+     * @var array
+     */
+    protected $lastQuerySort = [];
+
     public function onBootstrap(MvcEvent $event)
     {
         parent::onBootstrap($event);
@@ -159,11 +166,22 @@ class Module extends AbstractModule
             'rep.resource.json',
             [$this, 'filterJsonLdSitePage']
         );
-
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\SitePageAdapter::class,
             'api.update.post',
             [$this, 'handleApiUpdatePostPage']
+        );
+
+        // Order the form element for properties and resource classes.
+        $sharedEventManager->attach(
+            \Omeka\Form\Element\AbstractVocabularyMemberSelect::class,
+            'form.vocab_member_select.query',
+            [$this, 'filterVocabularyMemberSelectQuery']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Form\Element\AbstractVocabularyMemberSelect::class,
+            'form.vocab_member_select.value_options',
+            [$this, 'filterVocabularyMemberSelectValues']
         );
 
         $sharedEventManager->attach(
@@ -595,6 +613,95 @@ SQL;
         }
         $sql = rtrim($sql, ',');
         $connection->exec($sql);
+    }
+
+    public function filterVocabularyMemberSelectQuery(Event $event)
+    {
+        $query = $event->getParam('query', []);
+        $this->lastQuerySort = [
+            'sort_by' => $query['sort_by'],
+            'sort_order' => isset($query['sort_order']) && strtolower($query['sort_order']) === 'desc' ? 'desc' : 'asc',
+        ];
+    }
+
+    public function filterVocabularyMemberSelectValues(Event $event)
+    {
+        if ($this->lastQuerySort['sort_by'] !== 'label') {
+            $this->lastQuerySort = [];
+            return;
+        }
+
+        // TODO Replace this event by a upper level sql event. May require insertion of translated terms in a table (automatically via rdf or po files?).
+
+        $valueOptions = $event->getParam('valueOptions', []);
+
+        // During this event, the labels are not yet translated by Zend form.
+        // They must not be translated twice.
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        // TODO natcasesort() doesn't manage accented letters ("É" is after "Z") (will be fixed by sql event?).
+
+        // Order first level by translated label: don't order prepended values,
+        // dcterms and dctype.
+        // The prepended values may contain array (module BulkImport).
+        // Keys "dcterms" and "dctype" may be missing (no example currently, but
+        // dctype is not used for properties).
+        if (isset($valueOptions['dcterms'])) {
+            $offset = array_search('dcterms', array_keys($valueOptions));
+            $prepended = array_slice($valueOptions, 0, $offset + 1, true);
+            $appended = array_slice($valueOptions, $offset + 1, null, true);
+        } elseif (isset($valueOptions['dctype'])) {
+            $offset = array_search('dctype', array_keys($valueOptions));
+            $prepended = array_slice($valueOptions, 0, $offset + 1, true);
+            $appended = array_slice($valueOptions, $offset + 1, null, true);
+        } else {
+            // This case is very rare (no example currently).
+            // In most cases, prepended values are not arrays.
+            $prepended = array_filter($valueOptions, 'is_scalar');
+            $appended = array_diff_key($valueOptions, $prepended);
+        }
+        $translateLabels = function($v) use ($translator) {
+            return is_array($v) ? $translator->translate($v['label']) : $translator->translate($v);
+        };
+        $appendedTranslated = array_map($translateLabels, $appended);
+        natcasesort($appendedTranslated);
+        $appended = array_replace($appendedTranslated, $appended);
+        $valueOptions = $prepended + $appended;
+
+        // Order second level by translated label, dcterms / dctype included,
+        // but not the prepended values.
+        if (isset($valueOptions['dctype'])) {
+            $offset = array_search('dctype', array_keys($valueOptions));
+            $prepended = array_slice($valueOptions, 0, $offset, true);
+            $appended = array_slice($valueOptions, $offset, null, true);
+        } elseif (isset($valueOptions['dcterms'])) {
+            $offset = array_search('dcterms', array_keys($valueOptions));
+            $prepended = array_slice($valueOptions, 0, $offset, true);
+            $appended = array_slice($valueOptions, $offset, null, true);
+        } else {
+            $prepended = array_filter($valueOptions, 'is_scalar');
+            $appended = array_diff_key($valueOptions, $prepended);
+        }
+        $reverted = $this->lastQuerySort['sort_order'] === 'desc';
+        $translateOptionsLabels = function($v) use ($translator, $reverted) {
+            if (is_scalar($v)) {
+                return $v;
+            }
+            $optionLabelsTranslated = array_map(function($vv) use ($translator) {
+                return $translator->translate($vv['label']);
+            }, $v['options']);
+            natcasesort($optionLabelsTranslated);
+            if ($reverted) {
+                $optionLabelsTranslated = array_reverse($optionLabelsTranslated, true);
+            }
+            $this->lastQuerySort['sort_by'];
+            $v['options'] = array_replace($optionLabelsTranslated, $v['options']);
+            return $v;
+        };
+        $appended = array_map($translateOptionsLabels, $appended);
+        $valueOptions = $prepended + $appended;
+
+        $this->lastQuerySort = [];
+        $event->setParam('valueOptions', $valueOptions);
     }
 
     public function handleMainSettings(Event $event)
