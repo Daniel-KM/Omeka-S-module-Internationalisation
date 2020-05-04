@@ -244,12 +244,17 @@ class Module extends AbstractModule
         } else {
             $title = $resource->value('dcterms:title');
         }
-
         $event->setParam('title', $title);
     }
 
     /**
      * Order values of each property according to settings, without filtering.
+     *
+     * All values in all languages are cached internally for each resource. The
+     * first value is always in the good locale, in particular for title. The
+     * other values are displayed and filtered via method displayValues().
+     *
+     * @todo Improve this process for memory and to avoid to loop values (even if it's not the common case). Store only language+key order of the value?
      *
      * @param Event $event
      */
@@ -262,7 +267,18 @@ class Module extends AbstractModule
 
         $resourceId = $event->getTarget()->id();
         if (isset($this->cacheLocaleValues[$resourceId])) {
-            return $this->cacheLocaleValues[$resourceId];
+            $values = $event->getParam('values');
+            foreach ($this->cacheLocaleValues[$resourceId] as $term => $valuesByLang) {
+                // TODO Sometime, array_merge of array_values returns a null.
+                // $values[$term]['values'] = array_merge(...array_values($valuesByLang));
+                $vv = [];
+                foreach ($valuesByLang as $vvalues) {
+                    $vv = array_merge($vv, array_values($vvalues));
+                }
+                $values[$term]['values'] = $vv;
+            }
+            $event->setParam('values', $values);
+            return;
         }
 
         $this->cacheLocaleValues[$resourceId] = [];
@@ -270,16 +286,27 @@ class Module extends AbstractModule
         // Order values for each property according to settings.
         $values = $event->getParam('values');
         foreach ($values as $term => &$valueInfo) {
-            $valuesByLang = $locales;
-            foreach ($valueInfo['values'] as $value) {
-                $valuesByLang[$value->lang()][] = $value;
+            // Sometime, the key "values" is null.
+            // TODO Find why the key "values" of the resource can be null. Probably related to templates.
+            if ($valueInfo['values']) {
+                $valuesByLang = $locales;
+                foreach ($valueInfo['values'] as $value) {
+                    $valuesByLang[$value->lang()][] = $value;
+                }
+                $valuesByLang = array_filter($valuesByLang) ?: [];
+            } else {
+                $valuesByLang = [];
             }
-            $valuesByLang = array_filter($valuesByLang);
             $this->cacheLocaleValues[$resourceId][$term] = $valuesByLang;
-            $valueInfo['values'] = $valuesByLang
-                ? array_merge(...array_values($valuesByLang))
-                : [];
+            // TODO Sometime, array_merge of array_values returns a null.
+            // $valueInfo['values'] = $valuesByLang ? array_merge(...array_values($valuesByLang)) : [];
+            $vv = [];
+            foreach ($valuesByLang as $vvalues) {
+                $vv = array_merge($vv, array_values($vvalues));
+            }
+            $valueInfo['values'] = $vv;
         }
+        unset($valueInfo);
 
         $event->setParam('values', $values);
     }
@@ -352,6 +379,7 @@ class Module extends AbstractModule
                     return;
             }
         }
+        unset($valueInfo);
 
         $event->setParam('values', $values);
     }
@@ -479,6 +507,7 @@ class Module extends AbstractModule
                         $value['property_label'] = $propertyLabels[$label];
                     }
                 }
+                unset($value);
             }
         } else {
             // Process the replacement of the property labels without template.
@@ -495,6 +524,7 @@ class Module extends AbstractModule
                     }
                     $value['property_label'] = $propertyLabels[$label];
                 }
+                unset($value);
             }
         }
 
