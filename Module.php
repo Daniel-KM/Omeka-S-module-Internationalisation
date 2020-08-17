@@ -689,7 +689,7 @@ SQL;
             $prepended = array_filter($valueOptions, 'is_scalar');
             $appended = array_diff_key($valueOptions, $prepended);
         }
-        $translateLabels = function($v) use ($translator) {
+        $translateLabels = function ($v) use ($translator) {
             return is_array($v) ? $translator->translate($v['label']) : $translator->translate($v);
         };
         $appendedTranslated = array_map($translateLabels, $appended);
@@ -712,11 +712,11 @@ SQL;
             $appended = array_diff_key($valueOptions, $prepended);
         }
         $reverted = $this->lastQuerySort['sort_order'] === 'desc';
-        $translateOptionsLabels = function($v) use ($translator, $reverted) {
+        $translateOptionsLabels = function ($v) use ($translator, $reverted) {
             if (is_scalar($v)) {
                 return $v;
             }
-            $optionLabelsTranslated = array_map(function($vv) use ($translator) {
+            $optionLabelsTranslated = array_map(function ($vv) use ($translator) {
                 return $translator->translate($vv['label']);
             }, $v['options']);
             natcasesort($optionLabelsTranslated);
