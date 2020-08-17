@@ -15,7 +15,7 @@ It is recommended to install the php extension `intl` to localize some strings,
 in particular dates. It may or may not be installed by default on your server,
 so check the system information in the bottom of the admin board of Omeka.
 
-This module may use the optional module [`Generic`] if installed.
+This module may use the optional module [Generic] if installed.
 
 The module uses external libraries, so use the release zip to install it, or use
 and init the source.
@@ -24,7 +24,7 @@ See general end user documentation for [installing a module].
 
 * From the zip
 
-Download the last release [`Internationalisation.zip`] from the list of releases
+Download the last release [Internationalisation.zip] from the list of releases
 (the master does not contain the dependency), and uncompress it in the `modules`
 directory.
 
@@ -34,7 +34,7 @@ If the module was installed from the source, rename the name of the folder of
 the module to `Internationalisation`, go to the root of the module, and run:
 
 ```
-composer install
+composer install --no-dev
 ```
 
 **Important**: Read below to display all translations for interface and metadata.
@@ -104,9 +104,9 @@ header:
 <?php if ($this->getHelperPluginManager()->has('languageSwitcher')) echo $this->languageSwitcher(); ?>
 ```
 
-The partial `common/helper/language-switcher.phtml` view can be themed: simply copy it
-in your theme and customize it. The helper supports options "template" and "locale_as_code".
-Other options are passed to the template.
+The partial `common/helper/language-switcher.phtml` view can be themed: simply
+copy it in your theme and customize it. The helper supports options "template"
+and "locale_as_code". Other options are passed to the template.
 
 ### Properties
 
@@ -290,12 +290,13 @@ This module was built for [Watau].
 [MultiLanguage]: https://github.com/patrickmj/multilanguage
 [Locale Switcher]: https://github.com/Daniel-KM/Omeka-plugin-LocaleSwitcher
 [Omeka Classic]: https://omeka.org/classic
-[`Generic`]: https://github.com/Daniel-KM/Omeka-S-module-Generic
-[`Internationalisation.zip`]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/releases
+[Generic]: https://github.com/Daniel-KM/Omeka-S-module-Generic
+[Internationalisation.zip]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/releases
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L489
 [#1506]: https://github.com/omeka/omeka-s/pull/1506/files
+[omeka/omeka-s#1493]: https://github.com/omeka/omeka-s/pull/1493
 [ApiInfo]: https://github.com/Daniel-KM/Omeka-S-module-ApiInfo
 [Next]: https://github.com/Daniel-KM/Omeka-S-module-Next
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/issues
