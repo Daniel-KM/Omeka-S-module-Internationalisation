@@ -26,6 +26,8 @@ class LocaleValueFactory implements FactoryInterface
             $fallbacks = $settings->get('internationalisation_iso_codes', []);
         } elseif ($displayValues === 'site_fallback') {
             $fallbacks = $settings->get('internationalisation_fallbacks', []);
+        } else {
+            $fallbacks = [];
         }
 
         return new LocaleValue(
