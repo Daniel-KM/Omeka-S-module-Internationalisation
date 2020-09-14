@@ -4,7 +4,7 @@ namespace Internationalisation\Form;
 use Internationalisation\Form\Element\SitesPageSelect;
 use Zend\Form\Fieldset;
 
-class SimplePageFieldset extends Fieldset
+class MirrorPageFieldset extends Fieldset
 {
     public function init()
     {

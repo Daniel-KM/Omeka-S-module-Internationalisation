@@ -50,13 +50,13 @@ SQL;
 
 if (version_compare($oldVersion, '3.2.7', '<')) {
     $sql = <<<SQL
-UPDATE site_setting SET value = '"all_site"'
+UPDATE `site_setting` SET `value` = '"all_site"'
 WHERE `id` = "internationalisation_display_values"
     AND `value` = '"all_ordered"';
-UPDATE site_setting SET value = '"site"'
+UPDATE site_setting SET `value` = '"site"'
 WHERE `id` = "internationalisation_display_values"
     AND `value` = '"site_lang"';
-UPDATE site_setting SET value = '"site_iso"'
+UPDATE site_setting SET `value` = '"site_iso"'
 WHERE `id` = "internationalisation_display_values"
     AND `value` = '"site_lang_iso"';
 SQL;
@@ -74,4 +74,12 @@ SQL;
         $settings->setTargetId($siteId);
         $this->prepareSiteLocales($settings);
     }
+}
+
+if (version_compare($oldVersion, '3.2.10', '<')) {
+    $sql = <<<SQL
+UPDATE `site_page_block` SET `layout` = "mirrorPage"
+WHERE `layout` = "simplePage";
+SQL;
+    $connection->exec($sql);
 }

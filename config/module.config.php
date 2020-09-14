@@ -40,13 +40,13 @@ return [
     ],
     'block_layouts' => [
         'factories' => [
-            'simplePage' => Service\BlockLayout\SimplePageFactory::class,
+            'mirrorPage' => Service\BlockLayout\MirrorPageFactory::class,
         ],
     ],
     'form_elements' => [
         'invokables' => [
             Form\SettingsFieldset::class => Form\SettingsFieldset::class,
-            Form\SimplePageFieldset::class => Form\SimplePageFieldset::class,
+            Form\MirrorPageFieldset::class => Form\MirrorPageFieldset::class,
         ],
         'factories' => [
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
@@ -83,7 +83,7 @@ return [
             'internationalisation_iso_codes' => [],
         ],
         'block_settings' => [
-            'simplePage' => [
+            'mirrorPage' => [
                 'page' => null,
             ],
         ],

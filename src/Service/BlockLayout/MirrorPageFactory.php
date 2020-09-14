@@ -1,20 +1,21 @@
 <?php
+
 namespace Internationalisation\Service\BlockLayout;
 
-use Internationalisation\Site\BlockLayout\SimplePage;
+use Internationalisation\Site\BlockLayout\MirrorPage;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class SimplePageFactory implements FactoryInterface
+class MirrorPageFactory implements FactoryInterface
 {
     /**
      * Create the SimplePage block layout service.
      *
-     * @return SimplePage
+     * @return MirrorPage
      */
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return new SimplePage(
+        return new MirrorPage(
             $services->get('Omeka\ApiManager')
         );
     }

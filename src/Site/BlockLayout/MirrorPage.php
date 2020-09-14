@@ -1,4 +1,5 @@
 <?php
+
 namespace Internationalisation\Site\BlockLayout;
 
 use Omeka\Api\Manager as ApiManager;
@@ -11,7 +12,12 @@ use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Omeka\Stdlib\ErrorStore;
 use Zend\View\Renderer\PhpRenderer;
 
-class SimplePage extends AbstractBlockLayout
+/**
+ * Copy of the same block from module BlockPlus.
+ *
+ * @see \BlockPlus\Site\BlockLayout\MirrorPage
+ */
+class MirrorPage extends AbstractBlockLayout
 {
     /**
      * The default partial view script.
@@ -33,34 +39,34 @@ class SimplePage extends AbstractBlockLayout
 
     public function getLabel()
     {
-        return 'Simple page'; // @translate
+        return 'Mirror page'; // @translate
     }
 
     public function onHydrate(SitePageBlock $block, ErrorStore $errorStore)
     {
-        $simplePage = (int) $block->getData()['page'] ?: $this->defaultSettings['page'];
+        $mirrorPage = (int) $block->getData()['page'] ?: $this->defaultSettings['page'];
 
-        if (empty($simplePage)) {
-            $errorStore->addError('o:block[__blockIndex__][o:data][page]', 'A page should be selected to create a simple page.'); // @translate
+        if (empty($mirrorPage)) {
+            $errorStore->addError('o:block[__blockIndex__][o:data][page]', 'A page should be selected to create a mirror page.'); // @translate
             return;
         }
 
-        if ($simplePage === $block->getPage()->getId()) {
-            $errorStore->addError('o:block[__blockIndex__][o:data][page]', 'A simple page cannot be inside itself.'); // @translate
+        if ($mirrorPage === $block->getPage()->getId()) {
+            $errorStore->addError('o:block[__blockIndex__][o:data][page]', 'A mirror page cannot be inside itself.'); // @translate
             return;
         }
 
         // A page cannot be searched by id, so try read.
         try {
-            $response = $this->api->read('site_pages', ['id' => $simplePage], [], ['responseContent' => 'resource']);
+            $response = $this->api->read('site_pages', ['id' => $mirrorPage], [], ['responseContent' => 'resource']);
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
-            $errorStore->addError('o:block[__blockIndex__][o:data][page]', 'A simple page cannot use a page that uses it recursively as a block.'); // @translate
+            $errorStore->addError('o:block[__blockIndex__][o:data][page]', 'A mirror page cannot use a page that uses it recursively as a block.'); // @translate
             return;
         }
-        $simplePage = $response->getContent();
+        $mirrorPage = $response->getContent();
 
-        if (!$this->checkSimplePage($block->getPage(), $simplePage)) {
-            $errorStore->addError('o:block[__blockIndex__][o:data][page]', 'A simple page cannot use a page that uses it recursively as a block.'); // @translate
+        if (!$this->checkMirrorPage($block->getPage(), $mirrorPage)) {
+            $errorStore->addError('o:block[__blockIndex__][o:data][page]', 'A mirror page cannot use a page that uses it recursively as a block.'); // @translate
             return;
         }
     }
@@ -74,8 +80,8 @@ class SimplePage extends AbstractBlockLayout
         // Factory is not used to make rendering simpler.
         $services = $site->getServiceLocator();
         $formElementManager = $services->get('FormElementManager');
-        $defaultSettings = $services->get('Config')['internationalisation']['block_settings']['simplePage'];
-        $blockFieldset = \Internationalisation\Form\SimplePageFieldset::class;
+        $defaultSettings = $services->get('Config')['blockplus']['block_settings']['mirrorPage'];
+        $blockFieldset = \BlockPlus\Form\MirrorPageFieldset::class;
 
         $data = $block ? $block->data() + $defaultSettings : $defaultSettings;
 
@@ -98,14 +104,14 @@ class SimplePage extends AbstractBlockLayout
 
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
-        $simplePage = $block->dataValue('page');
+        $mirrorPage = $block->dataValue('page');
 
         // A page cannot be searched by id, so try read.
         try {
-            $response = $view->api()->read('site_pages', ['id' => $simplePage]);
+            $response = $view->api()->read('site_pages', ['id' => $mirrorPage]);
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             $view->logger()->err(sprintf(
-                'Simple page block #%d of page "%s" of site "%s" should be updated: it refers to a removed page.', // @translate
+                'Mirror page block #%d of page "%s" of site "%s" should be updated: it refers to a removed page.', // @translate
                 $block->id(),
                 $block->page()->slug(),
                 $block->page()->site()->slug()
@@ -115,16 +121,16 @@ class SimplePage extends AbstractBlockLayout
             return '';
         }
 
-        /** @var \Omeka\Api\Representation\SitePageRepresentation $simplePage */
-        $simplePage = $response->getContent();
+        /** @var \Omeka\Api\Representation\SitePageRepresentation $mirrorPage */
+        $mirrorPage = $response->getContent();
 
         // The page cannot be rendered by the partial directly, because some
         // cases should be fixed.
 
         // @see \Omeka\Controller\Site\PageController::showAction()
         $contentView = new \Zend\View\Model\ViewModel;
-        $contentView->setVariable('site', $simplePage->site());
-        $contentView->setVariable('page', $simplePage);
+        $contentView->setVariable('site', $mirrorPage->site());
+        $contentView->setVariable('page', $mirrorPage);
         $contentView->setTemplate('omeka/site/page/content');
         // This fixes the block Table Of Contents.
         $contentView->setVariable('pageViewModel', $contentView);
@@ -133,26 +139,26 @@ class SimplePage extends AbstractBlockLayout
 
     public function getFulltextText(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
-        // TODO Many blocks are not indexed. Why indexing them in simple pages?
+        // TODO Many blocks are not indexed. Why indexing them in mirror pages?
         return strip_tags($this->render($view, $block));
     }
 
     /**
-     * Recursively check if a simple page belongs to itself via recursive blocks.
+     * Recursively check if a mirror page belongs to itself via recursive blocks.
      *
      * @param SitePage $page
-     * @param SitePage $simplePage
+     * @param SitePage $mirrorPage
      * @param array $blocks
      * @return bool
      */
-    protected function checkSimplePage(SitePage $page, SitePage $simplePage)
+    protected function checkMirrorPage(SitePage $page, SitePage $mirrorPage)
     {
-        if ($page->getId() === $simplePage->getId()) {
+        if ($page->getId() === $mirrorPage->getId()) {
             return false;
         }
 
-        foreach ($simplePage->getBlocks() as $block) {
-            if ($block->getLayout() === 'simplePage') {
+        foreach ($mirrorPage->getBlocks() as $block) {
+            if ($block->getLayout() === 'mirrorPage') {
                 if ($page->getId() === $block->getData()['page']) {
                     return false;
                 }
@@ -161,8 +167,8 @@ class SimplePage extends AbstractBlockLayout
                 } catch (\Omeka\Api\Exception\NotFoundException $e) {
                     return false;
                 }
-                $simplePage = $response->getContent();
-                if (!$this->checkSimplePage($page, $simplePage)) {
+                $mirrorPage = $response->getContent();
+                if (!$this->checkMirrorPage($page, $mirrorPage)) {
                     return false;
                 }
             }
