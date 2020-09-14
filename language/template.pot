@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-24 00:00+0100\n"
+"POT-Creation-Date: 2020-09-14 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,12 +17,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:53
+#: Module.php:63
 msgid "The composer vendor is not ready."
 msgstr ""
 
-#: Module.php:54
+#: Module.php:64
 msgid "See module’s installation documentation."
+msgstr ""
+
+#: Module.php:898
+msgid "Remove and copy data"
 msgstr ""
 
 #: src/Api/Adapter/SitePageRelationAdapter.php:253
@@ -30,47 +34,99 @@ msgstr ""
 msgid "The \"%s\" field is not available in the %s entity class."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:542
+#: src/Generic/AbstractModule.php:601
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:562
+#: src/Generic/AbstractModule.php:621
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:630
+#: src/Generic/AbstractModule.php:689
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
 "unavailable."
 msgstr ""
 
-#: src/Site/BlockLayout/SimplePage.php:91
+#: src/Site/BlockLayout/MirrorPage.php:97
 msgid "Choose any page from any site."
 msgstr ""
 
-#: src/Site/BlockLayout/SimplePage.php:92
+#: src/Site/BlockLayout/MirrorPage.php:98
 msgid ""
 "If a page of a private site is selected, it will be hidden on the public "
 "side."
 msgstr ""
 
-#: src/Site/BlockLayout/SimplePage.php:93
+#: src/Site/BlockLayout/MirrorPage.php:99
 msgid "The current page and recursive pages are forbidden."
 msgstr ""
 
-#: Module.php:610 src/Form/SettingsFieldset.php:22
+#: Module.php:806 src/Form/SettingsFieldset.php:22
 #: src/Form/SettingsFieldset.php:24
 msgid "Remove all groups"
 msgstr ""
 
-#: src/Form/SimplePageFieldset.php:16
-msgid ""
-"Private sites are marked with a \"*\". If a private page is selected, it "
-"will be hidden on the public site. The current page and recursive pages are "
-"forbidden."
+#: Module.php:955 src/Job/DuplicateSite.php:89
+#, php-format
+msgid "The site #%1$s cannot be copied. Check your rights."
+msgstr ""
+
+#: Module.php:986
+#, php-format
+msgid "Remove/copy processes have been done for site \"%1$s\"."
+msgstr ""
+
+#: Module.php:993
+#, php-format
+msgid "See %1$sjob #%2$d%3$s for more information (%4$slogs%3$s)."
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:12
+msgid "Duplicate site"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:20
+msgid "Site navigation"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:21
+msgid "Site settings"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:25
+msgid "Permissions"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:28
+msgid "Collecting forms"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:46
+msgid "Data to remove"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:59
+msgid "Site to copy"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:74
+msgid "Data to copy"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:87
+msgid "Duplication mode for pages"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:89
+msgid "Copy each page and block individually"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:90
+msgid "Create linked mirror pages"
 msgstr ""
 
 #: src/Form/SitePageForm.php:17
@@ -172,6 +228,13 @@ msgid ""
 "displayed in all cases. Set one language code by line."
 msgstr ""
 
+#: src/Form/MirrorPageFieldset.php:16
+msgid ""
+"Private sites are marked with a \"*\". If a private page is selected, it "
+"will be hidden on the public site. The current page and recursive pages are "
+"forbidden."
+msgstr ""
+
 #: src/Api/Adapter/SitePageRelationAdapter.php:67
 msgid "A relation between pages must have a page."
 msgstr ""
@@ -185,26 +248,84 @@ msgid ""
 "The page and the related page of a relation between pages must be different."
 msgstr ""
 
-#: src/Site/BlockLayout/SimplePage.php:36
-msgid "Simple page"
+#: src/Job/DuplicateSite.php:74
+#, php-format
+msgid "The site #%1$s is not available for copy. Check your rights."
 msgstr ""
 
-#: src/Site/BlockLayout/SimplePage.php:44
-msgid "A page should be selected to create a simple page."
+#: src/Job/DuplicateSite.php:180
+msgid "Check logs: an error occurred."
 msgstr ""
 
-#: src/Site/BlockLayout/SimplePage.php:49
-msgid "A simple page cannot be inside itself."
+#: src/Job/DuplicateSite.php:223
+#, php-format
+msgid "Site settings of \"%1$s\" successfully removed."
 msgstr ""
 
-#: src/Site/BlockLayout/SimplePage.php:57
-#: src/Site/BlockLayout/SimplePage.php:63
-msgid "A simple page cannot use a page that uses it recursively as a block."
+#: src/Job/DuplicateSite.php:257
+#, php-format
+msgid "%1$d site permissions removed from \"%2$s\"."
 msgstr ""
 
-#: src/Site/BlockLayout/SimplePage.php:108
+#: src/Job/DuplicateSite.php:296
+#, php-format
+msgid "%1$d site pages removed from \"%2$s\"."
+msgstr ""
+
+#: src/Job/DuplicateSite.php:310
+#, php-format
+msgid "%1$d collecting forms removed from \"%2$s\"."
+msgstr ""
+
+#: src/Job/DuplicateSite.php:345
+#, php-format
+msgid "Site settings of \"%1$s\" successfully copied into \"%2$s\"."
+msgstr ""
+
+#: src/Job/DuplicateSite.php:407
+#, php-format
+msgid "The page slug \"%1$s\" from the source has been renamed \"%2$s\"."
+msgstr ""
+
+#: src/Job/DuplicateSite.php:413
+#, php-format
+msgid "Unable to copy page \"%1$s\" of site \"%2$s\". The page is skipped."
+msgstr ""
+
+#: src/Job/DuplicateSite.php:423
 #, php-format
 msgid ""
-"Simple page block #%d of page \"%s\" of site \"%s\" should be updated: it "
+"%1$d site pages of \"%2$s\" successfully copied into \"%3$s\" (mode \"%4$s"
+"\")."
+msgstr ""
+
+#: src/Job/DuplicateSite.php:524
+#, php-format
+msgid ""
+"%1$d collecting forms from site \"%2$s\" were successfully copied into \"%3$s"
+"\"."
+msgstr ""
+
+#: src/Site/BlockLayout/MirrorPage.php:42
+msgid "Mirror page"
+msgstr ""
+
+#: src/Site/BlockLayout/MirrorPage.php:50
+msgid "A page should be selected to create a mirror page."
+msgstr ""
+
+#: src/Site/BlockLayout/MirrorPage.php:55
+msgid "A mirror page cannot be inside itself."
+msgstr ""
+
+#: src/Site/BlockLayout/MirrorPage.php:63
+#: src/Site/BlockLayout/MirrorPage.php:69
+msgid "A mirror page cannot use a page that uses it recursively as a block."
+msgstr ""
+
+#: src/Site/BlockLayout/MirrorPage.php:114
+#, php-format
+msgid ""
+"Mirror page block #%d of page \"%s\" of site \"%s\" should be updated: it "
 "refers to a removed page."
 msgstr ""
