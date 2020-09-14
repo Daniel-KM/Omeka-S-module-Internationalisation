@@ -45,12 +45,12 @@ return [
     ],
     'form_elements' => [
         'invokables' => [
-            Form\DuplicateSiteFieldset::class => Form\DuplicateSiteFieldset::class,
             Form\MirrorPageFieldset::class => Form\MirrorPageFieldset::class,
             Form\SettingsFieldset::class => Form\SettingsFieldset::class,
         ],
         'factories' => [
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
+            Form\DuplicateSiteFieldset::class => \Zend\Form\ElementFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
             \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
         ],

@@ -13,9 +13,18 @@ class DuplicateSiteFieldset extends Fieldset
 
     public function init()
     {
+        $isNew = (bool) $this->getOption('is_new');
         $this
             ->setName('internationalisation')
             ->setAttribute('id', 'internationalisation')
+            ->add([
+                'name' => 'is_new',
+                'type' => Element\Hidden::class,
+                'attributes' => [
+                    'id' => 'is_new',
+                    'value' => (int) $isNew,
+                ],
+            ])
             ->add([
                 'name' => 'source',
                 'type' => SiteSelect::class,
@@ -32,14 +41,26 @@ class DuplicateSiteFieldset extends Fieldset
                 ],
             ])
             ->add([
+                'name' => 'remove_pages',
+                'type' => $isNew ? Element\Hidden::class : Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Remove existing pages', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'remove_pages',
+                    'value' => (int) $isNew,
+                ],
+            ])
+            ->add([
                 'name' => 'data',
                 'type' => Element\MultiCheckbox::class,
                 'options' => [
                     'label' => 'Data to copy', // @translate
                     'value_options' => [
-                        'metadata' => 'Site metadata', // @translate
-                        'settings' => 'Site settings', // @translate
                         'pages' => 'Pages', // @translate
+                        'navigation' => 'Site navigation', // @translate
+                        'settings' => 'Site settings', // @translate
+                        'theme' => 'Theme', // @translate
                         'item_pool' => 'Item pool', // @translate
                         'item_sets' => 'Item sets', // @translate
                         'permissions' => 'Permissions', // @translate
@@ -48,7 +69,7 @@ class DuplicateSiteFieldset extends Fieldset
                 'attributes' => [
                     'id' => 'data',
                     'required' => false,
-                    'value' => ['metadata', 'settings', 'pages', 'item_pool', 'item_sets', 'permissions'],
+                    'value' => $isNew ? ['pages', 'navigation', 'settings', 'theme', 'item_pool', 'item_sets', 'permissions'] : [],
                 ],
             ])
             ->add([
@@ -66,19 +87,22 @@ class DuplicateSiteFieldset extends Fieldset
                     'required' => false,
                     'value' => 'block',
                 ],
-            ])
-            ->add([
-                'name' => 'locale',
-                'type' => 'Omeka\Form\Element\LocaleSelect',
-                'options' => [
-                    'label' => 'Locale', // @translate
-                    'info' => 'Locale/language code for this site. Leave blank to use the global locale setting.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'locale',
-                    'class' => 'chosen-select',
-                ],
             ]);
+        if ($isNew) {
+            $this
+                ->add([
+                    'name' => 'locale',
+                    'type' => 'Omeka\Form\Element\LocaleSelect',
+                    'options' => [
+                        'label' => 'Locale', // @translate
+                        'info' => 'Locale/language code for this site. Leave blank to use the global locale setting.', // @translate
+                    ],
+                    'attributes' => [
+                        'id' => 'locale',
+                        'class' => 'chosen-select',
+                    ],
+                ]);
+        }
     }
 
     public function updateInputFilter(InputFilter $inputFilter)

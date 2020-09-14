@@ -222,7 +222,22 @@ class Module extends AbstractModule
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\SiteAdapter::class,
             'api.create.post',
-            [$this, 'handleSiteCreatePost']
+            [$this, 'handleSitePost']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\SiteAdapter::class,
+            'api.update.post',
+            [$this, 'handleSitePost']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\SiteAdmin\Index',
+            'view.add.after',
+            [$this, 'handleSiteAdminViewAfter']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\SiteAdmin\Index',
+            'view.edit.after',
+            [$this, 'handleSiteAdminViewAfter']
         );
     }
 
@@ -840,35 +855,59 @@ SQL;
 
     public function handleSiteFormElements(Event $event)
     {
-        // Add the select to duplicate a site only when "add".
-        /** @var \Omeka\Mvc\Status $status */
+        /**
+         * @var \Zend\Router\Http\RouteMatch $routeMatch
+         * @var \Internationalisation\Form\DuplicateSiteFieldset $fieldset
+         */
         $services = $this->getServiceLocator();
-        if ($services->get('Omeka\Status')->getRouteMatch()->getParam('action') === 'edit') {
-            return;
-        }
-
-        $fieldset = $services->get('FormElementManager')
-            ->get(\Internationalisation\Form\DuplicateSiteFieldset::class);
+        $routeMatch = $services->get('Omeka\Status')->getRouteMatch();
+        $isNew = $routeMatch->getParam('controller') === 'Omeka\Controller\SiteAdmin\Index'
+            && $routeMatch->getParam('action') === 'add';
+        $fieldset = $services->get('FormElementManager')->get(
+            \Internationalisation\Form\DuplicateSiteFieldset::class,
+            ['is_new' => $isNew]
+        );
         $event->getTarget()->add($fieldset);
     }
 
     public function handleSiteFormFilters(Event $event)
     {
-        // Add the select to duplicate a site only when "add".
-        /** @var \Omeka\Mvc\Status $status */
-        $services = $this->getServiceLocator();
-        if ($services->get('Omeka\Status')->getRouteMatch()->getParam('action') === 'edit') {
-            return;
-        }
-
-        /** @var \Internationalisation\Form\DuplicateSiteFieldset $fieldset */
-        $fieldset = $services->get('FormElementManager')
-            ->get(\Internationalisation\Form\DuplicateSiteFieldset::class);
-        $inputFilter = $event->getParam('inputFilter')->get('internationalisation');
-        $fieldset->updateInputFilter($inputFilter);
+        /**
+         * @var \Internationalisation\Form\DuplicateSiteFieldset $fieldset
+         */
+        $inputFilter = $event->getParam('inputFilter')
+            ->get('internationalisation');
+        $fieldset = $this->getServiceLocator()->get('FormElementManager')->get(
+            \Internationalisation\Form\DuplicateSiteFieldset::class,
+            ['is_new' => true]
+        );
+        $fieldset
+            ->updateInputFilter($inputFilter);
     }
 
-    public function handleSiteCreatePost(Event $event)
+    public function handleSiteAdminViewAfter(Event $event)
+    {
+        $view = $event->getTarget();
+        $expand = json_encode($view->translate('Expand'), 320);
+        $legend = json_encode($view->translate('Copy data from another site'), 320);
+        echo <<<INLINE
+<style>
+.collapse + #internationalisation.collapsible {
+    overflow: initial;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('[name^="internationalisation"]').closest('.field')
+        .wrapAll('<fieldset id="internationalisation" class="field-container collapsible">')
+        .closest('#internationalisation')
+        .before('<a href="#" class="expand" aria-label=$expand>' + $legend + ' </a> ');
+});
+</script>
+INLINE;
+    }
+
+    public function handleSitePost(Event $event)
     {
         $site = $event->getParam('response')->getContent();
         if (empty($site)) {
@@ -885,11 +924,13 @@ SQL;
         // Set default values in case of a creation outside of the form.
         $params += [
             'source' => null,
-            'data' => ['metadata', 'settings', 'pages', 'item_pool', 'item_sets', 'permissions'],
-            'pages_mode' => 'block',
+            'remove_pages' => false,
+            'data' => [],
+            'pages_mode' => null,
             'locale' => null,
+            'is_new' => false,
         ];
-        if (!$params['source']) {
+        if (!$params['source'] || !count($params['data'])) {
             return;
         }
 
@@ -907,13 +948,23 @@ SQL;
             return;
         }
 
+        $isNew = (bool) $params['is_new'];
+        if ($isNew) {
+            $locale = $params['locale'];
+        } else {
+            $siteSettings = $services->get('Omeka\Settings\Site');
+            $siteSettings->setTargetId($site->getId());
+            $locale = $siteSettings->get('locale');
+        }
+
         $args = [
             'source' => (int) $params['source'],
             'target' => $site->getId(),
+            'remove_pages' => $params['remove_pages'],
             'data' => $params['data'],
             'pages_mode' => $params['pages_mode'],
-            'remove_pages' => true,
-            'settings' => ['locale' => $params['locale']],
+            // Settings to keep.
+            'settings' => ['locale' => $locale],
         ];
 
         // A sync job is used because it's a quick operation and rare.
@@ -921,11 +972,9 @@ SQL;
         $job = $services->get(\Omeka\Job\Dispatcher::class)
             ->dispatch(\Internationalisation\Job\DuplicateSite::class, $args, $strategy);
         $message = new Message(
-            'The site "%1$s" has been copied into the current site "%2$s" (mode "%3$s", locale "%4$s").', // @translate
+            'The site "%1$s" has been copied into the current site "%2$s".', // @translate
             $source->getSlug(),
-            $site->getSlug(),
-            $params['pages_mode'],
-            $params['locale']
+            $site->getSlug()
         );
         $messenger->addSuccess($message);
 

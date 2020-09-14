@@ -55,7 +55,7 @@ class DuplicateSite extends AbstractJob
         $this->entityManager = $services->get('Omeka\EntityManager');
         $this->connection = $this->entityManager->getConnection();
 
-        $duplicateData = $this->getArg('data', ['metadata', 'settings', 'pages', 'item_pool', 'item_sets', 'permissions']);
+        $duplicateData = $this->getArg('data', []);
         if (empty($duplicateData)) {
             return;
         }
@@ -65,7 +65,6 @@ class DuplicateSite extends AbstractJob
         $pagesMode = $this->getArg('pages_mode', 'block');
         // TODO Finalize removing of pages when false.
         $removePages = $this->getArg('remove_pages', false);
-        $settings = $this->getArg('settings', []);
 
         try {
             /** @var \Omeka\Entity\Site $source */
@@ -95,10 +94,6 @@ class DuplicateSite extends AbstractJob
             return;
         }
 
-        if (in_array('settings', $duplicateData)) {
-            $this->duplicateSettings($source, $target, $settings);
-        }
-
         // Add the site to the group first to simplify duplication of pages.
         $settings = $services->get('Omeka\Settings');
         $siteGroups = $settings->get('internationalisation_site_groups') ?: [];
@@ -123,8 +118,9 @@ class DuplicateSite extends AbstractJob
             $this->entityManager->flush();
         }
 
-        if (in_array('pages', $duplicateData)) {
-            $this->duplicatePages($source, $target, $pagesMode);
+        if (in_array('settings', $duplicateData)) {
+            $settings = $this->getArg('settings', []);
+            $this->duplicateSettings($source, $target, $settings);
         }
 
         if (in_array('permissions', $duplicateData)) {
@@ -139,12 +135,17 @@ class DuplicateSite extends AbstractJob
             $this->copySiteItemSets($source, $target);
         }
 
-        if (in_array('metadata', $duplicateData)) {
-            $this->copySiteMetadata($source, $target);
+        if (in_array('theme', $duplicateData)) {
+            $this->copySiteTheme($source, $target);
         }
 
-        if (in_array('pages', $duplicateData) || in_array('metadata', $duplicateData)) {
-            $this->updateSiteMetadata($source, $target);
+        if (in_array('pages', $duplicateData)) {
+            $this->duplicateSitePages($source, $target, $pagesMode);
+        }
+
+        // Navigation can be updated only if pages are copied.
+        if (in_array('pages', $duplicateData) && in_array('navigation', $duplicateData)) {
+            $this->copySiteNavigation($source, $target);
         }
 
         $this->indexPages($target);
@@ -198,22 +199,34 @@ SQL;
      * @param Site $target
      * @param string $mode
      */
-    protected function duplicatePages(Site $source, Site $target, $mode)
+    protected function duplicateSitePages(Site $source, Site $target, $mode)
     {
         // Get pages to check rights.
         if (!$source->getPages()->count()) {
             return;
         }
 
+        // Manage private page slugs.
+        $sql = 'SELECT id, slug FROM site_page WHERE site_id = ' . (int) $target->getId();
+        $existingSlugs = $this->connection->query($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
+
         /**
          * @var \Omeka\Entity\SitePage $sourcePage
          * @var \Omeka\Api\Representation\SitePageRepresentation $targetPage
          */
         foreach ($source->getPages() as $sourcePage) {
+            $slug = $sourcePage->getSlug();
+            $slugExists = in_array($slug, $existingSlugs);
+            if ($slugExists) {
+                $slug = mb_substr($slug . '_' . $source->getSlug(), 0, 190);
+                if (in_array($slug, $existingSlugs)) {
+                    $slug = mb_substr($slug, 0, 185) . '_' . substr(str_replace(['+', '/'], '', base64_encode(random_bytes(20))), 0, 4);
+                }
+            }
             if ($mode === 'mirror') {
                 $targetPage = [
                     'o:title' => $sourcePage->getTitle(),
-                    'o:slug' => $sourcePage->getSlug(),
+                    'o:slug' => $slug,
                     'o:site' => ['o:id' => $target->getId()],
                     'o:block' => [[
                         'o:layout' => 'mirrorPage',
@@ -227,11 +240,19 @@ SQL;
                 $targetPage = json_decode(json_encode($this->pageAdapter->getRepresentation($sourcePage)), true);
                 $targetPage['o:site'] = ['o:id' => $target->getId()];
             }
+            $targetPage['o:slug'] = $slug;
+
             $response = $this->api->create('site_pages', $targetPage, [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false, 'flushEntityManager' => false]);
             if ($response) {
                 $targetPage = $response->getContent();
                 $this->mapPages[$sourcePage->getId()] = $targetPage;
                 $this->addRelations($sourcePage, $targetPage);
+                if ($slugExists) {
+                    $this->logger->err(new Message(
+                        'The page slug "%1$s" from the source has been renamed "%2$s".', // @translate
+                        $sourcePage->getSlug(), $slug
+                    ));
+                }
             } else {
                 $this->logger->err(new Message(
                     'Unable to copy page "%1$s" of site "%2$s". The page is skipped.', // @translate
@@ -281,24 +302,28 @@ SQL;
         $this->entityManager->refresh($target);
     }
 
-    protected function copySiteMetadata(Site $source, Site $target)
+    protected function copySiteTheme(Site $source, Site $target)
     {
         // $target->setTitle($source->getTitle());
         // $target->setSummary($source->getSummary());
         // $target->setIsPublic($source->isPublic());
-        $target->setTheme($source->getTheme());
-        $target->setHomepage($source->getHomepage());
-        $target->setNavigation($source->getNavigation());
-        // $target->setSitePermissions($source->getSitePermissions());
-        // $target->setItemPool($source->getItemPool());
-        // $target->setSiteItemSets($source->getSiteItemSets());
+
+        $theme = $source->getTheme() ?: 'default';
+        $target->setTheme($theme);
+
+        /** @var \Omeka\Settings\SiteSettings $siteSettings */
+        // The settings may be already copied with other settings.
+        $siteSettings = $this->getServiceLocator()->get('Omeka\Settings\Site');
+        $siteSettings->setTargetId($source->getId());
+        $themeSettings = $siteSettings->get('theme_settings_' . $theme) ?: '{}';
+        $siteSettings->setTargetId($target->getId());
+        $siteSettings->set('theme_settings_' . $theme, $themeSettings);
+
         $this->entityManager->flush();
     }
 
-    protected function updateSiteMetadata(Site $source, Site $target)
+    protected function copySiteNavigation(Site $source, Site $target)
     {
-        $target->setTheme($source->getTheme());
-
         $homepage = $source->getHomepage();
         if ($homepage && isset($this->mapPages[$homepage->getId()])) {
             $target->setHomepage($this->mapPages[$homepage->getId()]);
