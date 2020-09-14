@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "components/flag-icon-css",
-            "version": "3.4.6",
+            "version": "3.5.0",
             "source": {
                 "type": "git",
-                "url": "git@github.com:lipis/flag-icon-css.git",
-                "reference": "f4376babc181c3753197c269b9086943ea781efc"
+                "url": "https://github.com/lipis/flag-icon-css.git",
+                "reference": "5141384c57972b0b08fc3bb67bea297321fbd799"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lipis/flag-icon-css/zipball/f4376babc181c3753197c269b9086943ea781efc",
-                "reference": "f4376babc181c3753197c269b9086943ea781efc",
+                "url": "https://api.github.com/repos/lipis/flag-icon-css/zipball/5141384c57972b0b08fc3bb67bea297321fbd799",
+                "reference": "5141384c57972b0b08fc3bb67bea297321fbd799",
                 "shasum": ""
             },
             "type": "component",
@@ -42,7 +42,7 @@
                 }
             ],
             "description": "CSS for vector based country flags",
-            "time": "2020-02-04T16:13:49+00:00"
+            "time": "2020-06-10T11:53:19+00:00"
         },
         {
             "name": "daniel-km/simple-iso-639-3",
@@ -78,16 +78,16 @@
         },
         {
             "name": "slowprog/composer-copy-file",
-            "version": "0.3.1",
+            "version": "0.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/slowprog/CopyFile.git",
-                "reference": "5a82ba4613948f70b2d4b041c13c1c9259fc6477"
+                "reference": "b02d55f7587577f29d355f0ce7b697f66dffc0af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slowprog/CopyFile/zipball/5a82ba4613948f70b2d4b041c13c1c9259fc6477",
-                "reference": "5a82ba4613948f70b2d4b041c13c1c9259fc6477",
+                "url": "https://api.github.com/repos/slowprog/CopyFile/zipball/b02d55f7587577f29d355f0ce7b697f66dffc0af",
+                "reference": "b02d55f7587577f29d355f0ce7b697f66dffc0af",
                 "shasum": ""
             },
             "require": {
@@ -122,7 +122,7 @@
             "keywords": [
                 "copy file"
             ],
-            "time": "2019-01-10T05:06:10+00:00"
+            "time": "2020-07-02T14:44:41+00:00"
         }
     ],
     "packages-dev": [],
