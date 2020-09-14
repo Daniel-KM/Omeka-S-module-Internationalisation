@@ -14,6 +14,17 @@ class DuplicateSiteFieldset extends Fieldset
     public function init()
     {
         $isNew = (bool) $this->getOption('is_new');
+
+        $data = [
+            'pages' => 'Pages', // @translate
+            'navigation' => 'Site navigation', // @translate
+            'settings' => 'Site settings', // @translate
+            'theme' => 'Theme', // @translate
+            'item_pool' => 'Item pool', // @translate
+            'item_sets' => 'Item sets', // @translate
+            'permissions' => 'Permissions', // @translate
+        ];
+
         $this
             ->setName('internationalisation')
             ->setAttribute('id', 'internationalisation')
@@ -23,6 +34,19 @@ class DuplicateSiteFieldset extends Fieldset
                 'attributes' => [
                     'id' => 'is_new',
                     'value' => (int) $isNew,
+                ],
+            ])
+            ->add([
+                'name' => 'remove',
+                'type' => Element\MultiCheckbox::class,
+                'options' => [
+                    'label' => 'Data to remove', // @translate
+                    'value_options' => $data,
+                ],
+                'attributes' => [
+                    'id' => 'remove',
+                    'required' => false,
+                    'value' => $isNew ? array_keys($data) : [],
                 ],
             ])
             ->add([
@@ -41,35 +65,16 @@ class DuplicateSiteFieldset extends Fieldset
                 ],
             ])
             ->add([
-                'name' => 'remove_pages',
-                'type' => $isNew ? Element\Hidden::class : Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Remove existing pages', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'remove_pages',
-                    'value' => (int) $isNew,
-                ],
-            ])
-            ->add([
-                'name' => 'data',
+                'name' => 'copy',
                 'type' => Element\MultiCheckbox::class,
                 'options' => [
                     'label' => 'Data to copy', // @translate
-                    'value_options' => [
-                        'pages' => 'Pages', // @translate
-                        'navigation' => 'Site navigation', // @translate
-                        'settings' => 'Site settings', // @translate
-                        'theme' => 'Theme', // @translate
-                        'item_pool' => 'Item pool', // @translate
-                        'item_sets' => 'Item sets', // @translate
-                        'permissions' => 'Permissions', // @translate
-                    ],
+                    'value_options' => $data,
                 ],
                 'attributes' => [
-                    'id' => 'data',
+                    'id' => 'copy',
                     'required' => false,
-                    'value' => $isNew ? ['pages', 'navigation', 'settings', 'theme', 'item_pool', 'item_sets', 'permissions'] : [],
+                    'value' => $isNew ? array_keys($data) : [],
                 ],
             ])
             ->add([
@@ -113,7 +118,11 @@ class DuplicateSiteFieldset extends Fieldset
                 'required' => false,
             ])
             ->add([
-                'name' => 'data',
+                'name' => 'remove',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'copy',
                 'required' => false,
             ])
             ->add([

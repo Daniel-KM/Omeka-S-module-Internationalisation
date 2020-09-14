@@ -889,7 +889,7 @@ SQL;
     {
         $view = $event->getTarget();
         $expand = json_encode($view->translate('Expand'), 320);
-        $legend = json_encode($view->translate('Copy data from another site'), 320);
+        $legend = json_encode($view->translate('Remove and copy data'), 320);
         echo <<<INLINE
 <style>
 .collapse + #internationalisation.collapsible {
@@ -924,13 +924,16 @@ INLINE;
         // Set default values in case of a creation outside of the form.
         $params += [
             'source' => null,
-            'remove_pages' => false,
-            'data' => [],
+            'remove' => [],
+            'copy' => [],
             'pages_mode' => null,
             'locale' => null,
             'is_new' => false,
         ];
-        if (!$params['source'] || !count($params['data'])) {
+        // TODO A source should be set even for remove currently.
+        if ((!count($params['remove']) && !count($params['copy']))
+            || (count($params['copy']) && !$params['source'])
+        ) {
             return;
         }
 
@@ -938,7 +941,9 @@ INLINE;
         $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger();
 
         try {
-            $source = $services->get('Omeka\ApiManager')->read('sites', ['id' => $params['source']], [], ['responseContent' => 'resource'])->getContent();
+            $source = $params['source']
+                ? $services->get('Omeka\ApiManager')->read('sites', ['id' => $params['source']], [], ['responseContent' => 'resource'])->getContent()
+                : null;
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             $message = new Message(
                 'The site #%1$s cannot be copied. Check your rights.', // @translate
@@ -958,10 +963,10 @@ INLINE;
         }
 
         $args = [
-            'source' => (int) $params['source'],
             'target' => $site->getId(),
-            'remove_pages' => $params['remove_pages'],
-            'data' => $params['data'],
+            'source' => $source ? $source->getId() : null,
+            'remove' => $params['remove'],
+            'copy' => $params['copy'],
             'pages_mode' => $params['pages_mode'],
             // Settings to keep.
             'settings' => ['locale' => $locale],
@@ -972,8 +977,7 @@ INLINE;
         $job = $services->get(\Omeka\Job\Dispatcher::class)
             ->dispatch(\Internationalisation\Job\DuplicateSite::class, $args, $strategy);
         $message = new Message(
-            'The site "%1$s" has been copied into the current site "%2$s".', // @translate
-            $source->getSlug(),
+            'Remove/copy processes have been done for site "%1$s".', // @translate
             $site->getSlug()
         );
         $messenger->addSuccess($message);

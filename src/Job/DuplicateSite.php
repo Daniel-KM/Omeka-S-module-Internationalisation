@@ -55,30 +55,14 @@ class DuplicateSite extends AbstractJob
         $this->entityManager = $services->get('Omeka\EntityManager');
         $this->connection = $this->entityManager->getConnection();
 
-        $duplicateData = $this->getArg('data', []);
-        if (empty($duplicateData)) {
+        $removeData = $this->getArg('remove', []);
+        $copyData = $this->getArg('copy', []);
+        if (empty($removeData) && empty($copyData)) {
             return;
         }
 
-        $sourceId = $this->getArg('source');
         $targetId = $this->getArg('target');
-        $pagesMode = $this->getArg('pages_mode', 'block');
-        // TODO Finalize removing of pages when false.
-        $removePages = $this->getArg('remove_pages', false);
-
-        try {
-            /** @var \Omeka\Entity\Site $source */
-            $source = $this->api->read('sites', ['id' => $sourceId], [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false])->getContent();
-        } catch (NotFoundException $e) {
-        }
-        if (empty($source)) {
-            $this->logger->err(new Message(
-                'The site #%1$s cannot be copied. Check your rights.', // @translate
-                $sourceId
-            ));
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            return;
-        }
+        $sourceId = $this->getArg('source');
 
         try {
             /** @var \Omeka\Entity\Site $target */
@@ -89,62 +73,96 @@ class DuplicateSite extends AbstractJob
             $this->logger->err(new Message(
                 'The site #%1$s is not available for copy. Check your rights.', // @translate
                 $targetId
-            ));
+                ));
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             return;
         }
 
-        // Add the site to the group first to simplify duplication of pages.
-        $settings = $services->get('Omeka\Settings');
-        $siteGroups = $settings->get('internationalisation_site_groups') ?: [];
-        if (isset($siteGroups[$source->getSlug()])) {
-            $sortList = $siteGroups[$source->getSlug()];
-            $sortList[] = $target->getSlug();
-        } else {
-            $sortList = [$source->getSlug(), $target->getSlug()];
-        }
-        ksort($sortList, SORT_NATURAL);
-        $siteGroups[$source->getSlug()] = $sortList;
-        $siteGroups[$target->getSlug()] = $sortList;
-        ksort($siteGroups, SORT_NATURAL);
-        $settings->set('internationalisation_site_groups', $siteGroups);
-
-        // Remove all pages if wanted (welcome page is automatically added).
-        if ($removePages) {
-            $collection = $target->getPages();
-            foreach ($collection->getKeys() as $key) {
-                $collection->remove($key);
+        if ($sourceId) {
+            try {
+                /** @var \Omeka\Entity\Site $source */
+                $source = $this->api->read('sites', ['id' => $sourceId], [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false])->getContent();
+            } catch (NotFoundException $e) {
             }
-            $this->entityManager->flush();
+            if (empty($source)) {
+                $this->logger->err(new Message(
+                    'The site #%1$s cannot be copied. Check your rights.', // @translate
+                    $sourceId
+                ));
+                $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+                return;
+            }
+        } else {
+            $copyData = [];
         }
 
-        if (in_array('settings', $duplicateData)) {
+        if ($source) {
+            $this->updateSiteGroups($source, $target);
+            // Add the site to the group first to simplify duplication of pages.
+            $settings = $services->get('Omeka\Settings');
+            $siteGroups = $settings->get('internationalisation_site_groups') ?: [];
+            if (isset($siteGroups[$source->getSlug()])) {
+                $sortList = $siteGroups[$source->getSlug()];
+                $sortList[] = $target->getSlug();
+            } else {
+                $sortList = [$source->getSlug(), $target->getSlug()];
+            }
+            ksort($sortList, SORT_NATURAL);
+            $siteGroups[$source->getSlug()] = $sortList;
+            $siteGroups[$target->getSlug()] = $sortList;
+            ksort($siteGroups, SORT_NATURAL);
+            $settings->set('internationalisation_site_groups', $siteGroups);
+        }
+
+        // First step: remove data.
+
+        if (in_array('settings', $removeData)) {
             $settings = $this->getArg('settings', []);
-            $this->duplicateSettings($source, $target, $settings);
+            $this->removeSettings($target, $settings);
+        }
+        if (in_array('permissions', $removeData)) {
+            $this->removeSitePermissions($target);
+        }
+        if (in_array('item_pool', $removeData)) {
+            $this->removeSiteItemPool($target);
+        }
+        if (in_array('item_sets', $removeData)) {
+            $this->removeSiteItemSets($target);
+        }
+        if (in_array('theme', $removeData)) {
+            $this->removeSiteTheme($target);
+        }
+        if (in_array('pages', $removeData)) {
+            $this->removeSitePages($target);
+        }
+        if (in_array('navigation', $removeData)) {
+            $this->removeNavigation($target);
         }
 
-        if (in_array('permissions', $duplicateData)) {
+        // Second step: copy data.
+
+        if (in_array('settings', $copyData)) {
+            $settings = $this->getArg('settings', []);
+            $this->copySettings($source, $target, $settings);
+        }
+        if (in_array('permissions', $copyData)) {
             $this->copySitePermissions($source, $target);
         }
-
-        if (in_array('item_pool', $duplicateData)) {
+        if (in_array('item_pool', $copyData)) {
             $this->copySiteItemPool($source, $target);
         }
-
-        if (in_array('item_sets', $duplicateData)) {
+        if (in_array('item_sets', $copyData)) {
             $this->copySiteItemSets($source, $target);
         }
-
-        if (in_array('theme', $duplicateData)) {
+        if (in_array('theme', $copyData)) {
             $this->copySiteTheme($source, $target);
         }
-
-        if (in_array('pages', $duplicateData)) {
-            $this->duplicateSitePages($source, $target, $pagesMode);
+        if (in_array('pages', $copyData)) {
+            $pagesMode = $this->getArg('pages_mode', 'block');
+            $this->copySitePages($source, $target, $pagesMode);
         }
-
         // Navigation can be updated only if pages are copied.
-        if (in_array('pages', $duplicateData) && in_array('navigation', $duplicateData)) {
+        if (in_array('pages', $copyData) && in_array('navigation', $copyData)) {
             $this->copySiteNavigation($source, $target);
         }
 
@@ -157,6 +175,108 @@ class DuplicateSite extends AbstractJob
         }
     }
 
+    protected function updateSiteGroups(Site $source, Site $target)
+    {
+        // Add the site to the group first to simplify duplication of pages.
+        $settings = $this->getServiceLocator()->get('Omeka\Settings');
+        $siteGroups = $settings->get('internationalisation_site_groups') ?: [];
+        if (isset($siteGroups[$source->getSlug()])) {
+            $sortList = $siteGroups[$source->getSlug()];
+            $sortList[] = $target->getSlug();
+        } else {
+            $sortList = [$source->getSlug(), $target->getSlug()];
+        }
+        ksort($sortList, SORT_NATURAL);
+        $siteGroups[$source->getSlug()] = $sortList;
+        $siteGroups[$target->getSlug()] = $sortList;
+        ksort($siteGroups, SORT_NATURAL);
+        $settings->set('internationalisation_site_groups', $siteGroups);
+    }
+
+    protected function removeSettings(Site $site, array $settings = null)
+    {
+        $sql = <<<SQL
+DELETE FROM `site_setting`
+WHERE `site_id` = {$site->getId()};
+SQL;
+        $this->connection->exec($sql);
+
+        if (!$settings) {
+            return;
+        }
+
+        /** @var \Omeka\Settings\SiteSettings $siteSettings */
+        $siteSettings = $this->getServiceLocator()->get('Omeka\Settings\Site');
+        $siteSettings->setTargetId($site->getId());
+        foreach ($settings as $id => $value) {
+            $siteSettings->set($id, $value);
+        }
+
+        $this->logger->notice(new Message(
+            'Site settings of "%1$s" successfully removed.', // @translate
+            $site->getSlug()
+        ));
+    }
+
+    protected function removeSiteItemPool(Site $site)
+    {
+        $site->setItemPool([]);
+        $this->entityManager->refresh($site);
+    }
+
+    protected function removeSiteTheme(Site $site)
+    {
+        $site->setTheme('default');
+        $this->entityManager->refresh($site);
+    }
+
+    protected function removeNavigation(Site $site)
+    {
+        $site->setHomepage(null);
+        $site->setNavigation([]);
+        $this->entityManager->refresh($site);
+    }
+
+    protected function removeSitePermissions(Site $site)
+    {
+        $sql = <<<SQL
+DELETE FROM `site_permission`
+WHERE `site_id` = {$site->getId()};
+SQL;
+        $result = $this->connection->exec($sql);
+        $this->entityManager->refresh($site);
+
+        $this->logger->notice(new Message(
+            '%1$d site permission removed from "%2$s".', // @translate
+            $result, $site->getSlug()
+        ));
+    }
+
+    protected function removeSiteItemSets(Site $site)
+    {
+        $sql = <<<SQL
+DELETE FROM `site_item_set`
+WHERE `site_id` = {$site->getId()};
+SQL;
+        $this->connection->exec($sql);
+        $this->entityManager->refresh($site);
+    }
+
+    protected function removeSitePages(Site $site)
+    {
+        $sql = <<<SQL
+DELETE FROM `site_page`
+WHERE `site_id` = {$site->getId()};
+SQL;
+        $result = $this->connection->exec($sql);
+        $this->entityManager->refresh($site);
+
+        $this->logger->notice(new Message(
+            '%1$d site pages removed from "%2$s".', // @translate
+            $result, $site->getSlug()
+        ));
+    }
+
     /**
      * Duplicate settings of a site.
      *
@@ -164,11 +284,11 @@ class DuplicateSite extends AbstractJob
      * @param Site $target
      * @param array $settings
      */
-    protected function duplicateSettings(Site $source, Site $target, array $settings = null)
+    protected function copySettings(Site $source, Site $target, array $settings = null)
     {
         $sql = <<<SQL
 INSERT INTO `site_setting` (`id`, `site_id`, `value`)
-SELECT `t2`.`id`, {$target->getId()}, `t2`.`value` FROM (
+SELECT `t2`.`id`, {$target->getId()} AS 'site_id', `t2`.`value` FROM (
     SELECT `t`.`id`, `t`.`value` FROM `site_setting` AS `t` WHERE `site_id` = {$source->getId()}
 ) AS `t2`
 ON DUPLICATE KEY UPDATE `id`=`t2`.`id`, `site_id`={$target->getId()}, `value`=`t2`.`value`;
@@ -199,7 +319,7 @@ SQL;
      * @param Site $target
      * @param string $mode
      */
-    protected function duplicateSitePages(Site $source, Site $target, $mode)
+    protected function copySitePages(Site $source, Site $target, $mode)
     {
         // Get pages to check rights.
         if (!$source->getPages()->count()) {
@@ -207,7 +327,7 @@ SQL;
         }
 
         // Manage private page slugs.
-        $sql = 'SELECT id, slug FROM site_page WHERE site_id = ' . (int) $target->getId();
+        $sql = 'SELECT `id`, `slug` FROM `site_page` WHERE `site_id` = ' . (int) $target->getId();
         $existingSlugs = $this->connection->query($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         /**
@@ -274,7 +394,7 @@ SQL;
     {
         $sql = <<<SQL
 INSERT INTO `site_permission` (`site_id`, `user_id`, `role`)
-SELECT {$target->getId()}, `t2`.`user_id`, `t2`.`role` FROM (
+SELECT {$target->getId()} AS 'site_id', `t2`.`user_id`, `t2`.`role` FROM (
     SELECT `t`.`site_id`, `t`.`user_id`, `t`.`role` FROM `site_permission` AS `t` WHERE `site_id` = {$source->getId()}
 ) AS `t2`
 ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `user_id`=`t2`.`user_id`, `role`=`t2`.`role`;
@@ -293,7 +413,7 @@ SQL;
     {
         $sql = <<<SQL
 INSERT INTO `site_item_set` (`site_id`, `item_set_id`, `position`)
-SELECT {$target->getId()}, `t2`.`item_set_id`, `t2`.`position` FROM (
+SELECT {$target->getId()} AS 'site_id', `t2`.`item_set_id`, `t2`.`position` FROM (
     SELECT `t`.`site_id`, `t`.`item_set_id`, `t`.`position` FROM `site_item_set` AS `t` WHERE `site_id` = {$source->getId()}
 ) AS `t2`
 ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `item_set_id`=`t2`.`item_set_id`, `position`=`t2`.`position`;
