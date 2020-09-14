@@ -55,14 +55,14 @@ class DuplicateSite extends AbstractJob
         $this->entityManager = $services->get('Omeka\EntityManager');
         $this->connection = $this->entityManager->getConnection();
 
-        $duplicateData = $this->getArg('internationalisation_duplicate_data', ['metadata', 'settings', 'pages', 'item_pool', 'item_sets', 'permissions']);
+        $duplicateData = $this->getArg('data', ['metadata', 'settings', 'pages', 'item_pool', 'item_sets', 'permissions']);
         if (empty($duplicateData)) {
             return;
         }
 
         $sourceId = $this->getArg('source');
         $targetId = $this->getArg('target');
-        $mode = $this->getArg('mode', 'block');
+        $pagesMode = $this->getArg('pages_mode', 'block');
         // TODO Finalize removing of pages when false.
         $removePages = $this->getArg('remove_pages', false);
         $settings = $this->getArg('settings', []);
@@ -124,7 +124,7 @@ class DuplicateSite extends AbstractJob
         }
 
         if (in_array('pages', $duplicateData)) {
-            $this->duplicatePages($source, $target, $mode);
+            $this->duplicatePages($source, $target, $pagesMode);
         }
 
         if (in_array('permissions', $duplicateData)) {
@@ -150,7 +150,7 @@ class DuplicateSite extends AbstractJob
         $this->indexPages($target);
 
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            $this->logger->warning(
+            $this->logger->warn(
                 'Check logs: an error occurred.' // @translate
             );
         }

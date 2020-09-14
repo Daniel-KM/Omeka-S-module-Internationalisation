@@ -45,8 +45,9 @@ return [
     ],
     'form_elements' => [
         'invokables' => [
-            Form\SettingsFieldset::class => Form\SettingsFieldset::class,
+            Form\DuplicateSiteFieldset::class => Form\DuplicateSiteFieldset::class,
             Form\MirrorPageFieldset::class => Form\MirrorPageFieldset::class,
+            Form\SettingsFieldset::class => Form\SettingsFieldset::class,
         ],
         'factories' => [
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,

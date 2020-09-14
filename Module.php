@@ -842,108 +842,30 @@ SQL;
     {
         // Add the select to duplicate a site only when "add".
         /** @var \Omeka\Mvc\Status $status */
-        if ($this->getServiceLocator()->get('Omeka\Status')->getRouteMatch()->getParam('action') === 'edit') {
+        $services = $this->getServiceLocator();
+        if ($services->get('Omeka\Status')->getRouteMatch()->getParam('action') === 'edit') {
             return;
         }
 
-        $event->getTarget()
-            ->add([
-                'name' => 'internationalisation',
-                'type' => \Zend\Form\Fieldset::class,
-            ])
-            ->get('internationalisation')
-            ->add([
-                'name' => 'duplicate',
-                'type' => \Omeka\Form\Element\SiteSelect::class,
-                'options' => [
-                    'label' => 'Duplicate config and pages of site', // @translate
-                    'empty_option' => '',
-                ],
-                'attributes' => [
-                    'id' => 'duplicate',
-                    'class' => 'chosen-select',
-                    'required' => false,
-                    'multiple' => false,
-                    'data-placeholder' => 'Select site…', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'duplicate_data',
-                'type' => \Zend\Form\Element\MultiCheckbox::class,
-                'options' => [
-                    'label' => 'Duplication mode', // @translate
-                    'value_options' => [
-                        'metadata' => 'Site metadata', // @translate
-                        'settings' => 'Site settings', // @translate
-                        'pages' => 'Pages', // @translate
-                        'item_pool' => 'Item pool', // @translate
-                        'item_sets' => 'Item sets', // @translate
-                        'permissions' => 'Permissions', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'duplicate_data',
-                    'required' => false,
-                    'value' => ['metadata', 'settings', 'pages', 'item_pool', 'item_sets', 'permissions'],
-                ],
-            ])
-            ->add([
-                'name' => 'duplicate_mode',
-                'type' => \Zend\Form\Element\Radio::class,
-                'options' => [
-                    'label' => 'Duplication mode for pages', // @translate
-                    'value_options' => [
-                        'block' => 'Copy each page and block individually', // @translate
-                        'mirror' => 'Create linked mirror pages', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'duplicate_mode',
-                    'required' => false,
-                    'value' => 'block',
-                ],
-            ])
-            ->add([
-                'name' => 'locale',
-                'type' => 'Omeka\Form\Element\LocaleSelect',
-                'options' => [
-                    'label' => 'Locale', // @translate
-                    'info' => 'Locale/language code for this site. Leave blank to use the global locale setting.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'locale',
-                    'class' => 'chosen-select',
-                ],
-            ]);
+        $fieldset = $services->get('FormElementManager')
+            ->get(\Internationalisation\Form\DuplicateSiteFieldset::class);
+        $event->getTarget()->add($fieldset);
     }
 
     public function handleSiteFormFilters(Event $event)
     {
         // Add the select to duplicate a site only when "add".
         /** @var \Omeka\Mvc\Status $status */
-        if ($this->getServiceLocator()->get('Omeka\Status')->getRouteMatch()->getParam('action') === 'edit') {
+        $services = $this->getServiceLocator();
+        if ($services->get('Omeka\Status')->getRouteMatch()->getParam('action') === 'edit') {
             return;
         }
 
-        $event->getParam('inputFilter')
-            ->get('internationalisation')
-            ->add([
-                'name' => 'duplicate',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'duplicate_data',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'duplicate_mode',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'locale',
-                'required' => false,
-            ])
-        ;
+        /** @var \Internationalisation\Form\DuplicateSiteFieldset $fieldset */
+        $fieldset = $services->get('FormElementManager')
+            ->get(\Internationalisation\Form\DuplicateSiteFieldset::class);
+        $inputFilter = $event->getParam('inputFilter')->get('internationalisation');
+        $fieldset->updateInputFilter($inputFilter);
     }
 
     public function handleSiteCreatePost(Event $event)
@@ -962,12 +884,12 @@ SQL;
 
         // Set default values in case of a creation outside of the form.
         $params += [
-            'duplicate' => null,
-            'duplicate_data' => ['metadata', 'settings', 'pages', 'item_pool', 'item_sets', 'permissions'],
-            'duplicate_mode' => 'block',
+            'source' => null,
+            'data' => ['metadata', 'settings', 'pages', 'item_pool', 'item_sets', 'permissions'],
+            'pages_mode' => 'block',
             'locale' => null,
         ];
-        if (!$params['duplicate']) {
+        if (!$params['source']) {
             return;
         }
 
@@ -975,21 +897,21 @@ SQL;
         $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger();
 
         try {
-            $siteToDuplicate = $services->get('Omeka\ApiManager')->read('sites', ['id' => $params['duplicate']], [], ['responseContent' => 'resource'])->getContent();
+            $source = $services->get('Omeka\ApiManager')->read('sites', ['id' => $params['source']], [], ['responseContent' => 'resource'])->getContent();
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             $message = new Message(
                 'The site #%1$s cannot be copied. Check your rights.', // @translate
-                $params['duplicate']
+                $params['source']
             );
             $messenger->addError($message);
             return;
         }
 
         $args = [
-            'source' => (int) $params['duplicate'],
+            'source' => (int) $params['source'],
             'target' => $site->getId(),
-            'duplicate_data' => $params['duplicate_data'],
-            'mode' => $params['duplicate_mode'],
+            'data' => $params['data'],
+            'pages_mode' => $params['pages_mode'],
             'remove_pages' => true,
             'settings' => ['locale' => $params['locale']],
         ];
@@ -1000,9 +922,9 @@ SQL;
             ->dispatch(\Internationalisation\Job\DuplicateSite::class, $args, $strategy);
         $message = new Message(
             'The site "%1$s" has been copied into the current site "%2$s" (mode "%3$s", locale "%4$s").', // @translate
-            $siteToDuplicate->getSlug(),
+            $source->getSlug(),
             $site->getSlug(),
-            $params['duplicate_mode'],
+            $params['pages_mode'],
             $params['locale']
         );
         $messenger->addSuccess($message);
