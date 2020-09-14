@@ -865,7 +865,10 @@ SQL;
             && $routeMatch->getParam('action') === 'add';
         $fieldset = $services->get('FormElementManager')->get(
             \Internationalisation\Form\DuplicateSiteFieldset::class,
-            ['is_new' => $isNew]
+            [
+                'is_new' => $isNew,
+                'collecting' => $this->isModuleActive('Collecting'),
+            ]
         );
         $event->getTarget()->add($fieldset);
     }
@@ -879,7 +882,10 @@ SQL;
             ->get('internationalisation');
         $fieldset = $this->getServiceLocator()->get('FormElementManager')->get(
             \Internationalisation\Form\DuplicateSiteFieldset::class,
-            ['is_new' => true]
+            [
+                'is_new' => true,
+                'collecting' => $this->isModuleActive('Collecting'),
+            ]
         );
         $fieldset
             ->updateInputFilter($inputFilter);

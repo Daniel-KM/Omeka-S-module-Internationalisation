@@ -96,7 +96,7 @@ class DuplicateSite extends AbstractJob
             $copyData = [];
         }
 
-        if ($source) {
+        if ($source && count($copyData)) {
             $this->updateSiteGroups($source, $target);
             // Add the site to the group first to simplify duplication of pages.
             $settings = $services->get('Omeka\Settings');
@@ -107,6 +107,7 @@ class DuplicateSite extends AbstractJob
             } else {
                 $sortList = [$source->getSlug(), $target->getSlug()];
             }
+            $sortList = array_unique($sortList);
             ksort($sortList, SORT_NATURAL);
             $siteGroups[$source->getSlug()] = $sortList;
             $siteGroups[$target->getSlug()] = $sortList;
@@ -134,6 +135,9 @@ class DuplicateSite extends AbstractJob
         }
         if (in_array('pages', $removeData)) {
             $this->removeSitePages($target);
+        }
+        if (in_array('collecting', $removeData) && $this->isModuleActive('Collecting')) {
+            $this->removeCollecting($target);
         }
         if (in_array('navigation', $removeData)) {
             $this->removeNavigation($target);
@@ -164,6 +168,9 @@ class DuplicateSite extends AbstractJob
         // Navigation can be updated only if pages are copied.
         if (in_array('pages', $copyData) && in_array('navigation', $copyData)) {
             $this->copySiteNavigation($source, $target);
+        }
+        if (in_array('collecting', $copyData) && $this->isModuleActive('Collecting')) {
+            $this->copyCollecting($source, $target);
         }
 
         $this->indexPages($target);
@@ -247,7 +254,7 @@ SQL;
         $this->entityManager->refresh($site);
 
         $this->logger->notice(new Message(
-            '%1$d site permission removed from "%2$s".', // @translate
+            '%1$d site permissions removed from "%2$s".', // @translate
             $result, $site->getSlug()
         ));
     }
@@ -273,6 +280,20 @@ SQL;
 
         $this->logger->notice(new Message(
             '%1$d site pages removed from "%2$s".', // @translate
+            $result, $site->getSlug()
+        ));
+    }
+
+    protected function removeCollecting(Site $site)
+    {
+        $sql = <<<SQL
+DELETE FROM `collecting_form`
+WHERE `site_id` = {$site->getId()};
+SQL;
+        $result = $this->connection->exec($sql);
+
+        $this->logger->notice(new Message(
+            '%1$d collecting forms removed from "%2$s".', // @translate
             $result, $site->getSlug()
         ));
     }
@@ -475,6 +496,32 @@ SQL;
         $this->entityManager->flush();
     }
 
+    protected function copyCollecting(Site $source, Site $target)
+    {
+        $sql = <<<SQL
+INSERT INTO `collecting_form` (`item_set_id`, `site_id`, `owner_id`, `label`, `anon_type`, `success_text`, `email_text`)
+SELECT  `t2`.`item_set_id`, {$target->getId()} AS 'site_id', `t2`.`owner_id`, `t2`.`label`, `t2`.`anon_type`, `t2`.`success_text`, `t2`.`email_text` FROM (
+    SELECT `t`.`item_set_id`, `t`.`site_id`, `t`.`owner_id`, `t`.`label`, `t`.`anon_type`, `t`.`success_text`, `t`.`email_text` FROM `collecting_form` AS `t` WHERE `site_id` = {$source->getId()}
+) AS `t2`;
+SQL;
+        $result = $this->connection->exec($sql);
+
+        $this->logger->notice(new Message(
+            '%1$d collecting forms from site "%2$s" were successfully copied into "%3$s".', // @translate
+            $result, $source->getSlug(), $target->getSlug()
+        ));
+
+$sql = <<<SQL
+INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`, `multiple`)
+SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`, `multiple` FROM `collecting_prompt`
+JOIN `collecting_form` ON `collecting_form`.`id` = `collecting_prompt`.`form_id`
+WHERE `collecting_form`.`site_id` = {$source->getId()};
+SQL;
+        $this->connection->exec($sql);
+
+        // No need to refresh.
+    }
+
     protected function indexPages(Site $site)
     {
         /**
@@ -504,5 +551,21 @@ SQL;
                 ->setRelatedPage($targetPage);
             $this->entityManager->persist($newRelatedPage);
         }
+    }
+
+    /**
+     * Check if a module is active.
+     *
+     * @param string $module
+     * @return bool
+     */
+    protected function isModuleActive($module)
+    {
+        $services = $this->getServiceLocator();
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $services->get('Omeka\ModuleManager');
+        $module = $moduleManager->getModule($module);
+        return $module
+            && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE;
     }
 }
