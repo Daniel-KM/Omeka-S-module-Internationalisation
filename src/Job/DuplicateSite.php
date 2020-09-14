@@ -271,6 +271,20 @@ SQL;
 
     protected function removeSitePages(Site $site)
     {
+        // FIXME There is no "on delete cascade" on db level currently!
+        $sql = <<<SQL
+DELETE `site_block_attachment` FROM `site_block_attachment`
+INNER JOIN `site_page_block` ON `site_page_block`.`id` = `site_block_attachment`.`block_id`
+INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
+WHERE `site_page`.`site_id` = {$site->getId()};
+SQL;
+        $this->connection->exec($sql);
+        $sql = <<<SQL
+DELETE `site_page_block` FROM `site_page_block`
+INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
+WHERE `site_page`.`site_id` = {$site->getId()};
+SQL;
+        $this->connection->exec($sql);
         $sql = <<<SQL
 DELETE FROM `site_page`
 WHERE `site_id` = {$site->getId()};
