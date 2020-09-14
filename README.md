@@ -48,14 +48,22 @@ is to manage sites by group, each of them (sites) with a specific language. So
 even if you have multiple sites, you can translate them all and keep them
 separately by group of sites.
 
-1. In site admin board
+1. Duplicate a site
 
-Set the locale setting for all sites you want to translate. It allows to set the
-language of all pages. Furthermore, set the options you want for the display of
-the values of internationalised properties of the resources in the section
-Internationalisation.
+It is sometime simpler to start from a clean site instead of to try to fix each
+page. When you add a site, an option allow to duplicate another site with all
+pages and settings. Furthermore, each page are related together, even if the
+site has multiple trnaslations. If the site exists already, you can copy all
+pages and settings between sites via the site form in the page "Site info".
 
-2. In main settings
+2. In site admin board
+
+In the case you didn’t duplicate the site, you have to set the locale setting
+for all sites you want to translate. It allows to set the language of all pages.
+Furthermore, set the options you want for the display of the values of
+internationalised properties of the resources in the section Internationalisation.
+
+3. In main settings
 
 Set the groups of all sites that will be translated. For example if you have a
 main site and three exhibits, or four sites for different libraries:
@@ -69,7 +77,7 @@ fourth-site
 Here, the first site is available in three languages, the second and third ones
 in two languages and the last is not translated (and can be omitted).
 
-3. In site pages
+4. In site pages
 
 Make the relations between translated pages in each group of sites. For that
 purpose, there is a new field to fill in the site page: the pages that are a
@@ -118,27 +126,6 @@ your needs. Note that the method `displayTitle()` cannot be used to get the
 translated title in Omeka 2.
 
 #### Via the core (for Omeka < 2.1)
-
-##### Modification of the core
-
-Insert this snippet line 279 (Omeka S version 1.4) in [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]:
-```php
-        ...
-        $this->values = $sortedValues + $values;
-
-        // Added code for module Internationalisation 3.2.0 and above.
-        $eventManager = $this->getEventManager();
-        $args = $eventManager->prepareArgs(['values' => $this->values]);
-        $eventManager->trigger('rep.resource.values', $this, $args);
-        $this->values = $args['values'];
-
-        return $this->values;
-    }
-```
-
-By this way, the internationalised values will be used anywhere in front-end.
-
-##### Modification of the core (for Omeka >= 2.0 and < 2.1)
 
 Include patch [#1506] in the same file [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]:
 
@@ -210,19 +197,22 @@ property "dcterms:creator" on a template "Book").
 TODO
 ----
 
-- Return original page when it is not translated in a site, instead of an error.
-- Add links for easier browsing between translated pages.
-- Add a button to duplicate a site (item pool, pages and navigation, relations).
-- Add a button to duplicate a page or to append blocks of a page to another one.
-- Add a button to apply settings of another site (except translatable content).
-- Add automatic selection of the site with the browser language.
-- Manage sites by group instead of sync manually.
-- Add a view to display all the languages that are used.
-- Add a bulk edit to normalize all languages, so fallbacks won't be necessary in
+- [ ] Return original page when it is not translated in a site, instead of an error.
+- [ ] Add links for easier browsing between translated pages.
+- [ ] Add a button to duplicate a site (item pool, pages and navigation, relations).
+- [ ] Add a button to duplicate a page or to append blocks of a page to another one.
+- [x] Add a button to apply settings of another site (except translatable content).
+- [ ] Add automatic selection of the site with the browser language.
+- [ ] Manage sites by group instead of sync manually.
+- [ ] Add a view to display all the languages that are used.
+- [ ] Add a bulk edit to normalize all languages, so fallbacks won't be necessary in
   most of the cases.
-- Add a view to manage fallbacks (site settings?).
-- Sort by the translated value.
-- Sort by the translated resource class and template labels.
+- [ ] Add a view to manage fallbacks (site settings?).
+- [ ] Sort by the translated value.
+- [ ] Sort by the translated resource class and template labels.
+- [x] Duplicate settings and pages for an existing site.
+- [ ] Modify the internal urls with the target site one when copying blocks.
+- [ ] Copy of pages: there is no mapping for collecting forms.
 
 
 Warning
