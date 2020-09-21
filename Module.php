@@ -1093,7 +1093,6 @@ INLINE;
             ]);
     }
 
-
     public function filterSiteGroups($groups)
     {
         $services = $this->getServiceLocator();

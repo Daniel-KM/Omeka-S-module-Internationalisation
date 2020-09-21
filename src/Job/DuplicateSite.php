@@ -525,7 +525,7 @@ SQL;
             $result, $source->getSlug(), $target->getSlug()
         ));
 
-$sql = <<<SQL
+        $sql = <<<SQL
 INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`, `multiple`)
 SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`, `multiple` FROM `collecting_prompt`
 JOIN `collecting_form` ON `collecting_form`.`id` = `collecting_prompt`.`form_id`

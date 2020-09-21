@@ -18,6 +18,7 @@ class MvcListeners extends AbstractListenerAggregate
     /**
      * Add theme translations.
      *
+     * @see \Zend\I18n\Translator\TranslatorInterface
      * @param MvcEvent $event
      */
     public function prepareTranslations(MvcEvent $event)
@@ -34,7 +35,6 @@ class MvcListeners extends AbstractListenerAggregate
             return;
         }
 
-        /** @var \Zend\I18n\Translator\TranslatorInterface $translator */
         $services->get('MvcTranslator')->getDelegatedTranslator()
             ->addTranslationFilePattern('gettext', $themeLanguagePath, '%s.mo', 'default');
     }
