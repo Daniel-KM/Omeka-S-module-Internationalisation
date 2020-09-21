@@ -922,7 +922,7 @@ INLINE;
 
         /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
-        $params = $request->getValue('internationalisation');
+        $params = $request->getValue('internationalisation', []);
         if (!count($params)) {
             return;
         }
