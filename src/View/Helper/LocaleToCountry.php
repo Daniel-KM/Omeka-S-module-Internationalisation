@@ -1,7 +1,7 @@
 <?php
 namespace Internationalisation\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 /**
  * View helper to get country from a locale id.

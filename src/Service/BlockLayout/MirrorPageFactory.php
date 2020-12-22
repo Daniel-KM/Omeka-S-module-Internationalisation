@@ -4,7 +4,7 @@ namespace Internationalisation\Service\BlockLayout;
 
 use Internationalisation\Site\BlockLayout\MirrorPage;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class MirrorPageFactory implements FactoryInterface
 {

@@ -3,7 +3,7 @@ namespace Internationalisation\Service\Form\Element;
 
 use Internationalisation\Form\Element\SitesPageSelect;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SitesPageSelectFactory implements FactoryInterface
 {

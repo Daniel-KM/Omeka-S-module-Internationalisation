@@ -2,7 +2,7 @@
 namespace Internationalisation\Form;
 
 use Omeka\Form\Element\RestoreTextarea;
-use Zend\Form\Fieldset;
+use Laminas\Form\Fieldset;
 
 class SettingsFieldset extends Fieldset
 {

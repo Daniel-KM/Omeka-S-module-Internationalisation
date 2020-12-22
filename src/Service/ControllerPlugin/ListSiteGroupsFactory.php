@@ -4,7 +4,7 @@ namespace Internationalisation\Service\ControllerPlugin;
 use Internationalisation\Mvc\Controller\Plugin\ListSiteGroups;
 use Interop\Container\ContainerInterface;
 use Omeka\Api\Exception\NotFoundException;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ListSiteGroupsFactory implements FactoryInterface
 {

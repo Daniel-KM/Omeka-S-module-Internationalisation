@@ -3,7 +3,7 @@ namespace Internationalisation\Form\Element;
 
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Api\Representation\SiteRepresentation;
-use Zend\Form\Element\Select;
+use Laminas\Form\Element\Select;
 
 /**
  * @see \Omeka\Form\Element\AbstractGroupByOwnerSelect
