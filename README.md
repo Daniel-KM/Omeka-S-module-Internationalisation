@@ -1,6 +1,9 @@
 Internationalisation (module for Omeka S)
 =========================================
 
+> __New versions of this module and support for Omeka S version 3.0 and above
+> are available on [GitLab], which seems to respect users and privacy better.__
+
 [Internationalisation] is a module for [Omeka S] that allows visitors to switch
 between sites pages, when the sites are managed by language.
 
@@ -297,4 +300,5 @@ This module was built for [Watau].
 [flag icons]: https://github.com/lipis/flag-icon-css
 [Watau]: https://watau.fr
 [BibLibre]: https://github.com/BibLibre
+[GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
