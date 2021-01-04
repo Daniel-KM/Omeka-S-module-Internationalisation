@@ -525,9 +525,14 @@ SQL;
             $result, $source->getSlug(), $target->getSlug()
         ));
 
+        // Check if the module is the fork one with column multiple or the basic one.
+        $sql = <<<'SQL'
+SHOW COLUMNS FROM `collecting_prompt` LIKE 'multiple';
+SQL;
+        $multiple = (bool) $this->connection->exec($sql) ? ', `multiple`' : '';
         $sql = <<<SQL
-INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`, `multiple`)
-SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`, `multiple` FROM `collecting_prompt`
+INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple)
+SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple FROM `collecting_prompt`
 JOIN `collecting_form` ON `collecting_form`.`id` = `collecting_prompt`.`form_id`
 WHERE `collecting_form`.`site_id` = {$source->getId()};
 SQL;
