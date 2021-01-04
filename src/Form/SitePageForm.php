@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Form;
 
 use Internationalisation\Form\Element\SitesPageSelect;
 
 class SitePageForm extends \Omeka\Form\SitePageForm
 {
-    public function init()
+    public function init(): void
     {
         parent::init();
 

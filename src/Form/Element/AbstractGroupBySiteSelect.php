@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Form\Element;
 
+use Laminas\Form\Element\Select;
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Api\Representation\SiteRepresentation;
-use Laminas\Form\Element\Select;
 
 /**
  * @see \Omeka\Form\Element\AbstractGroupByOwnerSelect

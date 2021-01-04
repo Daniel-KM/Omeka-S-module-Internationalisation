@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;

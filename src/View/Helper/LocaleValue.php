@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\View\Helper;
 
-use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Laminas\View\Helper\AbstractHelper;
+use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 
 /**
  * @todo Use a filter (rep.value.html or rep.resource.display_values, entity level) to display the good locale anywhere, even in admin.

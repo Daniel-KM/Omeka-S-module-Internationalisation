@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Form;
 
-use Omeka\View\Helper\Setting;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Omeka\View\Helper\Setting;
 
 class SiteSettingsFieldset extends Fieldset
 {
@@ -14,7 +14,7 @@ class SiteSettingsFieldset extends Fieldset
 
     protected $label = 'Internationalisation'; // @translate
 
-    public function init()
+    public function init(): void
     {
         $siteSetting = $this->getSiteSetting();
         $locale = $siteSetting('locale');

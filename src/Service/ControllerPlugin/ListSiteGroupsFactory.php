@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Service\ControllerPlugin;
 
 use Internationalisation\Mvc\Controller\Plugin\ListSiteGroups;
 use Interop\Container\ContainerInterface;
-use Omeka\Api\Exception\NotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Omeka\Api\Exception\NotFoundException;
 
 class ListSiteGroupsFactory implements FactoryInterface
 {

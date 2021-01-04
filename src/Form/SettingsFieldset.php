@@ -1,14 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Form;
 
-use Omeka\Form\Element\RestoreTextarea;
 use Laminas\Form\Fieldset;
+use Omeka\Form\Element\RestoreTextarea;
 
 class SettingsFieldset extends Fieldset
 {
     protected $label = 'Internationalisation'; // @translate
 
-    public function init()
+    public function init(): void
     {
         // See \Internationalisation\Module::handleMainSettings().
         $this

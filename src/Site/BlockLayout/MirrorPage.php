@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Internationalisation\Site\BlockLayout;
 
+use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
 use Omeka\Api\Representation\SitePageRepresentation;
@@ -10,7 +11,6 @@ use Omeka\Entity\SitePage;
 use Omeka\Entity\SitePageBlock;
 use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Omeka\Stdlib\ErrorStore;
-use Laminas\View\Renderer\PhpRenderer;
 
 /**
  * Copy of the same block from module BlockPlus.
@@ -42,7 +42,7 @@ class MirrorPage extends AbstractBlockLayout
         return 'Mirror page'; // @translate
     }
 
-    public function onHydrate(SitePageBlock $block, ErrorStore $errorStore)
+    public function onHydrate(SitePageBlock $block, ErrorStore $errorStore): void
     {
         $mirrorPage = (int) $block->getData()['page'] ?: $this->defaultSettings['page'];
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Internationalisation\Job;
 
@@ -41,7 +41,7 @@ class DuplicateSite extends AbstractJob
      */
     protected $mapPages = [];
 
-    public function perform()
+    public function perform(): void
     {
         $services = $this->getServiceLocator();
 
@@ -182,7 +182,7 @@ class DuplicateSite extends AbstractJob
         }
     }
 
-    protected function updateSiteGroups(Site $source, Site $target)
+    protected function updateSiteGroups(Site $source, Site $target): void
     {
         // Add the site to the group first to simplify duplication of pages.
         $settings = $this->getServiceLocator()->get('Omeka\Settings');
@@ -200,7 +200,7 @@ class DuplicateSite extends AbstractJob
         $settings->set('internationalisation_site_groups', $siteGroups);
     }
 
-    protected function removeSettings(Site $site, array $settings = null)
+    protected function removeSettings(Site $site, array $settings = null): void
     {
         $sql = <<<SQL
 DELETE FROM `site_setting`
@@ -225,26 +225,26 @@ SQL;
         ));
     }
 
-    protected function removeSiteItemPool(Site $site)
+    protected function removeSiteItemPool(Site $site): void
     {
         $site->setItemPool([]);
         $this->entityManager->refresh($site);
     }
 
-    protected function removeSiteTheme(Site $site)
+    protected function removeSiteTheme(Site $site): void
     {
         $site->setTheme('default');
         $this->entityManager->refresh($site);
     }
 
-    protected function removeNavigation(Site $site)
+    protected function removeNavigation(Site $site): void
     {
         $site->setHomepage(null);
         $site->setNavigation([]);
         $this->entityManager->refresh($site);
     }
 
-    protected function removeSitePermissions(Site $site)
+    protected function removeSitePermissions(Site $site): void
     {
         $sql = <<<SQL
 DELETE FROM `site_permission`
@@ -259,7 +259,7 @@ SQL;
         ));
     }
 
-    protected function removeSiteItemSets(Site $site)
+    protected function removeSiteItemSets(Site $site): void
     {
         $sql = <<<SQL
 DELETE FROM `site_item_set`
@@ -269,7 +269,7 @@ SQL;
         $this->entityManager->refresh($site);
     }
 
-    protected function removeSitePages(Site $site)
+    protected function removeSitePages(Site $site): void
     {
         // FIXME There is no "on delete cascade" on db level currently!
         $sql = <<<SQL
@@ -298,7 +298,7 @@ SQL;
         ));
     }
 
-    protected function removeCollecting(Site $site)
+    protected function removeCollecting(Site $site): void
     {
         $sql = <<<SQL
 DELETE FROM `collecting_form`
@@ -319,7 +319,7 @@ SQL;
      * @param Site $target
      * @param array $settings
      */
-    protected function copySettings(Site $source, Site $target, array $settings = null)
+    protected function copySettings(Site $source, Site $target, array $settings = null): void
     {
         $sql = <<<SQL
 INSERT INTO `site_setting` (`id`, `site_id`, `value`)
@@ -354,7 +354,7 @@ SQL;
      * @param Site $target
      * @param string $mode
      */
-    protected function copySitePages(Site $source, Site $target, $mode)
+    protected function copySitePages(Site $source, Site $target, $mode): void
     {
         // Get pages to check rights.
         if (!$source->getPages()->count()) {
@@ -425,7 +425,7 @@ SQL;
         ));
     }
 
-    protected function copySitePermissions(Site $source, Site $target)
+    protected function copySitePermissions(Site $source, Site $target): void
     {
         $sql = <<<SQL
 INSERT INTO `site_permission` (`site_id`, `user_id`, `role`)
@@ -438,13 +438,13 @@ SQL;
         $this->entityManager->refresh($target);
     }
 
-    protected function copySiteItemPool(Site $source, Site $target)
+    protected function copySiteItemPool(Site $source, Site $target): void
     {
         $target->setItemPool($source->getItemPool());
         $this->entityManager->refresh($target);
     }
 
-    protected function copySiteItemSets(Site $source, Site $target)
+    protected function copySiteItemSets(Site $source, Site $target): void
     {
         $sql = <<<SQL
 INSERT INTO `site_item_set` (`site_id`, `item_set_id`, `position`)
@@ -457,7 +457,7 @@ SQL;
         $this->entityManager->refresh($target);
     }
 
-    protected function copySiteTheme(Site $source, Site $target)
+    protected function copySiteTheme(Site $source, Site $target): void
     {
         // $target->setTitle($source->getTitle());
         // $target->setSummary($source->getSummary());
@@ -477,7 +477,7 @@ SQL;
         $this->entityManager->flush();
     }
 
-    protected function copySiteNavigation(Site $source, Site $target)
+    protected function copySiteNavigation(Site $source, Site $target): void
     {
         $homepage = $source->getHomepage();
         if ($homepage && isset($this->mapPages[$homepage->getId()])) {
@@ -494,7 +494,7 @@ SQL;
         }
 
         $navigation = $source->getNavigation();
-        $iterate = function (&$navigation) use (&$iterate) {
+        $iterate = function (&$navigation) use (&$iterate): void {
             foreach ($navigation as &$data) {
                 if ($data['type'] === 'page' && !empty($this->mapPages[$data['data']['id']])) {
                     $data['data']['id'] = $this->mapPages[$data['data']['id']]->getId();
@@ -510,7 +510,7 @@ SQL;
         $this->entityManager->flush();
     }
 
-    protected function copyCollecting(Site $source, Site $target)
+    protected function copyCollecting(Site $source, Site $target): void
     {
         $sql = <<<SQL
 INSERT INTO `collecting_form` (`item_set_id`, `site_id`, `owner_id`, `label`, `anon_type`, `success_text`, `email_text`)
@@ -536,7 +536,7 @@ SQL;
         // No need to refresh.
     }
 
-    protected function indexPages(Site $site)
+    protected function indexPages(Site $site): void
     {
         /**
          * @var \Omeka\Stdlib\FulltextSearch $fulltext
@@ -547,7 +547,7 @@ SQL;
         }
     }
 
-    protected function addRelations(SitePage $sourcePage, SitePage $targetPage)
+    protected function addRelations(SitePage $sourcePage, SitePage $targetPage): void
     {
         /** @var \Internationalisation\Entity\SitePageRelation[] $relations */
         $relations = $this->api->search('site_page_relations', ['relation' => $sourcePage->getId()], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false, 'flushEntityManager' => false])->getContent();

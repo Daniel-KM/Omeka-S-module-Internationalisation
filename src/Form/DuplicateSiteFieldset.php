@@ -1,17 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Internationalisation\Form;
 
-use Omeka\Form\Element\SiteSelect;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\InputFilter\InputFilter;
+use Omeka\Form\Element\SiteSelect;
 
 class DuplicateSiteFieldset extends Fieldset
 {
     protected $label = 'Duplicate site'; // @translate
 
-    public function init()
+    public function init(): void
     {
         $isNew = (bool) $this->getOption('is_new');
 
@@ -113,7 +113,7 @@ class DuplicateSiteFieldset extends Fieldset
         }
     }
 
-    public function updateInputFilter(InputFilter $inputFilter)
+    public function updateInputFilter(InputFilter $inputFilter): void
     {
         $inputFilter
             ->add([

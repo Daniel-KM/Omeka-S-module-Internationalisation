@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Service\ViewHelper;
 
 use Internationalisation\View\Helper\LanguageIso;
@@ -17,7 +17,7 @@ class LanguageIsoFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        require_once dirname(dirname(dirname(__DIR__))) . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
+        require_once dirname(__DIR__, 3) . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
 
         return new LanguageIso();
     }

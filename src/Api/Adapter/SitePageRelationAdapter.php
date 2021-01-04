@@ -1,15 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Api\Adapter;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Laminas\EventManager\Event;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Exception;
 use Omeka\Api\Request;
 use Omeka\Api\Response;
 use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
-use Laminas\EventManager\Event;
 
 class SitePageRelationAdapter extends AbstractEntityAdapter
 {
@@ -36,7 +36,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         return \Internationalisation\Entity\SitePageRelation::class;
     }
 
-    public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore)
+    public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore): void
     {
         /** @var \Internationalisation\Entity\SitePageRelation $entity */
         $data = $request->getContent();
@@ -58,7 +58,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         // This entity cannot be updated currently.
     }
 
-    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
+    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void
     {
         /** @var \Internationalisation\Entity\SitePageRelation $entity */
         $page = $entity->getPage();
@@ -73,7 +73,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         }
     }
 
-    public function buildQuery(QueryBuilder $qb, array $query)
+    public function buildQuery(QueryBuilder $qb, array $query): void
     {
         // TODO Check if the join with the site allows really to check rights/visibility and is really needed.
         $isOldOmeka = \Omeka\Module::VERSION < 2;

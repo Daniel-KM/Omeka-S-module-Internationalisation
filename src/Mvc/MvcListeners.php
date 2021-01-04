@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Mvc;
 
 use Laminas\EventManager\AbstractListenerAggregate;
@@ -7,7 +7,7 @@ use Laminas\Mvc\MvcEvent;
 
 class MvcListeners extends AbstractListenerAggregate
 {
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(
             MvcEvent::EVENT_ROUTE,
@@ -21,7 +21,7 @@ class MvcListeners extends AbstractListenerAggregate
      * @see \Laminas\I18n\Translator\TranslatorInterface
      * @param MvcEvent $event
      */
-    public function prepareTranslations(MvcEvent $event)
+    public function prepareTranslations(MvcEvent $event): void
     {
         $services = $event->getApplication()->getServiceManager();
         if (!$services->get('Omeka\Status')->isSiteRequest()) {

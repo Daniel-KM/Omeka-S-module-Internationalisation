@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Internationalisation;
 
@@ -9,12 +9,12 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use Generic\AbstractModule;
-use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Settings\SiteSettings;
-use Omeka\Stdlib\Message;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\MvcEvent;
+use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
+use Omeka\Settings\SiteSettings;
+use Omeka\Stdlib\Message;
 
 class Module extends AbstractModule
 {
@@ -32,7 +32,7 @@ class Module extends AbstractModule
      */
     protected $lastQuerySort = [];
 
-    public function onBootstrap(MvcEvent $event)
+    public function onBootstrap(MvcEvent $event): void
     {
         parent::onBootstrap($event);
         $this->addAclRules();
@@ -41,7 +41,7 @@ class Module extends AbstractModule
     /**
      * Add ACL rules for this module.
      */
-    protected function addAclRules()
+    protected function addAclRules(): void
     {
         /** @var \Omeka\Permissions\Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
@@ -53,7 +53,7 @@ class Module extends AbstractModule
             );
     }
 
-    protected function preInstall()
+    protected function preInstall(): void
     {
         $vendor = __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
         if (!file_exists($vendor)) {
@@ -66,7 +66,7 @@ class Module extends AbstractModule
         }
     }
 
-    public function attachListeners(SharedEventManagerInterface $sharedEventManager)
+    public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         $sharedEventManager->attach(
             '*',
@@ -241,7 +241,7 @@ class Module extends AbstractModule
         );
     }
 
-    public function handleViewLayoutPublic(Event $event)
+    public function handleViewLayoutPublic(Event $event): void
     {
         $view = $event->getTarget();
         if (!$view->status()->isSiteRequest()) {
@@ -259,7 +259,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function handleResourceTitle(Event $event)
+    public function handleResourceTitle(Event $event): void
     {
         $locales = $this->getLocales();
         if (!$locales) {
@@ -293,7 +293,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function handleResourceValues(Event $event)
+    public function handleResourceValues(Event $event): void
     {
         $locales = $this->getLocales();
         if (!$locales) {
@@ -353,7 +353,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function handleResourceDisplayValues(Event $event)
+    public function handleResourceDisplayValues(Event $event): void
     {
         $locales = $this->getLocales();
         if (!$locales) {
@@ -432,7 +432,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function filterJsonLdResource(Event $event)
+    public function filterJsonLdResource(Event $event): void
     {
         // TODO Use the Zend cache.
         /** @var \Laminas\Mvc\I18n\Translator $translator */
@@ -582,7 +582,7 @@ class Module extends AbstractModule
         return $templatePropertyLabels;
     }
 
-    public function filterJsonLdSitePage(Event $event)
+    public function filterJsonLdSitePage(Event $event): void
     {
         $page = $event->getTarget();
         $jsonLd = $event->getParam('jsonLd');
@@ -604,7 +604,7 @@ class Module extends AbstractModule
         $event->setParam('jsonLd', $jsonLd);
     }
 
-    public function handleApiUpdatePostPage(Event $event)
+    public function handleApiUpdatePostPage(Event $event): void
     {
         $services = $this->getServiceLocator();
         /**
@@ -680,7 +680,7 @@ SQL;
         $connection->exec($sql);
     }
 
-    public function filterVocabularyMemberSelectQuery(Event $event)
+    public function filterVocabularyMemberSelectQuery(Event $event): void
     {
         $query = $event->getParam('query', []);
         $this->lastQuerySort = [
@@ -689,7 +689,7 @@ SQL;
         ];
     }
 
-    public function filterVocabularyMemberSelectValues(Event $event)
+    public function filterVocabularyMemberSelectValues(Event $event): void
     {
         if ($this->lastQuerySort['sort_by'] !== 'label') {
             $this->lastQuerySort = [];
@@ -769,7 +769,7 @@ SQL;
         $event->setParam('valueOptions', $valueOptions);
     }
 
-    public function handleMainSettings(Event $event)
+    public function handleMainSettings(Event $event): void
     {
         parent::handleMainSettings($event);
 
@@ -807,7 +807,7 @@ SQL;
             ->setRestoreValue(implode("\n", $sites));
     }
 
-    public function handleMainSettingsFilters(Event $event)
+    public function handleMainSettingsFilters(Event $event): void
     {
         $event->getParam('inputFilter')
             ->get('internationalisation')
@@ -825,7 +825,7 @@ SQL;
             ]);
     }
 
-    public function handleSiteSettings(Event $event)
+    public function handleSiteSettings(Event $event): void
     {
         parent::handleSiteSettings($event);
 
@@ -853,7 +853,7 @@ SQL;
         $this->prepareSiteLocales($settings);
     }
 
-    public function handleSiteFormElements(Event $event)
+    public function handleSiteFormElements(Event $event): void
     {
         /**
          * @var \Laminas\Router\Http\RouteMatch $routeMatch
@@ -873,7 +873,7 @@ SQL;
         $event->getTarget()->add($fieldset);
     }
 
-    public function handleSiteFormFilters(Event $event)
+    public function handleSiteFormFilters(Event $event): void
     {
         /**
          * @var \Internationalisation\Form\DuplicateSiteFieldset $fieldset
@@ -891,7 +891,7 @@ SQL;
             ->updateInputFilter($inputFilter);
     }
 
-    public function handleSiteAdminViewAfter(Event $event)
+    public function handleSiteAdminViewAfter(Event $event): void
     {
         $view = $event->getTarget();
         $expand = json_encode($view->translate('Expand'), 320);
@@ -913,7 +913,7 @@ $(document).ready(function() {
 INLINE;
     }
 
-    public function handleSitePost(Event $event)
+    public function handleSitePost(Event $event): void
     {
         $site = $event->getParam('response')->getContent();
         if (empty($site)) {
@@ -1008,7 +1008,7 @@ INLINE;
      *
      * @param SiteSettings $settings
      */
-    protected function prepareSiteLocales(SiteSettings $settings)
+    protected function prepareSiteLocales(SiteSettings $settings): void
     {
         $settings->set('internationalisation_iso_codes', []);
 
@@ -1063,7 +1063,7 @@ INLINE;
         $settings->set('internationalisation_locales', $locales);
     }
 
-    public function handleSiteSettingsFilters(Event $event)
+    public function handleSiteSettingsFilters(Event $event): void
     {
         $inputFilter = $event->getParam('inputFilter');
         $inputFilter->get('internationalisation')
