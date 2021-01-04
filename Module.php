@@ -13,7 +13,6 @@ use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\MvcEvent;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Settings\SiteSettings;
 use Omeka\Stdlib\Message;
 
 class Module extends AbstractModule
@@ -201,11 +200,6 @@ class Module extends AbstractModule
             \Omeka\Form\SiteSettingsForm::class,
             'form.add_elements',
             [$this, 'handleSiteSettings']
-        );
-        $sharedEventManager->attach(
-            \Omeka\Form\SiteSettingsForm::class,
-            'form.add_input_filters',
-            [$this, 'handleSiteSettingsFilters']
         );
 
         // Duplicate site.
@@ -828,29 +822,7 @@ SQL;
     public function handleSiteSettings(Event $event): void
     {
         parent::handleSiteSettings($event);
-
-        $services = $this->getServiceLocator();
-
-        $space = strtolower(__NAMESPACE__);
-
-        $settings = $services->get('Omeka\Settings\Site');
-
-        /**
-         * @var \Omeka\Form\Element\RestoreTextarea $siteGroupsElement
-         * @var \Internationalisation\Form\SettingsFieldset $fieldset
-         */
-        $fieldset = $event->getTarget()
-            ->get($space);
-        $list = $settings->get('internationalisation_fallbacks') ?: [];
-        $fieldset
-            ->get('internationalisation_fallbacks')
-            ->setValue(implode("\n", $list));
-        $list = $settings->get('internationalisation_required_languages') ?: [];
-        $fieldset
-            ->get('internationalisation_required_languages')
-            ->setValue(implode("\n", $list));
-
-        $this->prepareSiteLocales($settings);
+        $this->prepareSiteLocales();
     }
 
     public function handleSiteFormElements(Event $event): void
@@ -1011,11 +983,11 @@ INLINE;
      *
      * It's not possible to save it simply after validation, so add it here,
      * since the form is always reloaded after submission.
-     *
-     * @param SiteSettings $settings
      */
-    protected function prepareSiteLocales(SiteSettings $settings): void
+    protected function prepareSiteLocales(): void
     {
+        $settings = $this->getServiceLocator()->get('Omeka\Settings\Site');
+
         $settings->set('internationalisation_iso_codes', []);
 
         $locale = $settings->get('locale');
@@ -1067,36 +1039,6 @@ INLINE;
         $locales[''] = [];
 
         $settings->set('internationalisation_locales', $locales);
-    }
-
-    public function handleSiteSettingsFilters(Event $event): void
-    {
-        $inputFilter = $event->getParam('inputFilter');
-        $inputFilter->get('internationalisation')
-            ->add([
-                'name' => 'internationalisation_fallbacks',
-                'required' => false,
-                'filters' => [
-                    [
-                        'name' => \Laminas\Filter\Callback::class,
-                        'options' => [
-                            'callback' => [$this, 'stringToList'],
-                        ],
-                    ],
-                ],
-            ])
-            ->add([
-                'name' => 'internationalisation_required_languages',
-                'required' => false,
-                'filters' => [
-                    [
-                        'name' => \Laminas\Filter\Callback::class,
-                        'options' => [
-                            'callback' => [$this, 'stringToList'],
-                        ],
-                    ],
-                ],
-            ]);
     }
 
     public function filterSiteGroups($groups)

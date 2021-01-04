@@ -3,6 +3,7 @@ namespace Internationalisation\Form;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Omeka\Form\Element\ArrayTextarea;
 use Omeka\View\Helper\Setting;
 
 class SiteSettingsFieldset extends Fieldset
@@ -54,7 +55,7 @@ class SiteSettingsFieldset extends Fieldset
 
             ->add([
                 'name' => 'internationalisation_fallbacks',
-                'type' => Element\Textarea::class,
+                'type' => ArrayTextarea::class,
                 'options' => [
                     'label' => 'Custom language fallbacks', // @translate
                     'info' => 'Specify values to display when a property has no value with the language of the site. Set one language code by line.', // @translate
@@ -70,7 +71,7 @@ fr',
 
             ->add([
                 'name' => 'internationalisation_required_languages',
-                'type' => Element\Textarea::class,
+                'type' => ArrayTextarea::class,
                 'options' => [
                     'label' => 'Required languages', // @translate
                     'info' => 'Specify values to display in all cases. Values without language are displayed in all cases. Set one language code by line.', // @translate
