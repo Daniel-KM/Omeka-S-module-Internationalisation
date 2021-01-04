@@ -106,7 +106,6 @@ class MirrorPage extends AbstractBlockLayout
     {
         $mirrorPage = $block->dataValue('page');
 
-        // A page cannot be searched by id, so try read.
         try {
             $response = $view->api()->read('site_pages', ['id' => $mirrorPage]);
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
@@ -128,19 +127,59 @@ class MirrorPage extends AbstractBlockLayout
         // cases should be fixed.
 
         // @see \Omeka\Controller\Site\PageController::showAction()
-        $contentView = new \Laminas\View\Model\ViewModel;
-        $contentView->setVariable('site', $mirrorPage->site());
-        $contentView->setVariable('page', $mirrorPage);
+        $contentView = new \Laminas\View\Model\ViewModel([
+            'site' => $mirrorPage->site(),
+            'page' => $mirrorPage,
+        ]);
         $contentView->setTemplate('omeka/site/page/content');
         // This fixes the block Table Of Contents.
         $contentView->setVariable('pageViewModel', $contentView);
-        return $view->render($contentView);
+        try {
+            return $view->render($contentView);
+        } catch (\Exception $e) {
+            $view->logger()->err(sprintf(
+                'Cannot render this mirror page for now: %s.', // @translate
+                $e
+            ));
+            return '';
+        }
     }
 
     public function getFulltextText(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
+        // The site and page slugs should be set in the route to be able to
+        // create url in background.
+        $page = $block->page();
+        $site = $page->site();
+
+        /** @var \Omeka\Mvc\Status $status */
+        $services = $block->getServiceLocator();
+        $status = $services->get('Omeka\Status');
+        $routeMatch = $status->getRouteMatch();
+        $routeMatch
+            ->setParam('site-slug', $site->slug())
+            ->setParam('page-slug', $page->slug());
+
+        // When site settings are used, the render may fail because the target
+        // is not set.
+        // @see \Omeka\Mvc\MvcListeners::prepareSite()
+        $services->get('Omeka\Settings\Site')->setTargetId($site->id());
+        $services->get('ControllerPluginManager')->get('currentSite')->setSite($site);
+
+        $themeManager = $services->get('Omeka\Site\ThemeManager');
+        $currentTheme = $themeManager->getTheme($site->theme());
+        if (!$currentTheme) {
+            $currentTheme = new \Omeka\Site\Theme\Theme('not_found');
+            $currentTheme->setState(\Omeka\Site\Theme\Manager::STATE_NOT_FOUND);
+        }
+        $themeManager->setCurrentTheme($currentTheme);
+
         // TODO Many blocks are not indexed. Why indexing them in mirror pages?
-        return strip_tags($this->render($view, $block));
+        try {
+            return strip_tags($this->render($view, $block));
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 
     /**
