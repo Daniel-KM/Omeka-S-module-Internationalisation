@@ -29,8 +29,8 @@ class DuplicateSiteFieldset extends Fieldset
         }
 
         $this
-            ->setName('internationalisation')
-            ->setAttribute('id', 'internationalisation')
+            ->setName('duplicate')
+            ->setAttribute('id', 'duplicate')
             ->add([
                 'name' => 'is_new',
                 'type' => Element\Hidden::class,
@@ -102,8 +102,8 @@ class DuplicateSiteFieldset extends Fieldset
                     'name' => 'locale',
                     'type' => 'Omeka\Form\Element\LocaleSelect',
                     'options' => [
-                        'label' => 'Locale', // @translate
-                        'info' => 'Locale/language code for this site. Leave blank to use the global locale setting.', // @translate
+                        'label' => 'Locale/language code', // @translate
+                        'info' => 'Leave blank to use the global locale setting.', // @translate
                     ],
                     'attributes' => [
                         'id' => 'locale',

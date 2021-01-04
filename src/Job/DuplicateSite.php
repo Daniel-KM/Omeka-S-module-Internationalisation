@@ -73,7 +73,7 @@ class DuplicateSite extends AbstractJob
             $this->logger->err(new Message(
                 'The site #%1$s is not available for copy. Check your rights.', // @translate
                 $targetId
-                ));
+            ));
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             return;
         }
@@ -172,6 +172,16 @@ class DuplicateSite extends AbstractJob
         if (in_array('collecting', $copyData) && $this->isModuleActive('Collecting')) {
             $this->copyCollecting($source, $target);
         }
+
+        // Assign resources and reindex pages.
+        $services->get(\Omeka\Job\Dispatcher::class)->dispatch(
+            \Omeka\Job\UpdateSiteItems::class,
+            [
+                'sites' => [$targetId => $target->getItemPool()],
+                'action' => 'add',
+            ],
+            $services->get(\Omeka\Job\DispatchStrategy\Synchronous::class)
+        );
 
         $this->indexPages($target);
 

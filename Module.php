@@ -851,7 +851,7 @@ SQL;
          * @var \Internationalisation\Form\DuplicateSiteFieldset $fieldset
          */
         $inputFilter = $event->getParam('inputFilter')
-            ->get('internationalisation');
+            ->get('duplicate');
         $fieldset = $this->getServiceLocator()->get('FormElementManager')->get(
             \Internationalisation\Form\DuplicateSiteFieldset::class,
             [
@@ -876,9 +876,9 @@ SQL;
 </style>
 <script type="text/javascript">
 $(document).ready(function() {
-    $('[name^="internationalisation"]').closest('.field')
-        .wrapAll('<fieldset id="internationalisation" class="field-container collapsible">')
-        .closest('#internationalisation')
+    $('[name^="duplicate"]').closest('.field')
+        .wrapAll('<fieldset id="duplicate" class="field-container collapsible">')
+        .closest('#duplicate')
         .before('<a href="#" class="expand" aria-label=$expand>' + $legend + ' </a> ');
 });
 </script>
@@ -894,7 +894,7 @@ INLINE;
 
         /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
-        $params = $request->getValue('internationalisation', []);
+        $params = $request->getValue('duplicate', []);
         if (!count($params)) {
             return;
         }
