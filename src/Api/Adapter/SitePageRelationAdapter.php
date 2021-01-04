@@ -76,8 +76,6 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
     public function buildQuery(QueryBuilder $qb, array $query): void
     {
         // TODO Check if the join with the site allows really to check rights/visibility and is really needed.
-        $isOldOmeka = \Omeka\Module::VERSION < 2;
-        $alias = $isOldOmeka ? $this->getEntityClass() : 'omeka_root';
         $expr = $qb->expr();
 
         if (isset($query['relation'])) {
@@ -89,11 +87,11 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             $pageAlias = $this->createAlias();
             $relatedPageAlias = $this->createAlias();
             $qb->innerJoin(
-                $alias . '.page',
+                'omeka_root.page',
                 $pageAlias
             );
             $qb->innerJoin(
-                $alias . '.relatedPage',
+                'omeka_root.relatedPage',
                 $relatedPageAlias
             );
             $qb->where($expr->orX(
@@ -114,7 +112,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             }
             $pageAlias = $this->createAlias();
             $qb->innerJoin(
-                $alias . '.page',
+                'omeka_root.page',
                 $pageAlias
             );
             $qb->andWhere($expr->in(
@@ -129,7 +127,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             }
             $pageAlias = $this->createAlias();
             $qb->innerJoin(
-                $alias . '.relatedPage',
+                'omeka_root.relatedPage',
                 $pageAlias
             );
             $qb->andWhere($expr->in(
@@ -145,7 +143,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             }
             $pageAlias = $this->createAlias();
             $qb->innerJoin(
-                $alias . '.page',
+                'omeka_root.page',
                 $pageAlias
             );
             $qb->andWhere($expr->in(
@@ -160,7 +158,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             }
             $pageAlias = $this->createAlias();
             $qb->innerJoin(
-                $alias . '.relatedPage',
+                'omeka_root.relatedPage',
                 $pageAlias
             );
             $qb->andWhere($expr->in(
@@ -172,7 +170,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         if (isset($query['site_id'])) {
             $pageAlias = $this->createAlias();
             $qb->innerJoin(
-                $alias . '.page',
+                'omeka_root.page',
                 $pageAlias
             );
             $qb->andWhere($expr->in(
@@ -208,16 +206,13 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         // Begin building the search query.
         $entityClass = $this->getEntityClass();
 
-        $isOldOmeka = \Omeka\Module::VERSION < 2;
-        $alias = $isOldOmeka ? $entityClass : 'omeka_root';
-
         $this->index = 0;
         $qb = $this->getEntityManager()
             ->createQueryBuilder()
-            ->select($alias)
-            ->from($entityClass, $alias);
+            ->select('omeka_root')
+            ->from($entityClass, 'omeka_root');
         $this->buildQuery($qb, $query);
-        // $qb->groupBy($alias . '.id');
+        // $qb->groupBy('omeka_root.id');
 
         // Trigger the search.query event.
         $event = new Event('api.search.query', $this, [
@@ -242,7 +237,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         // Add the ORDER BY clause. Always sort by entity ID in addition to any
         // sorting the adapters add.
         $this->sortQuery($qb, $query);
-        $qb->addOrderBy($alias . '.page', $query['sort_order']);
+        $qb->addOrderBy('omeka_root.page', $query['sort_order']);
 
         // TODO Make return scalar working for site page relations.
         $scalarField = $request->getOption('returnScalar');
@@ -254,7 +249,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
                     $scalarField, $entityClass
                 ));
             }
-            $qb->select($alias . '.' . $scalarField);
+            $qb->select('omeka_root.' . $scalarField);
             $content = array_column($qb->getQuery()->getScalarResult(), $scalarField);
             $response = new Response($content);
             $response->setTotalResults(count($content));
