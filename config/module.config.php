@@ -50,7 +50,7 @@ return [
         ],
         'factories' => [
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
-            Form\DuplicateSiteFieldset::class => \Zend\Form\ElementFactory::class,
+            Form\DuplicateSiteFieldset::class => \Laminas\Form\ElementFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
             \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
         ],

@@ -1,9 +1,9 @@
 <?php
 namespace Internationalisation\Mvc;
 
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\EventManager\EventManagerInterface;
-use Zend\Mvc\MvcEvent;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Mvc\MvcEvent;
 
 class MvcListeners extends AbstractListenerAggregate
 {
@@ -18,7 +18,7 @@ class MvcListeners extends AbstractListenerAggregate
     /**
      * Add theme translations.
      *
-     * @see \Zend\I18n\Translator\TranslatorInterface
+     * @see \Laminas\I18n\Translator\TranslatorInterface
      * @param MvcEvent $event
      */
     public function prepareTranslations(MvcEvent $event)

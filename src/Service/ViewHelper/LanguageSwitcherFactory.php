@@ -3,7 +3,7 @@ namespace Internationalisation\Service\ViewHelper;
 
 use Internationalisation\View\Helper\LanguageSwitcher;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Service factory to get the language switcher view helper.
@@ -17,7 +17,7 @@ class LanguageSwitcherFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        /** @var \Zend\Authentication\AuthenticationService $auth */
+        /** @var \Laminas\Authentication\AuthenticationService $auth */
         $auth = $services->get('Omeka\AuthenticationService');
         if ($auth->hasIdentity()) {
             $role = $auth->getIdentity()->getRole();

@@ -9,7 +9,7 @@ use Omeka\Api\Request;
 use Omeka\Api\Response;
 use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
-use Zend\EventManager\Event;
+use Laminas\EventManager\Event;
 
 class SitePageRelationAdapter extends AbstractEntityAdapter
 {

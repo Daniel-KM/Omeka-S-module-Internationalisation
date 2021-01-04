@@ -3,7 +3,7 @@ namespace Internationalisation\Service\ViewHelper;
 
 use Internationalisation\View\Helper\LanguageIso;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Service factory to get the language switcher view helper.

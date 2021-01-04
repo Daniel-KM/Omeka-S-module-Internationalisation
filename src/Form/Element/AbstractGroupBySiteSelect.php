@@ -3,7 +3,7 @@ namespace Internationalisation\Form\Element;
 
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Api\Representation\SiteRepresentation;
-use Zend\Form\Element\Select;
+use Laminas\Form\Element\Select;
 
 /**
  * @see \Omeka\Form\Element\AbstractGroupByOwnerSelect
@@ -79,7 +79,7 @@ abstract class AbstractGroupBySiteSelect extends Select
      * - disable_group_by_site.
      *
      * {@inheritDoc}
-     * @see \Zend\Form\Element\Select::getValueOptions()
+     * @see \Laminas\Form\Element\Select::getValueOptions()
      */
     public function getValueOptions()
     {

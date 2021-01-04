@@ -2,7 +2,7 @@
 namespace Internationalisation\Form;
 
 use Internationalisation\Form\Element\SitesPageSelect;
-use Zend\Form\Fieldset;
+use Laminas\Form\Fieldset;
 
 class MirrorPageFieldset extends Fieldset
 {

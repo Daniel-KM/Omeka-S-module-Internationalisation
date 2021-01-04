@@ -12,9 +12,9 @@ use Generic\AbstractModule;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Settings\SiteSettings;
 use Omeka\Stdlib\Message;
-use Zend\EventManager\Event;
-use Zend\EventManager\SharedEventManagerInterface;
-use Zend\Mvc\MvcEvent;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\Mvc\MvcEvent;
 
 class Module extends AbstractModule
 {
@@ -435,7 +435,7 @@ class Module extends AbstractModule
     public function filterJsonLdResource(Event $event)
     {
         // TODO Use the Zend cache.
-        /** @var \Zend\Mvc\I18n\Translator $translator */
+        /** @var \Laminas\Mvc\I18n\Translator $translator */
         static $translator;
         static $propertyLabels;
         static $templatePropertyLabels = [[]];
@@ -445,7 +445,7 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
 
         // Process only external api requests.
-        /** @var \Zend\Mvc\MvcEvent $mvcEvent */
+        /** @var \Laminas\Mvc\MvcEvent $mvcEvent */
         $mvcEvent = $services->get('Application')->getMvcEvent();
         // A check is required on route match to allow background processes.
         $routeMatch = $mvcEvent->getRouteMatch();
@@ -454,7 +454,7 @@ class Module extends AbstractModule
             return;
         }
 
-        /** @var \Zend\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $mvcEvent->getRequest();
 
         // Use "use_locale" instead of "locale" to avoid conflicts with some
@@ -816,7 +816,7 @@ SQL;
                 'required' => false,
                 'filters' => [
                     [
-                        'name' => \Zend\Filter\Callback::class,
+                        'name' => \Laminas\Filter\Callback::class,
                         'options' => [
                             'callback' => [$this, 'filterSiteGroups'],
                         ],
@@ -856,7 +856,7 @@ SQL;
     public function handleSiteFormElements(Event $event)
     {
         /**
-         * @var \Zend\Router\Http\RouteMatch $routeMatch
+         * @var \Laminas\Router\Http\RouteMatch $routeMatch
          * @var \Internationalisation\Form\DuplicateSiteFieldset $fieldset
          */
         $services = $this->getServiceLocator();
@@ -1072,7 +1072,7 @@ INLINE;
                 'required' => false,
                 'filters' => [
                     [
-                        'name' => \Zend\Filter\Callback::class,
+                        'name' => \Laminas\Filter\Callback::class,
                         'options' => [
                             'callback' => [$this, 'stringToList'],
                         ],
@@ -1084,7 +1084,7 @@ INLINE;
                 'required' => false,
                 'filters' => [
                     [
-                        'name' => \Zend\Filter\Callback::class,
+                        'name' => \Laminas\Filter\Callback::class,
                         'options' => [
                             'callback' => [$this, 'stringToList'],
                         ],

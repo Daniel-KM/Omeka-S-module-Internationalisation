@@ -3,9 +3,9 @@
 namespace Internationalisation\Form;
 
 use Omeka\Form\Element\SiteSelect;
-use Zend\Form\Element;
-use Zend\Form\Fieldset;
-use Zend\InputFilter\InputFilter;
+use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
+use Laminas\InputFilter\InputFilter;
 
 class DuplicateSiteFieldset extends Fieldset
 {
