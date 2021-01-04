@@ -201,7 +201,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
             'sort_order' => null,
         ];
         $query += $defaultQuery;
-        $query['sort_order'] = strtoupper($query['sort_order']) === 'DESC' ? 'DESC' : 'ASC';
+        $query['sort_order'] = strtoupper((string) $query['sort_order']) === 'DESC' ? 'DESC' : 'ASC';
 
         // Begin building the search query.
         $entityClass = $this->getEntityClass();

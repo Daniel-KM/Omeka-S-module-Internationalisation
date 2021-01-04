@@ -685,7 +685,7 @@ SQL;
         $query = $event->getParam('query', []);
         $this->lastQuerySort = [
             'sort_by' => $query['sort_by'],
-            'sort_order' => isset($query['sort_order']) && strtolower($query['sort_order']) === 'desc' ? 'desc' : 'asc',
+            'sort_order' => isset($query['sort_order']) && strtolower((string) $query['sort_order']) === 'desc' ? 'desc' : 'asc',
         ];
     }
 
@@ -937,6 +937,12 @@ INLINE;
             'is_new' => false,
         ];
         // TODO A source should be set even for remove currently.
+        if (empty($params['remove'])) {
+            $params['remove'] = [];
+        }
+        if (empty($params['copy'])) {
+            $params['copy'] = [];
+        }
         if ((!count($params['remove']) && !count($params['copy']))
             || (count($params['copy']) && !$params['source'])
         ) {
