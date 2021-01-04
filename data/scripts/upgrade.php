@@ -76,7 +76,7 @@ SQL;
     }
 }
 
-if (version_compare($oldVersion, '3.2.10', '<')) {
+if (version_compare($oldVersion, '3.3.10', '<')) {
     $sql = <<<SQL
 UPDATE `site_page_block` SET `layout` = "mirrorPage"
 WHERE `layout` = "simplePage";
