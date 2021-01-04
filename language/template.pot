@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-14 00:00+0000\n"
+"POT-Creation-Date: 2021-01-04 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,34 +17,38 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:63
+#: Module.php:62
 msgid "The composer vendor is not ready."
 msgstr ""
 
-#: Module.php:64
+#: Module.php:63
 msgid "See module’s installation documentation."
 msgstr ""
 
-#: Module.php:898
+#: Module.php:870
 msgid "Remove and copy data"
 msgstr ""
 
-#: src/Api/Adapter/SitePageRelationAdapter.php:253
+#: src/Api/Adapter/SitePageRelationAdapter.php:248
 #, php-format
 msgid "The \"%s\" field is not available in the %s entity class."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:601
+#: src/Generic/AbstractModule.php:66
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:621
+#: src/Generic/AbstractModule.php:73
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:689
+#: src/Generic/AbstractModule.php:80
+msgid "This module has resources that connot be installed."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:707
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -65,22 +69,22 @@ msgstr ""
 msgid "The current page and recursive pages are forbidden."
 msgstr ""
 
-#: Module.php:806 src/Form/SettingsFieldset.php:22
+#: Module.php:800 src/Form/SettingsFieldset.php:22
 #: src/Form/SettingsFieldset.php:24
 msgid "Remove all groups"
 msgstr ""
 
-#: Module.php:955 src/Job/DuplicateSite.php:89
+#: Module.php:933 src/Job/DuplicateSite.php:89
 #, php-format
 msgid "The site #%1$s cannot be copied. Check your rights."
 msgstr ""
 
-#: Module.php:986
+#: Module.php:964
 #, php-format
 msgid "Remove/copy processes have been done for site \"%1$s\"."
 msgstr ""
 
-#: Module.php:993
+#: Module.php:971
 #, php-format
 msgid "See %1$sjob #%2$d%3$s for more information (%4$slogs%3$s)."
 msgstr ""
@@ -95,6 +99,10 @@ msgstr ""
 
 #: src/Form/DuplicateSiteFieldset.php:21
 msgid "Site settings"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:23
+msgid "Item pool"
 msgstr ""
 
 #: src/Form/DuplicateSiteFieldset.php:25
@@ -129,6 +137,14 @@ msgstr ""
 msgid "Create linked mirror pages"
 msgstr ""
 
+#: src/Form/DuplicateSiteFieldset.php:105
+msgid "Locale/language code"
+msgstr ""
+
+#: src/Form/DuplicateSiteFieldset.php:106
+msgid "Leave blank to use the global locale setting."
+msgstr ""
+
 #: src/Form/SitePageForm.php:17
 msgid "Translations"
 msgstr ""
@@ -148,7 +164,7 @@ msgstr ""
 msgid "[No site]"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:9 src/Form/SiteSettingsFieldset.php:15
+#: src/Form/SettingsFieldset.php:9 src/Form/SiteSettingsFieldset.php:16
 msgid "Internationalisation"
 msgstr ""
 
@@ -163,66 +179,66 @@ msgid ""
 "separator."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:23 src/Form/SiteSettingsFieldset.php:35
+#: src/Form/SiteSettingsFieldset.php:24 src/Form/SiteSettingsFieldset.php:36
 msgid "All values"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:24
+#: src/Form/SiteSettingsFieldset.php:25
 msgid "All values, with language of the site first"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:25
+#: src/Form/SiteSettingsFieldset.php:26
 msgid "All values, with language of the site or iso fallback first"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:26
+#: src/Form/SiteSettingsFieldset.php:27
 msgid "All values, with language of the site or custom fallback first"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:27
+#: src/Form/SiteSettingsFieldset.php:28
 msgid "Only values with the language of the site"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:28
+#: src/Form/SiteSettingsFieldset.php:29
 msgid "Only values with the language of the site, with iso fallback"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:29
+#: src/Form/SiteSettingsFieldset.php:30
 msgid "Only values with the language of the site, with custom fallback"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:32
+#: src/Form/SiteSettingsFieldset.php:33
 msgid ""
 "Display only the values in the specified language. It applies only for "
 "properties that contains at least one value with a language. The option can "
 "be overridden in the theme."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:37
+#: src/Form/SiteSettingsFieldset.php:38
 msgid ""
 "Display only the values in the specified language. This option is available "
 "only when the site has a language."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:45
+#: src/Form/SiteSettingsFieldset.php:46
 msgid "Language of values"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:59
+#: src/Form/SiteSettingsFieldset.php:60
 msgid "Custom language fallbacks"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:60
+#: src/Form/SiteSettingsFieldset.php:61
 msgid ""
 "Specify values to display when a property has no value with the language of "
 "the site. Set one language code by line."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:75
+#: src/Form/SiteSettingsFieldset.php:76
 msgid "Required languages"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:76
+#: src/Form/SiteSettingsFieldset.php:77
 msgid ""
 "Specify values to display in all cases. Values without language are "
 "displayed in all cases. Set one language code by line."
@@ -253,53 +269,53 @@ msgstr ""
 msgid "The site #%1$s is not available for copy. Check your rights."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:180
+#: src/Job/DuplicateSite.php:190
 msgid "Check logs: an error occurred."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:223
+#: src/Job/DuplicateSite.php:233
 #, php-format
 msgid "Site settings of \"%1$s\" successfully removed."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:257
+#: src/Job/DuplicateSite.php:267
 #, php-format
 msgid "%1$d site permissions removed from \"%2$s\"."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:296
+#: src/Job/DuplicateSite.php:306
 #, php-format
 msgid "%1$d site pages removed from \"%2$s\"."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:310
+#: src/Job/DuplicateSite.php:320
 #, php-format
 msgid "%1$d collecting forms removed from \"%2$s\"."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:345
+#: src/Job/DuplicateSite.php:355
 #, php-format
 msgid "Site settings of \"%1$s\" successfully copied into \"%2$s\"."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:407
+#: src/Job/DuplicateSite.php:417
 #, php-format
 msgid "The page slug \"%1$s\" from the source has been renamed \"%2$s\"."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:413
+#: src/Job/DuplicateSite.php:423
 #, php-format
 msgid "Unable to copy page \"%1$s\" of site \"%2$s\". The page is skipped."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:423
+#: src/Job/DuplicateSite.php:433
 #, php-format
 msgid ""
 "%1$d site pages of \"%2$s\" successfully copied into \"%3$s\" (mode \"%4$s"
 "\")."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:524
+#: src/Job/DuplicateSite.php:534
 #, php-format
 msgid ""
 "%1$d collecting forms from site \"%2$s\" were successfully copied into \"%3$s"
@@ -323,9 +339,14 @@ msgstr ""
 msgid "A mirror page cannot use a page that uses it recursively as a block."
 msgstr ""
 
-#: src/Site/BlockLayout/MirrorPage.php:114
+#: src/Site/BlockLayout/MirrorPage.php:113
 #, php-format
 msgid ""
 "Mirror page block #%d of page \"%s\" of site \"%s\" should be updated: it "
 "refers to a removed page."
+msgstr ""
+
+#: src/Site/BlockLayout/MirrorPage.php:141
+#, php-format
+msgid "Cannot render this mirror page for now: %s."
 msgstr ""
