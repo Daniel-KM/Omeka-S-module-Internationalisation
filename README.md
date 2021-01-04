@@ -2,7 +2,8 @@ Internationalisation (module for Omeka S)
 =========================================
 
 > __New versions of this module and support for Omeka S version 3.0 and above
-> are available on [GitLab], which seems to respect users and privacy better.__
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
 
 [Internationalisation] is a module for [Omeka S] that allows visitors to switch
 between sites pages, when the sites are managed by language.
@@ -230,7 +231,7 @@ your archives regularly so you can roll back if needed.
 Troubleshooting
 ---------------
 
-See online issues on the [module issues] page on GitHub.
+See online issues on the [module issues] page on GitLab.
 
 
 License
@@ -274,25 +275,25 @@ Copyright
 
 This module was built for [Watau].
 
-* Copyright Daniel Berthereau, 2019-2020 (see [Daniel-KM] on GitHub)
-* Copyright BibLibre, 2017 (see [BibLibre] on Github), for the switcher
+* Copyright Daniel Berthereau, 2019-2020 (see [Daniel-KM] on GitLab)
+* Copyright BibLibre, 2017 (see [BibLibre] on GitLab), for the switcher
 
 
-[Internationalisation]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation
+[Internationalisation]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation
 [Omeka S]: https://omeka.org/s
 [MultiLanguage]: https://github.com/patrickmj/multilanguage
-[Locale Switcher]: https://github.com/Daniel-KM/Omeka-plugin-LocaleSwitcher
+[Locale Switcher]: https://gitlab.com/Daniel-KM/Omeka-plugin-LocaleSwitcher
 [Omeka Classic]: https://omeka.org/classic
-[Generic]: https://github.com/Daniel-KM/Omeka-S-module-Generic
-[Internationalisation.zip]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/releases
+[Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
+[Internationalisation.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/releases
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L489
 [#1506]: https://github.com/omeka/omeka-s/pull/1506/files
 [omeka/omeka-s#1493]: https://github.com/omeka/omeka-s/pull/1493
-[ApiInfo]: https://github.com/Daniel-KM/Omeka-S-module-ApiInfo
-[Next]: https://github.com/Daniel-KM/Omeka-S-module-Next
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/issues
+[ApiInfo]: https://gitlab.com/Daniel-KM/Omeka-S-module-ApiInfo
+[Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
@@ -301,4 +302,4 @@ This module was built for [Watau].
 [Watau]: https://watau.fr
 [BibLibre]: https://github.com/BibLibre
 [GitLab]: https://gitlab.com/Daniel-KM
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
