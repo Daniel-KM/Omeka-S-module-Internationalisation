@@ -870,7 +870,7 @@ SQL;
         $legend = json_encode($view->translate('Remove and copy data'), 320);
         echo <<<INLINE
 <style>
-.collapse + #internationalisation.collapsible {
+.collapse + #duplicate.collapsible {
     overflow: initial;
 }
 </style>
