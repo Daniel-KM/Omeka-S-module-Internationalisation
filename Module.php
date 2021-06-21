@@ -273,7 +273,7 @@ class Module extends AbstractModule
         } else {
             $title = $resource->value('dcterms:title');
         }
-        $event->setParam('title', $title);
+        $event->setParam('title', (string) $title);
     }
 
     /**
