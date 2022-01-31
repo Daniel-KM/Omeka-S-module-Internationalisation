@@ -251,21 +251,15 @@ class LanguageList extends AbstractHelper
         ];
     }
 
+    /**
+     * Get the current site from the view or the root view (main layout).
+     */
     protected function currentSite(): ?\Omeka\Api\Representation\SiteRepresentation
     {
-        static $site;
-        if (!$site) {
-            $vars = $this->view->vars();
-            $site = $vars->offsetGet('site');
-            if (!$site) {
-                $site = $this->view
-                    ->getHelperPluginManager()
-                    ->get('Laminas\View\Helper\ViewModel')
-                    ->getRoot()
-                    ->getVariable('site');
-                $vars->offsetSet('site', $site);
-            }
-        }
-        return $site;
+        return $this->view->site ?? $this->view->site = $this->view
+            ->getHelperPluginManager()
+            ->get('Laminas\View\Helper\ViewModel')
+            ->getRoot()
+            ->getVariable('site');
     }
 }
