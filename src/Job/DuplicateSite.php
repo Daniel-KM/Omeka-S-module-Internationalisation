@@ -373,7 +373,7 @@ SQL;
 
         // Manage private page slugs.
         $sql = 'SELECT `id`, `slug` FROM `site_page` WHERE `site_id` = ' . (int) $target->getId();
-        $existingSlugs = $this->connection->query($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $existingSlugs = $this->connection->executeQuery($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         /**
          * @var \Omeka\Entity\SitePage $sourcePage
