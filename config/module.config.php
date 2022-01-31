@@ -34,6 +34,7 @@ return [
         ],
         'factories' => [
             'languageIso' => Service\ViewHelper\LanguageIsoFactory::class,
+            'languageList' => Service\ViewHelper\LanguageListFactory::class,
             'languageSwitcher' => Service\ViewHelper\LanguageSwitcherFactory::class,
             'localeValue' => Service\ViewHelper\LocaleValueFactory::class,
         ],

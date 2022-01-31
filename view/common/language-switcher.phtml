@@ -1,0 +1,55 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var array $locales
+ * @var array $localeLabels
+ * @var string $displayLocale "code" (the 2 or 3 letters language code, default) or "flag".
+ */
+
+// No switcher if there is only one site or a single language.
+if (count($locales) <= 1) {
+    return;
+}
+
+// Support old themes.
+if ($this->resolver('common/helper/language-switcher')) {
+    $vars = $this->vars();
+    $vars->offsetSet('locale_labels', $localeLabels);
+    $vars->offsetSet('locale_as_code', $displayLocale === 'code');
+    echo $this->partial('common/helper/language-switcher');
+    return;
+}
+
+$currentLocale = $this->siteSetting('locale') ?: 'en_US';
+?>
+
+<ul class="language-switcher locale-<?= $displayLocale ?>">
+    <?php if ($displayLocale === 'flag'): ?>
+
+    <?php $localeToCountry = $this->plugin('localeToCountry'); ?>
+    <?php foreach ($locales as $locale): ?>
+        <?php $country = $localeToCountry($locale['locale']); ?>
+        <li>
+            <?php if ($currentLocale == $locale['locale']): ?>
+                <span class="active flag-icon flag-icon-<?= strtolower($country) ?>" title="<?= $locale['locale_label'] ?>"></span>
+            <?php else: ?>
+                <a href="<?= $locale['url'] ?>" title="<?= $locale['locale_label'] ?>"><span class="flag-icon flag-icon-<?= strtolower($country) ?>"></span></a>
+            <?php endif; ?>
+        </li>
+    <?php endforeach; ?>
+
+    <?php else: ?>
+
+    <?php foreach ($locales as $locale): ?>
+        <li>
+            <?php if ($currentLocale == $locale['locale']): ?>
+                <span class="active" title="<?= $locale['locale_label'] ?>"><?= rtrim(substr($locale['locale'], 0, 3), '_-') ?></span>
+            <?php else: ?>
+                <a href="<?= $locale['url'] ?>" title="<?= $locale['locale_label'] ?>"><?= rtrim(substr($locale['locale'], 0, 3), '_-') ?></a>
+            <?php endif; ?>
+        </li>
+    <?php endforeach; ?>
+
+    <?php endif; ?>
+</ul>
