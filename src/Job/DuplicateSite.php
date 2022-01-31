@@ -385,7 +385,7 @@ SQL;
             if ($slugExists) {
                 $slug = mb_substr($slug . '_' . $source->getSlug(), 0, 190);
                 if (in_array($slug, $existingSlugs)) {
-                    $slug = mb_substr($slug, 0, 185) . '_' . substr(str_replace(['+', '/'], '', base64_encode(random_bytes(20))), 0, 4);
+                    $slug = mb_substr($slug, 0, 185) . '_' . substr(str_replace(['+', '/', '='], ['', '', ''], base64_encode(random_bytes(128))), 0, 4);
                 }
             }
             if ($mode === 'mirror') {

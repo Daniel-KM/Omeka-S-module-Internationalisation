@@ -152,7 +152,7 @@ property "dcterms:creator" on a template "Book").
 TODO
 ----
 
-- [ ] Return original page when it is not translated in a site, instead of an error.
+- [ ] Return original page when it is not translated in a site, instead of an error (virtual instant mirror page).
 - [ ] Add links for easier browsing between translated pages.
 - [x] Add a button to duplicate a site (item pool, pages and navigation, relations).
 - [ ] Add a button to duplicate a page or to append blocks of a page to another one.
