@@ -144,7 +144,7 @@ Note that Omeka doesn’t separate admin and public strings.
 
 To translate the property labels (for example "Title" for dcterms:title), the
 resource class label ("Book" for bibo:Book) and the resource template label, the
-client can add `&ùse_locale=xx_YY` and `&use_template_label=1` to the api
+client can add `&use_locale=xx_YY` and `&use_template_label=1` to the api
 queries. In such way, the api will response for example French "Auteur" for the
 property "dcterms:creator" on a template "Book").
 
