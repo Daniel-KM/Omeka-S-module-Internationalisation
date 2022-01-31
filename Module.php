@@ -742,7 +742,7 @@ SQL;
         }
         $reverted = $this->lastQuerySort['sort_order'] === 'desc';
         $translateOptionsLabels = function ($v) use ($translator, $reverted) {
-            if (is_scalar($v)) {
+            if (is_scalar($v) || empty($v['options'])) {
                 return $v;
             }
             $optionLabelsTranslated = array_map(function ($vv) use ($translator) {
