@@ -134,22 +134,21 @@ class LanguageSwitcher extends AbstractHelper
             }
         }
 
-        // Manage module Search (that has only one action, but multiple paths).
-        elseif ($controller === 'Search\Controller\IndexController'
-            // Require module Search >= 3.5.12.
+        // Manage module AdvancedSearch (that has only one action, but multiple paths).
+        elseif ($controller === 'AdvancedSearch\Controller\IndexController'
             && $pageSlug = $params->fromRoute('page-slug')
         ) {
             // It's not possible to use siteSettings for another site from the view. See git history.
 
             // TODO Save all the relations between search pages in a setting to avoid to prepare it each time.
             $api = $view->api();
+            /** @var \Doctrine\DBAL\Connection $connection */
             $connection = $site->getServiceLocator()->get('Omeka\Connection');
-            $connection->setFetchMode(\PDO::FETCH_KEY_PAIR);
-            $searchPageIdsBySite = $connection->fetchAll('SELECT `site_id`, `value` FROM `site_setting` WHERE `id` = "search_pages";');
+            $searchPageIdsBySite = $connection->fetchAllKeyValue('SELECT `site_id`, `value` FROM `site_setting` WHERE `id` = "advancedsearch_configs";');
             $searchPageIdsBySite = array_map(function ($v) {
                 return json_decode($v, true);
             }, $searchPageIdsBySite);
-            $mainSearchPageIdBySite = $connection->fetchAll('SELECT `site_id`, `value` FROM `site_setting` WHERE `id` = "search_main_page";');
+            $mainSearchPageIdBySite = $connection->fetchAllKeyValue('SELECT `site_id`, `value` FROM `site_setting` WHERE `id` = "advancedsearch_main_config";');
             $mainSearchPageIdBySite = array_map(function ($v) {
                 return json_decode($v, true);
             }, $mainSearchPageIdBySite);
