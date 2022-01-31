@@ -78,7 +78,18 @@ class LanguageList extends AbstractHelper
 
         // Only translate sites that have at least two locales.
         // This is automatically managed since siteGroups list only them.
-        $locales = array_intersect_key($this->localeSites, array_flip($siteGroup));
+        // TODO Update the setting for site groups when a site is renamed.
+        // $locales = array_intersect_key($this->localeSites, array_flip($siteGroup));
+        // First each lang keys to allow intersect keys.
+        if (!is_array(reset($siteGroup))) {
+            $siteGroupKeys = array_flip($siteGroup);
+        } else {
+            $siteGroupKeys = [];
+            foreach ($siteGroup as $key => $siteGroupElement) {
+                $siteGroupKeys[$key] = true;
+            }
+        }
+        $locales = array_intersect_key($this->localeSites, $siteGroupKeys);
 
         $urlHelper = $view->plugin('Url');
 
