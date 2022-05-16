@@ -73,9 +73,9 @@ Set the groups of all sites that will be translated. For example if you have a
 main site and three exhibits, or four sites for different libraries:
 
 ```
-my-site-fra, my-site-way, my-site-rus
-my-exhibit-fra, my-exhibit-rus
-other-exhibit-fra, other-exhibit-rus
+my-site-fra, my-site-way, my-site-vie
+my-exhibit-fra, my-exhibit-vie
+other-exhibit-fra, other-exhibit-vie
 fourth-site
 ```
 
