@@ -173,6 +173,7 @@ class DuplicateSite extends AbstractJob
             $this->copyCollecting($source, $target);
         }
 
+        $this->indexPages($target);
         // Assign resources and reindex pages.
         $services->get(\Omeka\Job\Dispatcher::class)->dispatch(
             \Omeka\Job\UpdateSiteItems::class,
@@ -183,7 +184,6 @@ class DuplicateSite extends AbstractJob
             $services->get(\Omeka\Job\DispatchStrategy\Synchronous::class)
         );
 
-        $this->indexPages($target);
 
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
             $this->logger->warn(
@@ -480,10 +480,11 @@ SQL;
         // The settings may be already copied with other settings.
         $siteSettings = $this->getServiceLocator()->get('Omeka\Settings\Site');
         $siteSettings->setTargetId($source->getId());
-        $themeSettings = $siteSettings->get('theme_settings_' . $theme) ?: '{}';
+        $themeSettings = $siteSettings->get('theme_settings_' . $theme);
         $siteSettings->setTargetId($target->getId());
-        $siteSettings->set('theme_settings_' . $theme, $themeSettings);
-
+        if ($themeSettings) {
+            $siteSettings->set('theme_settings_' . $theme, $themeSettings);
+        }
         $this->entityManager->flush();
     }
 
