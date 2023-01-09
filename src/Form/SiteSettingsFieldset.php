@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Internationalisation\Form;
 
 use Laminas\Form\Element;
@@ -86,19 +87,13 @@ fra',
             ]);
     }
 
-    /**
-     * @param Setting $siteSetting
-     */
-    public function setSiteSetting(Setting $siteSetting)
+    public function setSiteSetting(Setting $siteSetting): self
     {
         $this->siteSetting = $siteSetting;
         return $this;
     }
 
-    /**
-     * @return \Omeka\View\Helper\Setting
-     */
-    public function getSiteSetting()
+    public function getSiteSetting(): Setting
     {
         return $this->siteSetting;
     }

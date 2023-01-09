@@ -769,8 +769,6 @@ SQL;
 
         $services = $this->getServiceLocator();
 
-        $space = strtolower(__NAMESPACE__);
-
         $api = $services->get('Omeka\ApiManager');
         $sites = $api
             ->search('sites', ['sort_by' => 'slug', 'sort_order' => 'asc'], ['returnScalar' => 'slug'])
@@ -792,7 +790,9 @@ SQL;
          * @var \Internationalisation\Form\SettingsFieldset $fieldset
          */
         $form = $event->getTarget();
-        $fieldset = $form->get($space);
+        $fieldset = version_compare(\Omeka\Module::VERSION, '4', '<')
+            ? $form->get('internationalisation')
+            : $form;
         $siteGroupsElement = $fieldset
             ->get('internationalisation_site_groups');
         $siteGroupsElement
@@ -803,8 +803,10 @@ SQL;
 
     public function handleMainSettingsFilters(Event $event): void
     {
-        $event->getParam('inputFilter')
-            ->get('internationalisation')
+        $inputFilter = version_compare(\Omeka\Module::VERSION, '4', '<')
+            ? $event->getParam('inputFilter')->get('internationalisation')
+            : $event->getParam('inputFilter');
+        $inputFilter
             ->add([
                 'name' => 'internationalisation_site_groups',
                 'required' => false,
@@ -1102,5 +1104,23 @@ INLINE;
         }
 
         return $locales;
+    }
+
+    /**
+     * Get each line of a string separately.
+     */
+    public function stringToList($string): array
+    {
+        return array_filter(array_map('trim', explode("\n", $this->fixEndOfLine($string))), 'strlen');
+    }
+
+    /**
+     * Clean the text area from end of lines.
+     *
+     * This method fixes Windows and Apple copy/paste from a textarea input.
+     */
+    public function fixEndOfLine($string): string
+    {
+        return str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], (string) $string);
     }
 }
