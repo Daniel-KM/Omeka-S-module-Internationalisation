@@ -157,9 +157,9 @@ class MirrorPage extends AbstractBlockLayout
         $status = $services->get('Omeka\Status');
         $routeMatch = $status->getRouteMatch();
         // There may be no route match for a job in backend.
-        // TODO Fix indexing full text for mirror page with the job run from Bulk Import.
+        // TODO Fix indexing full text for mirror page with the job run from Bulk Import. Normally already done in core.
         if (!$routeMatch) {
-            return;
+            return '';
         }
         $routeMatch
             ->setParam('site-slug', $site->slug())
