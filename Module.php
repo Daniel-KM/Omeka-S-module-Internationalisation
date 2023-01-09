@@ -922,7 +922,7 @@ INLINE;
         }
 
         $services = $this->getServiceLocator();
-        $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger();
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
         try {
             $source = $params['source']

@@ -505,6 +505,7 @@ SQL;
         }
 
         $navigation = $source->getNavigation();
+        $iterate = null;
         $iterate = function (&$navigation) use (&$iterate): void {
             foreach ($navigation as &$data) {
                 if ($data['type'] === 'page' && !empty($this->mapPages[$data['data']['id']])) {

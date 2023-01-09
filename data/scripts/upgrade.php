@@ -1,24 +1,27 @@
 <?php declare(strict_types=1);
+
 namespace Internationalisation;
+
+use Omeka\Stdlib\Message;
 
 /**
  * @var Module $this
- * @var \Laminas\ServiceManager\ServiceLocatorInterface $serviceLocator
+ * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
  * @var string $newVersion
  * @var string $oldVersion
  *
+ * @var \Omeka\Api\Manager $api
+ * @var \Omeka\Settings\Settings $settings
  * @var \Doctrine\DBAL\Connection $connection
  * @var \Doctrine\ORM\EntityManager $entityManager
- * @var \Omeka\Api\Manager $api
+ * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
-$services = $serviceLocator;
-$settings = $services->get('Omeka\Settings');
-$config = require dirname(__DIR__, 2) . '/config/module.config.php';
-$connection = $services->get('Omeka\Connection');
-$entityManager = $services->get('Omeka\EntityManager');
 $plugins = $services->get('ControllerPluginManager');
 $api = $plugins->get('api');
-$space = strtolower(__NAMESPACE__);
+$settings = $services->get('Omeka\Settings');
+$connection = $services->get('Omeka\Connection');
+$messenger = $plugins->get('messenger');
+$entityManager = $services->get('Omeka\EntityManager');
 
 if (version_compare($oldVersion, '3.2.0', '<')) {
     $settings = $services->get('Omeka\Settings\Site');
@@ -27,9 +30,9 @@ if (version_compare($oldVersion, '3.2.0', '<')) {
     foreach ($siteIds as $siteId) {
         $settings->setTargetId($siteId);
         $settings->set('internationalisation_fallbacks',
-            $config[$space]['site_settings']['internationalisation_fallbacks']);
+            $config['internationalisation']['site_settings']['internationalisation_fallbacks']);
         $settings->set('internationalisation_required_languages',
-            $config[$space]['site_settings']['internationalisation_required_languages']);
+            $config['internationalisation']['site_settings']['internationalisation_required_languages']);
     }
 }
 
