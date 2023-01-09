@@ -39,6 +39,7 @@ class SiteSettingsFieldset extends Fieldset
         }
 
         $this
+            ->setAttribute('id', 'internationalisation')
             ->add([
                 'name' => 'internationalisation_display_values',
                 'type' => Element\Select::class,
