@@ -216,7 +216,7 @@ class DuplicateSite extends AbstractJob
 DELETE FROM `site_setting`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
 
         if (!$settings) {
             return;
@@ -260,7 +260,7 @@ SQL;
 DELETE FROM `site_permission`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $result = $this->connection->exec($sql);
+        $result = $this->connection->executeStatement($sql);
         $this->entityManager->refresh($site);
 
         $this->logger->notice(new Message(
@@ -275,7 +275,7 @@ SQL;
 DELETE FROM `site_item_set`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $this->entityManager->refresh($site);
     }
 
@@ -288,18 +288,18 @@ INNER JOIN `site_page_block` ON `site_page_block`.`id` = `site_block_attachment`
 INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
 WHERE `site_page`.`site_id` = {$site->getId()};
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $sql = <<<SQL
 DELETE `site_page_block` FROM `site_page_block`
 INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
 WHERE `site_page`.`site_id` = {$site->getId()};
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $sql = <<<SQL
 DELETE FROM `site_page`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $result = $this->connection->exec($sql);
+        $result = $this->connection->executeStatement($sql);
         $this->entityManager->refresh($site);
 
         $this->logger->notice(new Message(
@@ -314,7 +314,7 @@ SQL;
 DELETE FROM `collecting_form`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $result = $this->connection->exec($sql);
+        $result = $this->connection->executeStatement($sql);
 
         $this->logger->notice(new Message(
             '%1$d collecting forms removed from "%2$s".', // @translate
@@ -338,7 +338,7 @@ SELECT `t2`.`id`, {$target->getId()} AS 'site_id', `t2`.`value` FROM (
 ) AS `t2`
 ON DUPLICATE KEY UPDATE `id`=`t2`.`id`, `site_id`={$target->getId()}, `value`=`t2`.`value`;
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
 
         if (!$settings) {
             return;
@@ -373,7 +373,7 @@ SQL;
 
         // Manage private page slugs.
         $sql = 'SELECT `id`, `slug` FROM `site_page` WHERE `site_id` = ' . (int) $target->getId();
-        $existingSlugs = $this->connection->executeQuery($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $existingSlugs = $this->connection->executeQuery($sql)->fetchAllKeyValue();
 
         /**
          * @var \Omeka\Entity\SitePage $sourcePage
@@ -444,7 +444,7 @@ SELECT {$target->getId()} AS 'site_id', `t2`.`user_id`, `t2`.`role` FROM (
 ) AS `t2`
 ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `user_id`=`t2`.`user_id`, `role`=`t2`.`role`;
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $this->entityManager->refresh($target);
     }
 
@@ -463,7 +463,7 @@ SELECT {$target->getId()} AS 'site_id', `t2`.`item_set_id`, `t2`.`position` FROM
 ) AS `t2`
 ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `item_set_id`=`t2`.`item_set_id`, `position`=`t2`.`position`;
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $this->entityManager->refresh($target);
     }
 
@@ -530,7 +530,7 @@ SELECT  `t2`.`item_set_id`, {$target->getId()} AS 'site_id', `t2`.`owner_id`, `t
     SELECT `t`.`item_set_id`, `t`.`site_id`, `t`.`owner_id`, `t`.`label`, `t`.`anon_type`, `t`.`success_text`, `t`.`email_text` FROM `collecting_form` AS `t` WHERE `site_id` = {$source->getId()}
 ) AS `t2`;
 SQL;
-        $result = $this->connection->exec($sql);
+        $result = $this->connection->executeStatement($sql);
 
         $this->logger->notice(new Message(
             '%1$d collecting forms from site "%2$s" were successfully copied into "%3$s".', // @translate
@@ -541,14 +541,14 @@ SQL;
         $sql = <<<'SQL'
 SHOW COLUMNS FROM `collecting_prompt` LIKE 'multiple';
 SQL;
-        $multiple = (bool) $this->connection->exec($sql) ? ', `multiple`' : '';
+        $multiple = (bool) $this->connection->executeQuery($sql) ? ', `multiple`' : '';
         $sql = <<<SQL
 INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple)
 SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple FROM `collecting_prompt`
 JOIN `collecting_form` ON `collecting_form`.`id` = `collecting_prompt`.`form_id`
 WHERE `collecting_form`.`site_id` = {$source->getId()};
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
 
         // No need to refresh.
     }

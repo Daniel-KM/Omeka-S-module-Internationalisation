@@ -671,7 +671,7 @@ SQL;
             }
         }
         $sql = rtrim($sql, ',');
-        $connection->exec($sql);
+        $connection->executeStatement($sql);
     }
 
     public function filterVocabularyMemberSelectQuery(Event $event): void

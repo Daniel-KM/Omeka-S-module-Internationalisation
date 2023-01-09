@@ -47,7 +47,7 @@ SQL;
     // See core commit #2689ce92f.
     $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
     foreach ($sqls as $sql) {
-        $connection->exec($sql);
+        $connection->executeStatement($sql);
     }
 }
 
@@ -67,7 +67,7 @@ SQL;
     // See core commit #2689ce92f.
     $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
     foreach ($sqls as $sql) {
-        $connection->exec($sql);
+        $connection->executeStatement($sql);
     }
 
     $settings = $services->get('Omeka\Settings\Site');
@@ -84,5 +84,5 @@ if (version_compare($oldVersion, '3.3.10', '<')) {
 UPDATE `site_page_block` SET `layout` = "mirrorPage"
 WHERE `layout` = "simplePage";
 SQL;
-    $connection->exec($sql);
+    $connection->executeStatement($sql);
 }
