@@ -226,7 +226,7 @@ Copyright
 
 This module was built for [Watau].
 
-* Copyright Daniel Berthereau, 2019-2021 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2019-2023 (see [Daniel-KM] on GitLab)
 * Copyright BibLibre, 2017 (see [BibLibre] on GitLab), for the switcher
 
 
