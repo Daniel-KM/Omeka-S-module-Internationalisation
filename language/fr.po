@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-25 00:00+0000\n"
-"PO-Revision-Date: 2021-01-25 00:00+0000\n"
+"POT-Creation-Date: 2023-10-02 00:00+0000\n"
+"PO-Revision-Date: 2023-10-02 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: French <kde-i18n-doc@kde.org>\n"
 "Language: fr\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: Module.php:62
 msgid "The composer vendor is not ready."
@@ -25,7 +25,7 @@ msgstr "Le dossier /vendor de composer n’est pas prêt."
 msgid "See module’s installation documentation."
 msgstr "Consulter la documentation d’installation du module."
 
-#: Module.php:870
+#: Module.php:872
 msgid "Remove and copy data"
 msgstr "Supprimer et copier des données"
 
@@ -34,21 +34,41 @@ msgstr "Supprimer et copier des données"
 msgid "The \"%s\" field is not available in the %s entity class."
 msgstr "Le champ \"%s\" n'est pas disponible avec la classe %s."
 
-#: src/Generic/AbstractModule.php:66
+#: src/Generic/AbstractModule.php:80 src/Generic/AbstractModule.php:88
+#: src/Generic/AbstractModule.php:890
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr "Ce module requiert le module \"%s\"."
 
-#: src/Generic/AbstractModule.php:73
+#: src/Generic/AbstractModule.php:93
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr "Ce module requiert les modules \"%s\"."
 
-#: src/Generic/AbstractModule.php:80
-msgid "This module has resources that connot be installed."
+#: src/Generic/AbstractModule.php:101
+msgid "This module has resources that cannot be installed."
 msgstr "Ce module a des ressources qui ne peuvent pas être installées."
 
-#: src/Generic/AbstractModule.php:707
+#: src/Generic/AbstractModule.php:108
+msgid ""
+"This module cannot install its tables, because they exist already. Try to "
+"remove them first."
+msgstr ""
+"Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
+"de les supprimer manuellement."
+
+#: src/Generic/AbstractModule.php:398
+#, php-format
+msgid "The module removed tables \"%s\" from a previous broken install."
+msgstr ""
+"Le module a supprimé les tables « %s » depuis une installation échouée."
+
+#: src/Generic/AbstractModule.php:885
+#, php-format
+msgid "This module requires the module \"%1$s\", version %2$s or above."
+msgstr "Ce module requiert le module « %1$s », version %2$s ou supérieure."
+
+#: src/Generic/AbstractModule.php:982
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -75,28 +95,188 @@ msgstr ""
 "La page en cours ou qui se trouve récursivement dans une autre page ne peut "
 "être choisie."
 
-#: Module.php:800 src/Form/SettingsFieldset.php:22
-#: src/Form/SettingsFieldset.php:24
+#: Module.php:800 src/Form/SettingsFieldset.php:29
+#: src/Form/SettingsFieldset.php:31
 msgid "Remove all groups"
 msgstr "Supprimer tous les groupes"
 
-#: Module.php:933 src/Job/DuplicateSite.php:89
+#: Module.php:935 src/Job/DuplicateSite.php:89
 #, php-format
 msgid "The site #%1$s cannot be copied. Check your rights."
 msgstr "Le site #%1$s ne peut pas être copié. Vérifiez vos droits."
 
-#: Module.php:964
+#: Module.php:966
 #, php-format
 msgid "Remove/copy processes have been done for site \"%1$s\"."
 msgstr ""
 "Les traitements de suppression/copie ont été réalisés pour le site \"%1$s\"."
 
-#: Module.php:971
+#: Module.php:973
 #, php-format
 msgid "See %1$sjob #%2$d%3$s for more information (%4$slogs%3$s)."
 msgstr ""
-"Consulter la %1$stâche #%2$d%3$s pour davantage d’informations (%4$sjournaux"
-"%3$s)."
+"Consulter la %1$stâche #%2$d%3$s pour davantage d’informations "
+"(%4$sjournaux%3$s)."
+
+#: src/Job/DuplicateSite.php:74
+#, php-format
+msgid "The site #%1$s is not available for copy. Check your rights."
+msgstr "Le site #%1$s n’est pas disponible pour la copie. Vérifiez vos droits."
+
+#: src/Job/DuplicateSite.php:190
+msgid "Check logs: an error occurred."
+msgstr "Vérifier les journaux : une erreur est survenue."
+
+#: src/Job/DuplicateSite.php:233
+#, php-format
+msgid "Site settings of \"%1$s\" successfully removed."
+msgstr "Les paramètres du site \"%1$s\" ont été supprimés."
+
+#: src/Job/DuplicateSite.php:267
+#, php-format
+msgid "%1$d site permissions removed from \"%2$s\"."
+msgstr "%1$d permissions supprimées du site \"%2$s\"."
+
+#: src/Job/DuplicateSite.php:306
+#, php-format
+msgid "%1$d site pages removed from \"%2$s\"."
+msgstr "%1$d pages supprimées du site \"%2$s\"."
+
+#: src/Job/DuplicateSite.php:320
+#, php-format
+msgid "%1$d collecting forms removed from \"%2$s\"."
+msgstr "%1$d formulaires de collecte ont été supprimés du site \"%2$s\"."
+
+#: src/Job/DuplicateSite.php:355
+#, php-format
+msgid "Site settings of \"%1$s\" successfully copied into \"%2$s\"."
+msgstr ""
+"Les paramètres du site \"%1$s\" ont été copiés dans \"%2$s\" avec succès."
+
+#: src/Job/DuplicateSite.php:417
+#, php-format
+msgid "The page slug \"%1$s\" from the source has been renamed \"%2$s\"."
+msgstr "Le chemin de la page source \"%1$s\" a été renommé \"%2$s\"."
+
+#: src/Job/DuplicateSite.php:423
+#, php-format
+msgid "Unable to copy page \"%1$s\" of site \"%2$s\". The page is skipped."
+msgstr ""
+"Impossible de copier la page \"%1$s\" du site \"%2$s\". La page a été "
+"ignorée."
+
+#: src/Job/DuplicateSite.php:433
+#, php-format
+msgid ""
+"%1$d site pages of \"%2$s\" successfully copied into \"%3$s\" (mode "
+"\"%4$s\")."
+msgstr ""
+"%1$d pages du site \"%2$s\" ont été copiées avec succès dans le site "
+"\"%3$s\" (mode \"%4$s\")."
+
+#: src/Job/DuplicateSite.php:537 src/Job/DuplicateSite.php:566
+msgid ""
+"The module Collecting is a new version and is not copiable for now. Copy "
+"forms manually if needed."
+msgstr ""
+"Le module Collecting est une nouvelle version et n’est pas copiable "
+"actuellement. Copiez les formulaires manuellement si besoin."
+
+#: src/Job/DuplicateSite.php:543
+#, php-format
+msgid ""
+"%1$d collecting forms from site \"%2$s\" were successfully copied into "
+"\"%3$s\"."
+msgstr ""
+"%1$d formulaires de collecte du site \"%2$s\" ont été copiés avec succès "
+"dans \"%3$s\"."
+
+#: src/Form/SiteSettingsFieldset.php:17 src/Form/SiteSettingsFieldset.php:20
+#: src/Form/SettingsFieldset.php:10
+msgid "Internationalisation"
+msgstr "Internationalisation"
+
+#: src/Form/SiteSettingsFieldset.php:29 src/Form/SiteSettingsFieldset.php:41
+msgid "All values"
+msgstr "Toutes les valeurs"
+
+#: src/Form/SiteSettingsFieldset.php:30
+msgid "All values, with language of the site first"
+msgstr "Toutes les valeurs, avec la langue du site en premier"
+
+#: src/Form/SiteSettingsFieldset.php:31
+msgid "All values, with language of the site or iso fallback first"
+msgstr ""
+"Toutes les valeurs, avec la langue du site ou les langues de repli ISO en "
+"premier"
+
+#: src/Form/SiteSettingsFieldset.php:32
+msgid "All values, with language of the site or custom fallback first"
+msgstr ""
+"Toutes les valeurs, avec la langue du site ou une langue de repli "
+"personnalisée en premier"
+
+#: src/Form/SiteSettingsFieldset.php:33
+msgid "Only values with the language of the site"
+msgstr "Seulement les valeurs correspondant à la langue du site"
+
+#: src/Form/SiteSettingsFieldset.php:34
+msgid "Only values with the language of the site, with iso fallback"
+msgstr ""
+"Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
+"ayant les codes iso correspondant"
+
+#: src/Form/SiteSettingsFieldset.php:35
+msgid "Only values with the language of the site, with custom fallback"
+msgstr ""
+"Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
+"ayant les langues ci-dessous"
+
+#: src/Form/SiteSettingsFieldset.php:38
+msgid ""
+"Display only the values in the specified language. It applies only for "
+"properties that contains at least one value with a language. The option can "
+"be overridden in the theme."
+msgstr ""
+"Afficher seulement les valeurs dans la langue choisie. Cela s’applique "
+"seulement aux propriétés qui contiennent au moins une valeur avec une "
+"langue. Cette option peut être contournée par le thème."
+
+#: src/Form/SiteSettingsFieldset.php:43
+msgid ""
+"Display only the values in the specified language. This option is available "
+"only when the site has a language."
+msgstr ""
+"Afficher seulement les valeurs dans la langue choisie. Cette option est "
+"disponible seulement si le site a une langue."
+
+#: src/Form/SiteSettingsFieldset.php:54
+msgid "Language of values"
+msgstr "Langue des valeurs"
+
+#: src/Form/SiteSettingsFieldset.php:69
+msgid "Custom language fallbacks"
+msgstr "Langues de repli"
+
+#: src/Form/SiteSettingsFieldset.php:70
+msgid ""
+"Specify values to display when a property has no value with the language of "
+"the site. Set one language code by line."
+msgstr ""
+"Indique les valeurs à afficher quand une propriété n’a pas de valeur dans la "
+"langue du site. Indiquer une langue par ligne."
+
+#: src/Form/SiteSettingsFieldset.php:86
+msgid "Required languages"
+msgstr "Langues obligatoires"
+
+#: src/Form/SiteSettingsFieldset.php:87
+msgid ""
+"Specify values to display in all cases. Values without language are "
+"displayed in all cases. Set one language code by line."
+msgstr ""
+"Indique les valeurs à afficher dans tous les cas. Les valeurs sans langue "
+"sont affichées dans tous les cas. Indiquer un code de langue par ligne."
 
 #: src/Form/DuplicateSiteFieldset.php:12
 msgid "Duplicate site"
@@ -154,37 +334,11 @@ msgstr "Code de langue / localisation"
 msgid "Leave blank to use the global locale setting."
 msgstr "Laisser blanc pour utiliser le paramètre de langue global."
 
-#: src/Form/SitePageForm.php:17
-msgid "Translations"
-msgstr "Traductions"
-
-#: src/Form/SitePageForm.php:18
-msgid ""
-"The selected pages will be translations of the current page within a site "
-"group, that must be defined. The language switcher displays only one related "
-"page by site."
-msgstr ""
-"Les pages choisies seront des traductions de la page courante à l’intérieur "
-"du groupe de sites, qui doit être défini. Le sélecteur de langue affiche "
-"seulement une page liée par site."
-
-#: src/Form/SitePageForm.php:27
-msgid "Select translations of this page…"
-msgstr "Choisir les traductions de cette page…"
-
-#: src/Form/Element/AbstractGroupBySiteSelect.php:168
-msgid "[No site]"
-msgstr "[Aucun site]"
-
-#: src/Form/SettingsFieldset.php:9 src/Form/SiteSettingsFieldset.php:16
-msgid "Internationalisation"
-msgstr "Internationalisation"
-
-#: src/Form/SettingsFieldset.php:20
+#: src/Form/SettingsFieldset.php:27
 msgid "Site groups"
 msgstr "Groupes de sites"
 
-#: src/Form/SettingsFieldset.php:21
+#: src/Form/SettingsFieldset.php:28
 msgid ""
 "Group some sites with a different language so they can be managed together "
 "as a whole. Set all site slugs by group, one by line, with or without comma "
@@ -194,87 +348,27 @@ msgstr ""
 "gérer ensemble. Indiquer tous les chemins des sites, un par ligne avec un "
 "espace ou une virgule pour les séparer."
 
-#: src/Form/SiteSettingsFieldset.php:24 src/Form/SiteSettingsFieldset.php:36
-msgid "All values"
-msgstr "Toutes les valeurs"
+#: src/Form/Element/AbstractGroupBySiteSelect.php:156
+msgid "[No site]"
+msgstr "[Aucun site]"
 
-#: src/Form/SiteSettingsFieldset.php:25
-msgid "All values, with language of the site first"
-msgstr "Toutes les valeurs, avec la langue du site en premier"
+#: src/Form/SitePageForm.php:18
+msgid "Translations"
+msgstr "Traductions"
 
-#: src/Form/SiteSettingsFieldset.php:26
-msgid "All values, with language of the site or iso fallback first"
-msgstr ""
-"Toutes les valeurs, avec la langue du site ou les langues de repli ISO en "
-"premier"
-
-#: src/Form/SiteSettingsFieldset.php:27
-msgid "All values, with language of the site or custom fallback first"
-msgstr ""
-"Toutes les valeurs, avec la langue du site ou une langue de repli "
-"personnalisée en premier"
-
-#: src/Form/SiteSettingsFieldset.php:28
-msgid "Only values with the language of the site"
-msgstr "Seulement les valeurs correspondant à la langue du site"
-
-#: src/Form/SiteSettingsFieldset.php:29
-msgid "Only values with the language of the site, with iso fallback"
-msgstr ""
-"Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
-"ayant les codes iso correspondant"
-
-#: src/Form/SiteSettingsFieldset.php:30
-msgid "Only values with the language of the site, with custom fallback"
-msgstr ""
-"Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
-"ayant les langues ci-dessous"
-
-#: src/Form/SiteSettingsFieldset.php:33
+#: src/Form/SitePageForm.php:19
 msgid ""
-"Display only the values in the specified language. It applies only for "
-"properties that contains at least one value with a language. The option can "
-"be overridden in the theme."
+"The selected pages will be translations of the current page within a site "
+"group, that must be defined. The language switcher displays only one related "
+"page by site."
 msgstr ""
-"Afficher seulement les valeurs dans la langue choisie. Cela s’applique "
-"seulement aux propriétés qui contiennent au moins une valeur avec une "
-"langue. Cette option peut être contournée par le thème."
+"Les pages choisies seront des traductions de la page courante à l’intérieur "
+"du groupe de sites, qui doit être défini. Le sélecteur de langue affiche "
+"seulement une page liée par site."
 
-#: src/Form/SiteSettingsFieldset.php:38
-msgid ""
-"Display only the values in the specified language. This option is available "
-"only when the site has a language."
-msgstr ""
-"Afficher seulement les valeurs dans la langue choisie. Cette option est "
-"disponible seulement si le site a une langue."
-
-#: src/Form/SiteSettingsFieldset.php:46
-msgid "Language of values"
-msgstr "Langue des valeurs"
-
-#: src/Form/SiteSettingsFieldset.php:60
-msgid "Custom language fallbacks"
-msgstr "Langues de repli"
-
-#: src/Form/SiteSettingsFieldset.php:61
-msgid ""
-"Specify values to display when a property has no value with the language of "
-"the site. Set one language code by line."
-msgstr ""
-"Indique les valeurs à afficher quand une propriété n’a pas de valeur dans la "
-"langue du site. Indiquer une langue par ligne."
-
-#: src/Form/SiteSettingsFieldset.php:76
-msgid "Required languages"
-msgstr "Langues obligatoires"
-
-#: src/Form/SiteSettingsFieldset.php:77
-msgid ""
-"Specify values to display in all cases. Values without language are "
-"displayed in all cases. Set one language code by line."
-msgstr ""
-"Indique les valeurs à afficher dans tous les cas. Les valeurs sans langue "
-"sont affichées dans tous les cas. Indiquer un code de langue par ligne."
+#: src/Form/SitePageForm.php:28
+msgid "Select translations of this page…"
+msgstr "Choisir les traductions de cette page…"
 
 #: src/Form/MirrorPageFieldset.php:16
 msgid ""
@@ -299,71 +393,6 @@ msgid ""
 "The page and the related page of a relation between pages must be different."
 msgstr ""
 "La page et la page liée d’une relation entre pages doivent être différentes."
-
-#: src/Job/DuplicateSite.php:74
-#, php-format
-msgid "The site #%1$s is not available for copy. Check your rights."
-msgstr "Le site #%1$s n’est pas disponible pour la copie. Vérifiez vos droits."
-
-#: src/Job/DuplicateSite.php:190
-msgid "Check logs: an error occurred."
-msgstr "Vérifier les journaux : une erreur est survenue."
-
-#: src/Job/DuplicateSite.php:233
-#, php-format
-msgid "Site settings of \"%1$s\" successfully removed."
-msgstr "Les paramètres du site \"%1$s\" ont été supprimés."
-
-#: src/Job/DuplicateSite.php:267
-#, php-format
-msgid "%1$d site permissions removed from \"%2$s\"."
-msgstr "%1$d permissions supprimées du site \"%2$s\"."
-
-#: src/Job/DuplicateSite.php:306
-#, php-format
-msgid "%1$d site pages removed from \"%2$s\"."
-msgstr "%1$d pages supprimées du site \"%2$s\"."
-
-#: src/Job/DuplicateSite.php:320
-#, php-format
-msgid "%1$d collecting forms removed from \"%2$s\"."
-msgstr "%1$d formulaires de collecte ont été supprimés du site \"%2$s\"."
-
-#: src/Job/DuplicateSite.php:355
-#, php-format
-msgid "Site settings of \"%1$s\" successfully copied into \"%2$s\"."
-msgstr ""
-"Les paramètres du site \"%1$s\" ont été copiés dans \"%2$s\" avec succès."
-
-#: src/Job/DuplicateSite.php:417
-#, php-format
-msgid "The page slug \"%1$s\" from the source has been renamed \"%2$s\"."
-msgstr "Le chemin de la page source \"%1$s\" a été renommé \"%2$s\"."
-
-#: src/Job/DuplicateSite.php:423
-#, php-format
-msgid "Unable to copy page \"%1$s\" of site \"%2$s\". The page is skipped."
-msgstr ""
-"Impossible de copier la page \"%1$s\" du site \"%2$s\". La page a été "
-"ignorée."
-
-#: src/Job/DuplicateSite.php:433
-#, php-format
-msgid ""
-"%1$d site pages of \"%2$s\" successfully copied into \"%3$s\" (mode \"%4$s"
-"\")."
-msgstr ""
-"%1$d pages du site \"%2$s\" ont été copiées avec succès dans le site \"%3$s"
-"\" (mode \"%4$s\")."
-
-#: src/Job/DuplicateSite.php:534
-#, php-format
-msgid ""
-"%1$d collecting forms from site \"%2$s\" were successfully copied into \"%3$s"
-"\"."
-msgstr ""
-"%1$d formulaires de collecte du site \"%2$s\" ont été copiés avec succès "
-"dans \"%3$s\"."
 
 #: src/Site/BlockLayout/MirrorPage.php:42
 msgid "Mirror page"
