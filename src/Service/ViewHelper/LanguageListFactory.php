@@ -33,7 +33,7 @@ SELECT site.slug AS site_slug, REPLACE(site_setting.value, '"', "") AS localeId
 FROM site_setting
 JOIN site ON site.id = site_setting.site_id
 WHERE site_setting.id = :setting_id
-ORDER BY site.id
+ORDER BY site.id ASC
 SQL;
         $bind = ['setting_id' => 'locale'];
         if ($isPublic) {
