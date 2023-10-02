@@ -530,7 +530,14 @@ SELECT  `t2`.`item_set_id`, {$target->getId()} AS 'site_id', `t2`.`owner_id`, `t
     SELECT `t`.`item_set_id`, `t`.`site_id`, `t`.`owner_id`, `t`.`label`, `t`.`anon_type`, `t`.`success_text`, `t`.`email_text` FROM `collecting_form` AS `t` WHERE `site_id` = {$source->getId()}
 ) AS `t2`;
 SQL;
-        $result = $this->connection->executeStatement($sql);
+        try {
+            $result = $this->connection->executeStatement($sql);
+        } catch (\Exception $e) {
+            $this->logger->notice(new Message(
+                'The module Collecting is a new version and is not copiable for now. Copy forms manually if needed.' // @translate
+            ));
+            return;
+        }
 
         $this->logger->notice(new Message(
             '%1$d collecting forms from site "%2$s" were successfully copied into "%3$s".', // @translate
@@ -541,14 +548,25 @@ SQL;
         $sql = <<<'SQL'
 SHOW COLUMNS FROM `collecting_prompt` LIKE 'multiple';
 SQL;
-        $multiple = (bool) $this->connection->executeQuery($sql) ? ', `multiple`' : '';
+        try {
+            $multiple = $this->connection->executeStatement($sql) ? ', `multiple`' : '';
+        } catch (\Exception $e) {
+            $multiple = '';
+        }
         $sql = <<<SQL
 INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple)
 SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple FROM `collecting_prompt`
 JOIN `collecting_form` ON `collecting_form`.`id` = `collecting_prompt`.`form_id`
 WHERE `collecting_form`.`site_id` = {$source->getId()};
 SQL;
-        $this->connection->executeStatement($sql);
+        try {
+            $result = $this->connection->executeStatement($sql);
+        } catch (\Exception $e) {
+            $this->logger->notice(new Message(
+                'The module Collecting is a new version and is not copiable for now. Copy forms manually if needed.' // @translate
+            ));
+            return;
+        }
 
         // No need to refresh.
     }
