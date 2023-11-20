@@ -14,6 +14,11 @@ class LanguageSwitcher extends AbstractHelper
      */
     const PARTIAL_NAME = 'common/language-switcher';
 
+    /**
+     * @var \Internationalisation\View\Helper\LanguageList
+     */
+    protected $languageList;
+
     public function __construct(LanguageList $languageList)
     {
         $this->languageList = $languageList;
