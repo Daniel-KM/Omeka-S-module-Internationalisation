@@ -220,7 +220,7 @@ class LanguageList extends AbstractHelper
                 'site' => $siteSlug,
                 'locale' => $localeId,
                 'locale_label' => $this->localeLabels[$localeId],
-                'url' => $urlHelper(null, ['site-slug' => $siteSlug], true),
+                'url' => $urlHelper(null, ['site-slug' => $siteSlug], ['query' => $params->fromQuery()], true),
             ];
         }
 
