@@ -40,12 +40,16 @@ return [
         ],
     ],
     'block_layouts' => [
+        'invokables' => [
+            'languageSwitcher' => Site\BlockLayout\LanguageSwitcher::class,
+        ],
         'factories' => [
             'mirrorPage' => Service\BlockLayout\MirrorPageFactory::class,
         ],
     ],
     'form_elements' => [
         'invokables' => [
+            Form\LanguageSwitcherFieldset::class => Form\LanguageSwitcherFieldset::class,
             Form\MirrorPageFieldset::class => Form\MirrorPageFieldset::class,
             Form\SettingsFieldset::class => Form\SettingsFieldset::class,
         ],
@@ -92,6 +96,9 @@ return [
         'block_settings' => [
             'mirrorPage' => [
                 'page' => null,
+            ],
+            'languageSwitcher' => [
+                'display_locale' => null,
             ],
         ],
     ],

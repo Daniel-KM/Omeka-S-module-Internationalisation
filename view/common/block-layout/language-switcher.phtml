@@ -1,0 +1,18 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var string $displayLocale "code" or "flag".
+ *
+ * @uses \Internationalisation\View\Helper\LanguageSwitcher
+ */
+
+$plugins = $this->getHelperPluginManager();
+$languageSwitcher = $plugins->get('languageSwitcher');
+?>
+
+<div class="block block-language-switcher">
+    <?= $languageSwitcher([
+        'displayLocale' => $displayLocale,
+    ]) ?>
+</div>
