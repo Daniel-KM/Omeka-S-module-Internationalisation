@@ -100,3 +100,20 @@ if (version_compare($oldVersion, '3.3.10', '<')) {
         SQL;
     $connection->executeStatement($sql);
 }
+
+if (version_compare($oldVersion, '3.4.14', '<')) {
+    if ($this->isModuleActive('BlockPlus')
+        && !$this->isModuleVersionAtLeast('BlockPlus', '3.4.29')
+    ) {
+        $message = new PsrMessage(
+            'The module {module} should be upgraded to version {version} or later.', // @translate
+            ['module' => 'BlockPlus', 'version' => '3.4.29']
+        );
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
+    }
+
+    $message = new PsrMessage(
+        'The language switcher is now available as a page block and as a resource block.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
