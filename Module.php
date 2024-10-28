@@ -8,6 +8,7 @@ if (!class_exists(\Common\TraitModule::class)) {
 
 use Common\Stdlib\PsrMessage;
 use Common\TraitModule;
+use Internationalisation\Api\Representation\SitePageRelationRepresentation;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\MvcEvent;
@@ -617,21 +618,24 @@ class Module extends AbstractModule
 
     public function filterJsonLdSitePage(Event $event): void
     {
+        /**
+         * The related pages are json-serialized so the main page will be full
+         * json.
+         *
+         * @var \Omeka\Api\Representation\SitePageRepresentation $page
+         * @var \Internationalisation\Api\Representation\SitePageRelationRepresentation[] $relations
+         */
         $page = $event->getTarget();
         $jsonLd = $event->getParam('jsonLd');
         $api = $this->getServiceLocator()->get('Omeka\ApiManager');
         $pageId = $page->id();
-        $relations = $api
-            ->search(
-                'site_page_relations',
-                ['relation' => $pageId]
-            )
-            ->getContent();
-        $relations = array_map(function ($relation) use ($pageId) {
+        $relations = $api->search('site_page_relations',['relation' => $pageId])->getContent();
+        $relations = array_map(function (SitePageRelationRepresentation $relation) use ($pageId) {
             $related = $relation->relatedPage();
-            return $pageId === $related->id()
+            $relatedPage = $pageId === $related->id()
                 ? $relation->page()->getReference()
                 : $related->getReference();
+            return $relatedPage->jsonSerialize();
         }, $relations);
         $jsonLd['o-module-internationalisation:related_page'] = $relations;
         $event->setParam('jsonLd', $jsonLd);
