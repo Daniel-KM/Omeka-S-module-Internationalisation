@@ -574,10 +574,20 @@ SQL;
     {
         /**
          * @var \Omeka\Stdlib\FulltextSearch $fulltext
+         * @var \Omeka\Entity\SitePage $page
          */
         $fulltext = $this->getServiceLocator()->get('Omeka\FulltextSearch');
         foreach ($site->getPages() as $page) {
-            $fulltext->save($page, $this->pageAdapter);
+            try {
+                $fulltext->save($page, $this->pageAdapter);
+            } catch (\Exception $e) {
+                // Some blocks fail without a site, that may not be provided for
+                // background tasks.
+                $this->logger->warn(
+                    'The full text for page {page_slug} was not saved. Run indexation of full text manually in main settings or in tasks of Easy Admin. Exception: {exception}', // @translate
+                    ['page_slug', $page->getSlug(), 'exception' => $e]
+                );
+            }
         }
     }
 
