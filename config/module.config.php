@@ -52,7 +52,11 @@ return [
         'factories' => [
             Form\DuplicateSiteFieldset::class => \Laminas\Form\ElementFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
-            \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
+            Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
+        ],
+        'aliases' => [
+            // The site page form does not implement form events, so override it for now.
+            \Omeka\Form\SitePageForm::class => Form\SitePageForm::class,
         ],
     ],
     'controller_plugins' => [

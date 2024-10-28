@@ -206,6 +206,24 @@ class Module extends AbstractModule
             [$this, 'filterVocabularyMemberSelectValues']
         );
 
+        // As long as the core SitePageForm has no event, all derivative forms
+        // should be set.
+        $sharedEventManager->attach(
+            \Omeka\Form\SitePageForm::class,
+            'form.add_elements',
+            [$this, 'handleSitePageForm']
+        );
+        $sharedEventManager->attach(
+            \BlockPlus\Form\SitePageForm::class,
+            'form.add_elements',
+            [$this, 'handleSitePageForm']
+        );
+        $sharedEventManager->attach(
+            \Internationalisation\Form\SitePageForm::class,
+            'form.add_elements',
+            [$this, 'handleSitePageForm']
+        );
+
         // Settings.
         $sharedEventManager->attach(
             \Omeka\Form\SettingForm::class,
@@ -851,6 +869,38 @@ SQL;
     {
         $this->handleAnySettings($event, 'site_settings');
         $this->prepareSiteLocales();
+    }
+
+    public function handleSitePageForm(Event $event): void
+    {
+        /** @var \Laminas\Form\Form $form */
+        $form = $event->getTarget();
+
+        // The select for page models is added only on an existing page.
+        if ($form->getOption('addPage')) {
+            return;
+        }
+
+        // TODO Display one select by translated site.
+
+        $form
+            ->add([
+                'name' => 'o-module-internationalisation:related_page',
+                'type' => \Common\Form\Element\SitesPageSelect::class,
+                'options' => [
+                    'label' => 'Translations', // @translate
+                    'info' => 'The selected pages will be translations of the current page within a site group, that must be defined. The language switcher displays only one related page by site.', // @translate
+                    'site_group' => 'internationalisation_site_groups',
+                    'exclude_current_site' => true,
+                ],
+                'attributes' => [
+                    'id' => 'o-module-internationalisation:related_page',
+                    'required' => false,
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select translations of this page…', // @translate
+                ],
+            ]);
     }
 
     public function handleSiteFormElements(Event $event): void

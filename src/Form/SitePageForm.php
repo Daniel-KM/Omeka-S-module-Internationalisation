@@ -2,57 +2,22 @@
 
 namespace Internationalisation\Form;
 
-use Common\Form\Element as CommonElement;
+use Laminas\EventManager\EventManagerAwareTrait;
+use Laminas\EventManager\Event;
 
 class SitePageForm extends \Omeka\Form\SitePageForm
 {
-    public function init(): void
+    use EventManagerAwareTrait;
+
+    public function init()
     {
         parent::init();
 
-        if (!$this->getOption('addPage')) {
-            $this->add([
-                'name' => 'o-module-internationalisation:related_page',
-                'type' => CommonElement\SitesPageSelect::class,
-                'options' => [
-                    'label' => 'Translations', // @translate
-                    'info' => 'The selected pages will be translations of the current page within a site group, that must be defined. The language switcher displays only one related page by site.', // @translate
-                    'site_group' => 'internationalisation_site_groups',
-                    'exclude_current_site' => true,
-                ],
-                'attributes' => [
-                    'id' => 'o-module-internationalisation:related_page',
-                    'required' => false,
-                    'multiple' => true,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Select translations of this page…', // @translate
-                ],
-            ]);
-        }
+        $event = new Event('form.add_elements', $this);
+        $this->getEventManager()->triggerEvent($event);
 
         $inputFilter = $this->getInputFilter();
-        $inputFilter->add([
-            'name' => 'o-module-internationalisation:related_page',
-            'required' => false,
-        ]);
-    }
-
-    public function setData($data)
-    {
-        if (isset($data['o-module-internationalisation:related_page'])
-            && is_array($data['o-module-internationalisation:related_page'])
-        ) {
-            $data['o-module-internationalisation:related_page'] = array_map(function ($relatedPage) {
-                return is_numeric($relatedPage)
-                    ? $relatedPage
-                    : (is_array($relatedPage)
-                        ? $relatedPage['o:id']
-                        : (is_object($relatedPage)
-                            ? $relatedPage->id()
-                            : null));
-            }, $data['o-module-internationalisation:related_page']);
-        }
-
-        return parent::setData($data);
+        $event = new Event('form.add_input_filters', $this, ['inputFilter' => $inputFilter]);
+        $this->getEventManager()->triggerEvent($event);
     }
 }
