@@ -2,7 +2,7 @@
 
 namespace Internationalisation\Form;
 
-use Internationalisation\Form\Element as InternationalisationElement;
+use Common\Form\Element as CommonElement;
 
 class SitePageForm extends \Omeka\Form\SitePageForm
 {
@@ -13,7 +13,7 @@ class SitePageForm extends \Omeka\Form\SitePageForm
         if (!$this->getOption('addPage')) {
             $this->add([
                 'name' => 'o-module-internationalisation:related_page',
-                'type' => InternationalisationElement\SitesPageSelect::class,
+                'type' => CommonElement\SitesPageSelect::class,
                 'options' => [
                     'label' => 'Translations', // @translate
                     'info' => 'The selected pages will be translations of the current page within a site group, that must be defined. The language switcher displays only one related page by site.', // @translate

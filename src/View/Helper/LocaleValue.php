@@ -62,6 +62,8 @@ class LocaleValue extends AbstractHelper
      */
     public function __invoke(AbstractResourceEntityRepresentation $resource, $term, array $options = [])
     {
+        $view = $this->getView();
+
         // Set defaults.
         $defaultOptions = [
             'type' => null,
@@ -72,7 +74,9 @@ class LocaleValue extends AbstractHelper
         ];
         $options += $defaultOptions;
 
-        if (!$this->isTerm($term)) {
+        /** @var \Common\Stdlib\EasyMeta $easyMeta */
+        $easyMeta = $view->plugin('easyMeta')();
+        if (!$easyMeta->propertyId($term)) {
             return $options['default'];
         }
 
@@ -148,16 +152,5 @@ class LocaleValue extends AbstractHelper
         }
 
         return $options['all'] ? $matchingValues : $matchingValues[0];
-    }
-
-    /**
-     * Determine whether a string is a valid JSON-LD term.
-     *
-     * @param string $term
-     * @return bool
-     */
-    protected function isTerm($term)
-    {
-        return (bool) preg_match('/^[a-z0-9-_]+:[a-z0-9-_]+$/i', $term);
     }
 }

@@ -2,21 +2,29 @@
 
 namespace Internationalisation;
 
-if (!class_exists(\Generic\AbstractModule::class)) {
-    require file_exists(dirname(__DIR__) . '/Generic/AbstractModule.php')
-        ? dirname(__DIR__) . '/Generic/AbstractModule.php'
-        : __DIR__ . '/src/Generic/AbstractModule.php';
+if (!class_exists(\Common\TraitModule::class)) {
+    require_once dirname(__DIR__) . '/Common/TraitModule.php';
 }
 
-use Generic\AbstractModule;
+use Common\Stdlib\PsrMessage;
+use Common\TraitModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\MvcEvent;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Stdlib\Message;
+use Omeka\Module\AbstractModule;
 
+/**
+ * Internationalisation.
+ *
+ * @copyright Daniel Berthereau, 2019-2024
+ * @copyright BibLibre, 2017
+ * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
+ */
 class Module extends AbstractModule
 {
+    use TraitModule;
+
     const NAMESPACE = __NAMESPACE__;
 
     /**
@@ -54,14 +62,25 @@ class Module extends AbstractModule
 
     protected function preInstall(): void
     {
+        $services = $this->getServiceLocator();
+        $plugins = $services->get('ControllerPluginManager');
+        $translate = $plugins->get('translate');
+        $translator = $services->get('MvcTranslator');
+
+        if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.63')) {
+            $message = new \Omeka\Stdlib\Message(
+                $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+                'Common', '3.4.63'
+            );
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
+
         $vendor = __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
         if (!file_exists($vendor)) {
-            $services = $this->getServiceLocator();
-            $t = $services->get('MvcTranslator');
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException(
-                $t->translate('The composer vendor is not ready.') // @translate
-                    . ' ' . $t->translate('See module’s installation documentation.') // @translate
+            $message = new PsrMessage(
+                'The composer vendor is not ready. See module’s installation documentation.' // @translate
             );
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
         }
     }
 
@@ -775,7 +794,8 @@ SQL;
 
     public function handleMainSettings(Event $event): void
     {
-        parent::handleMainSettings($event);
+        // Process parent settings.
+        $this->handleAnySettings($event, 'settings');
 
         $services = $this->getServiceLocator();
 
@@ -800,9 +820,7 @@ SQL;
          * @var \Internationalisation\Form\SettingsFieldset $fieldset
          */
         $form = $event->getTarget();
-        $fieldset = version_compare(\Omeka\Module::VERSION, '4', '<')
-            ? $form->get('internationalisation')
-            : $form;
+        $fieldset = $form;
         $siteGroupsElement = $fieldset
             ->get('internationalisation_site_groups');
         $siteGroupsElement
@@ -813,9 +831,7 @@ SQL;
 
     public function handleMainSettingsFilters(Event $event): void
     {
-        $inputFilter = version_compare(\Omeka\Module::VERSION, '4', '<')
-            ? $event->getParam('inputFilter')->get('internationalisation')
-            : $event->getParam('inputFilter');
+        $inputFilter = $event->getParam('inputFilter');
         $inputFilter
             ->add([
                 'name' => 'internationalisation_site_groups',
@@ -833,7 +849,7 @@ SQL;
 
     public function handleSiteSettings(Event $event): void
     {
-        parent::handleSiteSettings($event);
+        $this->handleAnySettings($event, 'site_settings');
         $this->prepareSiteLocales();
     }
 
@@ -881,20 +897,20 @@ SQL;
         $expand = json_encode($view->translate('Expand'), 320);
         $legend = json_encode($view->translate('Remove and copy data'), 320);
         echo <<<INLINE
-<style>
-.collapse + #duplicate.collapsible {
-    overflow: initial;
-}
-</style>
-<script type="text/javascript">
-$(document).ready(function() {
-    $('[name^="duplicate"]').closest('.field')
-        .wrapAll('<fieldset id="duplicate" class="field-container collapsible">')
-        .closest('#duplicate')
-        .before('<a href="#" class="expand" aria-label=$expand>' + $legend + ' </a> ');
-});
-</script>
-INLINE;
+            <style>
+            .collapse + #duplicate.collapsible {
+                overflow: initial;
+            }
+            </style>
+            <script type="text/javascript">
+            $(document).ready(function() {
+                $('[name^="duplicate"]').closest('.field')
+                    .wrapAll('<fieldset id="duplicate" class="field-container collapsible">')
+                    .closest('#duplicate')
+                    .before('<a href="#" class="expand" aria-label=$expand>' + $legend + ' </a> ');
+            });
+            </script>
+            INLINE;
     }
 
     public function handleSitePost(Event $event): void
@@ -934,16 +950,18 @@ INLINE;
         }
 
         $services = $this->getServiceLocator();
-        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $plugins = $services->get('ControllerPluginManager');
+        $urlPlugin = $plugins->get('url');
+        $messenger = $plugins->get('messenger');
 
         try {
             $source = $params['source']
                 ? $services->get('Omeka\ApiManager')->read('sites', ['id' => $params['source']], [], ['responseContent' => 'resource'])->getContent()
                 : null;
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
-            $message = new Message(
-                'The site #%1$s cannot be copied. Check your rights.', // @translate
-                $params['source']
+            $message = new PsrMessage(
+                'The site #{site_id} cannot be copied. Check your rights.', // @translate
+                ['site_id' => $params['source']]
             );
             $messenger->addError($message);
             return;
@@ -972,19 +990,24 @@ INLINE;
         $strategy = $services->get(\Omeka\Job\DispatchStrategy\Synchronous::class);
         $job = $services->get(\Omeka\Job\Dispatcher::class)
             ->dispatch(\Internationalisation\Job\DuplicateSite::class, $args, $strategy);
-        $message = new Message(
-            'Remove/copy processes have been done for site "%1$s".', // @translate
-            $site->getSlug()
+        $message = new PsrMessage(
+            'Remove/copy processes have been done for site "{site_slug}".', // @translate
+            ['site_slug' => $site->getSlug()]
         );
         $messenger->addSuccess($message);
 
-        $urlHelper = $services->get('ViewHelperManager')->get('url');
-        $message = new Message(
-            'See %1$sjob #%2$d%3$s for more information (%4$slogs%3$s).', // @translate
-            sprintf('<a href="%1$s">', $urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
-            $job->getId(),
-            '</a>',
-            sprintf('<a href="%1$s">', $this->isModuleActive('Log') ? $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]) :  $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()]))
+        $message = new PsrMessage(
+            'A job was launched in background to copy site data: ({link_job}job #{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
+            [
+                'link_job' => sprintf('<a href="%s">',
+                    htmlspecialchars($urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
+                ),
+                'job_id' => $job->getId(),
+                'link_end' => '</a>',
+                'link_log' => sprintf('<a href="%1$s">', $this->isModuleActive('Log')
+                    ? $urlPlugin->fromRoute('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]])
+                    : $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
+            ]
         );
         $message->setEscapeHtml(false);
         $messenger->addSuccess($message);
@@ -1119,7 +1142,7 @@ INLINE;
     /**
      * Get each line of a string separately.
      */
-    public function stringToList($string): array
+    protected function stringToList($string): array
     {
         return array_filter(array_map('trim', explode("\n", $this->fixEndOfLine($string))), 'strlen');
     }
@@ -1129,7 +1152,7 @@ INLINE;
      *
      * This method fixes Windows and Apple copy/paste from a textarea input.
      */
-    public function fixEndOfLine($string): string
+    protected function fixEndOfLine($string): string
     {
         return str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], (string) $string);
     }

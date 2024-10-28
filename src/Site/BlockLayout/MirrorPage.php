@@ -109,12 +109,14 @@ class MirrorPage extends AbstractBlockLayout
         try {
             $response = $view->api()->read('site_pages', ['id' => $mirrorPage]);
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
-            $view->logger()->err(sprintf(
-                'Mirror page block #%d of page "%s" of site "%s" should be updated: it refers to a removed page.', // @translate
-                $block->id(),
-                $block->page()->slug(),
-                $block->page()->site()->slug()
-            ));
+            $view->logger()->err(
+                'Mirror page block #{block_id} in site {site_slug} and page {page_slug} should be updated: it refers to a removed page.', // @translate
+                [
+                    'block_id' => $block->id(),
+                    'site_slug' => $block->page()->site()->slug(),
+                    'page_slug' => $block->page()->slug(),
+                ]
+            );
             return '';
         } catch (\Omeka\Api\Exception\PermissionDeniedException $e) {
             return '';
@@ -137,10 +139,10 @@ class MirrorPage extends AbstractBlockLayout
         try {
             return $view->render($contentView);
         } catch (\Exception $e) {
-            $view->logger()->err(sprintf(
-                'Cannot render this mirror page for now: %s.', // @translate
-                $e
-            ));
+            $view->logger()->err(
+                'Cannot render this mirror page for now: {exception}.', // @translate
+                ['exception' => $e]
+            );
             return '';
         }
     }

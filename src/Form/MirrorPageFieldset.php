@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace Internationalisation\Form;
 
-use Internationalisation\Form\Element\SitesPageSelect;
+use Common\Form\Element as CommonElement;
 use Laminas\Form\Fieldset;
 
 class MirrorPageFieldset extends Fieldset
@@ -10,7 +11,7 @@ class MirrorPageFieldset extends Fieldset
     {
         $this->add([
             'name' => 'o:block[__blockIndex__][o:data][page]',
-            'type' => SitesPageSelect::class,
+            'type' => CommonElement\SitesPageSelect::class,
             'options' => [
                 'label' => 'Page', // @translate
                 'info' => 'Private sites are marked with a "*". If a private page is selected, it will be hidden on the public site. The current page and recursive pages are forbidden.', // @translate
