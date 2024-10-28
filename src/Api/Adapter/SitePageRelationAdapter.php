@@ -21,6 +21,14 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         // 'related_page_slug' => 'related_page_slug',
     ];
 
+    protected $scalarFields = [
+        'page' => 'page',
+        'related_page' => 'relatedPage',
+        // TODO Sort related pages by page slug?
+        // 'page_slug' => 'page_slug',
+        // 'related_page_slug' => 'related_page_slug',
+    ];
+
     public function getResourceName()
     {
         return 'site_page_relations';
