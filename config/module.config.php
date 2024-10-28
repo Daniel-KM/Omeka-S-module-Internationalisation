@@ -50,6 +50,8 @@ return [
             Form\SettingsFieldset::class => Form\SettingsFieldset::class,
         ],
         'factories' => [
+            // TODO To be removed when Common 3.4.64 will be released.
+            Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
             Form\DuplicateSiteFieldset::class => \Laminas\Form\ElementFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
             Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
