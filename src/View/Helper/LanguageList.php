@@ -162,7 +162,8 @@ class LanguageList extends AbstractHelper
             // TODO Save all the relations between search pages in a setting to avoid to prepare it each time.
             $api = $view->api();
             /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $site->getServiceLocator()->get('Omeka\Connection');
+            $services = $site->getServiceLocator();
+            $connection = $services->get('Omeka\Connection');
             $searchPageIdsBySite = $connection->fetchAllKeyValue('SELECT `site_id`, `value` FROM `site_setting` WHERE `id` = "advancedsearch_configs";');
             $searchPageIdsBySite = array_map(function ($v) {
                 return json_decode($v, true);
@@ -174,9 +175,11 @@ class LanguageList extends AbstractHelper
 
             $query = $params->fromQuery();
 
+            $settings = $services->get('Omeka\Settings');
             $searchPageId = $params->fromRoute('id');
             foreach ($locales as $siteSlug => $localeId) {
                 $url = null;
+                // TODO returnScalar is available in view helper api via a query argument.
                 // Option "returnScalar" is not available with view helper api.
                 $relatedSite = $api->searchOne('sites', ['slug' => $siteSlug])->getContent();
                 if (!$relatedSite) {
@@ -193,8 +196,12 @@ class LanguageList extends AbstractHelper
                     }
                     // Else use the main search engine of this related site.
                     elseif (isset($mainSearchPageIdBySite[$relatedSiteId])) {
+                        // Module AdvancedSearch uses the slug, and module Search uses id;
                         $searchPageId = $mainSearchPageIdBySite[$relatedSiteId];
-                        $url = $urlHelper('search-page-' . $searchPageId, ['site-slug' => $siteSlug], ['query' => $query], true);
+                        $searchPageSlug = $settings->get('advancedsearch_all_configs', [])[$searchPageId] ?? null;
+                        if ($searchPageSlug) {
+                            $url = $urlHelper('search-page-' . $searchPageSlug, ['site-slug' => $siteSlug], ['query' => $query], true);
+                        }
                     }
                 }
 
