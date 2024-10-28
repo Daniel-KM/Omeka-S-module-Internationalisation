@@ -167,6 +167,8 @@ class Module extends AbstractModule
             'rep.resource.json',
             [$this, 'filterJsonLdSitePage']
         );
+
+        // Store the related pages when the page is saved.
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\SitePageAdapter::class,
             'api.update.post',
@@ -663,14 +665,22 @@ SQL;
         $ids[] = $pageId;
         sort($ids);
         $relatedIds = $ids;
+        $has = false;
         foreach ($ids as $id) {
             foreach ($relatedIds as $relatedId) {
                 if ($relatedId > $id) {
+                    $has = true;
                     $sql .= "\n($id, $relatedId),";
                 }
             }
         }
         $sql = rtrim($sql, ',');
+        if (!$has) {
+            return;
+        }
+
+        $sql .= ' ON DUPLICATE KEY UPDATE `id` = `id`;';
+
         $connection->executeStatement($sql);
     }
 
