@@ -3,7 +3,7 @@
 namespace Internationalisation\Form;
 
 use Laminas\Form\Fieldset;
-use Omeka\Form\Element\RestoreTextarea;
+use Omeka\Form\Element as OmekaElement;
 
 class SettingsFieldset extends Fieldset
 {
@@ -21,7 +21,7 @@ class SettingsFieldset extends Fieldset
             ->setOption('element_groups', $this->elementGroups)
             ->add([
                     'name' => 'internationalisation_site_groups',
-                    'type' => RestoreTextarea::class,
+                    'type' => OmekaElement\RestoreTextarea::class,
                     'options' => [
                         'element_group' => 'sites',
                         'label' => 'Site groups', // @translate
@@ -31,9 +31,11 @@ class SettingsFieldset extends Fieldset
                     'restoreButtonText' => 'Remove all groups', // @translate
                     'attributes' => [
                         'id' => 'internationalisation_site_groups',
-                        'placeholder' => 'my-site-fra my-site-rus my-site-way
-my-exhibit-fra my-exhibit-rus
-other-exhibit-fra other-exhibit-rus',
+                        'placeholder' => <<<'TXT'
+                            my-site-fra my-site-rus my-site-way
+                            my-exhibit-fra my-exhibit-rus
+                            other-exhibit-fra other-exhibit-rus
+                            TXT,
                         'rows' => 10,
                     ],
             ])

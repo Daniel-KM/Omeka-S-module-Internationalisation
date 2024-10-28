@@ -396,18 +396,18 @@ class Module extends AbstractModule
 
         $services = $this->getServiceLocator();
 
-        /** @var \Omeka\Settings\SiteSettings $settings */
-        $settings = $services->get('Omeka\Settings\Site');
+        /** @var \Omeka\Settings\SiteSettings $siteSettings */
+        $siteSettings = $services->get('Omeka\Settings\Site');
 
-        $displayValues = $settings->get('internationalisation_display_values', 'all');
+        $displayValues = $siteSettings->get('internationalisation_display_values', 'all');
         if (in_array($displayValues, ['all', 'all_site', 'all_iso', 'all_fallback'])) {
             return;
         }
 
         $resourceId = $event->getTarget()->id();
 
-        // $fallbacks = $settings->get('internationalisation_fallbacks', []);
-        $requiredLanguages = $settings->get('internationalisation_required_languages', []);
+        // $fallbacks = $siteSettings->get('internationalisation_fallbacks', []);
+        $requiredLanguages = $siteSettings->get('internationalisation_required_languages', []);
 
         // Filter appropriate locales for each property when it is localisable.
         $values = $event->getParam('values');
@@ -740,6 +740,8 @@ SQL;
             $this->lastQuerySort = [];
             return;
         }
+
+        // TODO Check for last upgrade of Omeka S.
 
         // TODO Replace this event by a upper level sql event. May require insertion of translated terms in a table (automatically via rdf or po files?).
 
@@ -1075,19 +1077,19 @@ SQL;
      */
     protected function prepareSiteLocales(): void
     {
-        $settings = $this->getServiceLocator()->get('Omeka\Settings\Site');
+        $siteSettings = $this->getServiceLocator()->get('Omeka\Settings\Site');
 
-        $settings->set('internationalisation_iso_codes', []);
+        $siteSettings->set('internationalisation_iso_codes', []);
 
-        $locale = $settings->get('locale');
+        $locale = $siteSettings->get('locale');
         if (!$locale) {
-            $settings->set('internationalisation_locales', []);
+            $siteSettings->set('internationalisation_locales', []);
             return;
         }
 
-        $displayValues = $settings->get('internationalisation_display_values', 'all');
+        $displayValues = $siteSettings->get('internationalisation_display_values', 'all');
         if ($displayValues === 'all') {
-            $settings->set('internationalisation_locales', []);
+            $siteSettings->set('internationalisation_locales', []);
             return;
         }
 
@@ -1098,13 +1100,13 @@ SQL;
             case 'site_iso':
                 require_once __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
                 $isoCodes = \Iso639p3::codes($locale);
-                $settings->set('internationalisation_iso_codes', $isoCodes);
+                $siteSettings->set('internationalisation_iso_codes', $isoCodes);
                 $locales = array_merge($locales, $isoCodes);
                 break;
 
             case 'all_fallback':
             case 'site_fallback':
-                $locales = array_merge($locales, $settings->get('internationalisation_fallbacks', []));
+                $locales = array_merge($locales, $siteSettings->get('internationalisation_fallbacks', []));
                 break;
 
             case 'all_site':
@@ -1113,12 +1115,12 @@ SQL;
                 break;
 
             default:
-                $settings->set('internationalisation_display_values', 'all');
-                $settings->set('internationalisation_locales', []);
+                $siteSettings->set('internationalisation_display_values', 'all');
+                $siteSettings->set('internationalisation_locales', []);
                 return;
         }
 
-        $requiredLanguages = $settings->get('internationalisation_required_languages', []);
+        $requiredLanguages = $siteSettings->get('internationalisation_required_languages', []);
         $locales = array_merge($locales, $requiredLanguages);
         $locales = array_fill_keys(array_unique(array_filter($locales)), []);
 
@@ -1127,7 +1129,7 @@ SQL;
         // TODO Set an option to not fallback to values without language?
         $locales[''] = [];
 
-        $settings->set('internationalisation_locales', $locales);
+        $siteSettings->set('internationalisation_locales', $locales);
     }
 
     public function filterSiteGroups($groups)
@@ -1178,12 +1180,12 @@ SQL;
             /** @var \Omeka\Mvc\Status $status */
             $status = $services->get('Omeka\Status');
             if ($status->isSiteRequest()) {
-                /** @var \Omeka\Settings\SiteSettings $settings */
-                $settings = $services->get('Omeka\Settings\Site');
+                /** @var \Omeka\Settings\SiteSettings $siteSettings */
+                $siteSettings = $services->get('Omeka\Settings\Site');
 
                 // FIXME Remove the exception that occurs with background job and api during update: job seems to set status as site.
                 try {
-                    $locales = $settings->get('internationalisation_locales', []);
+                    $locales = $siteSettings->get('internationalisation_locales', []);
                 } catch (\Exception $e) {
                     // Probably a background process.
                 }

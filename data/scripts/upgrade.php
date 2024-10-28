@@ -51,12 +51,12 @@ if (version_compare($oldVersion, '3.2.0', '<')) {
 }
 
 if (version_compare($oldVersion, '3.2.4', '<')) {
-    $sql = <<<SQL
- ALTER TABLE site_page_relation DROP PRIMARY KEY;
- ALTER TABLE site_page_relation ADD id INT AUTO_INCREMENT NOT NULL UNIQUE FIRST;
- CREATE UNIQUE INDEX site_page_relation_idx ON site_page_relation (page_id, related_page_id);
- ALTER TABLE site_page_relation ADD PRIMARY KEY (id);
-SQL;
+    $sql = <<<'SQL'
+         ALTER TABLE site_page_relation DROP PRIMARY KEY;
+         ALTER TABLE site_page_relation ADD id INT AUTO_INCREMENT NOT NULL UNIQUE FIRST;
+         CREATE UNIQUE INDEX site_page_relation_idx ON site_page_relation (page_id, related_page_id);
+         ALTER TABLE site_page_relation ADD PRIMARY KEY (id);
+        SQL;
     // Use single statements for execution.
     // See core commit #2689ce92f.
     $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
@@ -66,17 +66,17 @@ SQL;
 }
 
 if (version_compare($oldVersion, '3.2.7', '<')) {
-    $sql = <<<SQL
-UPDATE `site_setting` SET `value` = '"all_site"'
-WHERE `id` = "internationalisation_display_values"
-    AND `value` = '"all_ordered"';
-UPDATE site_setting SET `value` = '"site"'
-WHERE `id` = "internationalisation_display_values"
-    AND `value` = '"site_lang"';
-UPDATE site_setting SET `value` = '"site_iso"'
-WHERE `id` = "internationalisation_display_values"
-    AND `value` = '"site_lang_iso"';
-SQL;
+    $sql = <<<'SQL'
+        UPDATE `site_setting` SET `value` = '"all_site"'
+        WHERE `id` = "internationalisation_display_values"
+            AND `value` = '"all_ordered"';
+        UPDATE site_setting SET `value` = '"site"'
+        WHERE `id` = "internationalisation_display_values"
+            AND `value` = '"site_lang"';
+        UPDATE site_setting SET `value` = '"site_iso"'
+        WHERE `id` = "internationalisation_display_values"
+            AND `value` = '"site_lang_iso"';
+        SQL;
     // Use single statements for execution.
     // See core commit #2689ce92f.
     $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
@@ -94,9 +94,9 @@ SQL;
 }
 
 if (version_compare($oldVersion, '3.3.10', '<')) {
-    $sql = <<<SQL
-UPDATE `site_page_block` SET `layout` = "mirrorPage"
-WHERE `layout` = "simplePage";
-SQL;
+    $sql = <<<'SQL'
+        UPDATE `site_page_block` SET `layout` = "mirrorPage"
+        WHERE `layout` = "simplePage";
+        SQL;
     $connection->executeStatement($sql);
 }

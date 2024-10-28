@@ -29,11 +29,11 @@ class LanguageListFactory implements FactoryInterface
 
         // Filter empty locale directly? Not here, in order to manage complex cases.
         $sql = <<<'SQL'
-SELECT site.slug AS site_slug, REPLACE(site_setting.value, '"', "") AS localeId
-FROM site_setting
-JOIN site ON site.id = site_setting.site_id
-WHERE site_setting.id = :setting_id
-SQL;
+            SELECT site.slug AS site_slug, REPLACE(site_setting.value, '"', "") AS localeId
+            FROM site_setting
+            JOIN site ON site.id = site_setting.site_id
+            WHERE site_setting.id = :setting_id
+            SQL;
         $bind = ['setting_id' => 'locale'];
 
         if ($isPublic) {

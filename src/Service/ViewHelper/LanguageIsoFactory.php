@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Internationalisation\Service\ViewHelper;
 
 use Internationalisation\View\Helper\LanguageIso;

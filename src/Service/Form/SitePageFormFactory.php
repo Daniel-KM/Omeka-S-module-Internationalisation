@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Internationalisation\Service\Form;
 
 use Internationalisation\Form\SitePageForm;

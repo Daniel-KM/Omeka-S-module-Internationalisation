@@ -5,7 +5,7 @@ namespace Internationalisation\Form;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\InputFilter\InputFilter;
-use Omeka\Form\Element\SiteSelect;
+use Omeka\Form\Element as OmekaElement;
 
 class DuplicateSiteFieldset extends Fieldset
 {
@@ -54,7 +54,7 @@ class DuplicateSiteFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'source',
-                'type' => SiteSelect::class,
+                'type' => OmekaElement\SiteSelect::class,
                 'options' => [
                     'label' => 'Site to copy', // @translate
                     'empty_option' => '',

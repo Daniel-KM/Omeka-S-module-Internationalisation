@@ -4,7 +4,7 @@ namespace Internationalisation\Form;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
-use Omeka\Form\Element\ArrayTextarea;
+use Omeka\Form\Element as OmekaElement;
 use Omeka\View\Helper\Setting;
 
 class SiteSettingsFieldset extends Fieldset
@@ -22,8 +22,7 @@ class SiteSettingsFieldset extends Fieldset
 
     public function init(): void
     {
-        $siteSetting = $this->getSiteSetting();
-        $locale = $siteSetting('locale');
+        $locale = $this->siteSetting->__invoke('locale');
         if ($locale) {
             $valueOptions = [
                 'all' => 'All values', // @translate
@@ -63,7 +62,7 @@ class SiteSettingsFieldset extends Fieldset
 
             ->add([
                 'name' => 'internationalisation_fallbacks',
-                'type' => ArrayTextarea::class,
+                'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'element_group' => 'internationalisation',
                     'label' => 'Custom language fallbacks', // @translate
@@ -71,16 +70,18 @@ class SiteSettingsFieldset extends Fieldset
                 ],
                 'attributes' => [
                     'id' => 'internationalisation_fallbacks',
-                    'placeholder' => 'way
-fra
-fre
-fr',
+                    'placeholder' => <<<'TXT'
+                        way
+                        fra
+                        fre
+                        fr
+                        TXT,
                 ],
             ])
 
             ->add([
                 'name' => 'internationalisation_required_languages',
-                'type' => ArrayTextarea::class,
+                'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'element_group' => 'internationalisation',
                     'label' => 'Required languages', // @translate
@@ -88,9 +89,11 @@ fr',
                 ],
                 'attributes' => [
                     'id' => 'internationalisation_required_languages',
-                    'placeholder' => 'apy
-way
-fra',
+                    'placeholder' => <<<'TXT'
+                        apy
+                        way
+                        fra
+                        TXT,
                 ],
             ]);
     }

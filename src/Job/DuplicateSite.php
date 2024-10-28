@@ -11,19 +11,14 @@ use Omeka\Mvc\Exception\NotFoundException;
 class DuplicateSite extends AbstractJob
 {
     /**
-     * @var \Laminas\Log\Logger
-     */
-    protected $logger;
-
-    /**
      * @var \Omeka\Api\Manager
      */
     protected $api;
 
     /**
-     * @var \Omeka\Api\Adapter\SitePageAdapter
+     * @var \Doctrine\DBAL\Connection
      */
-    protected $pageAdapter;
+    protected $connection;
 
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -31,9 +26,14 @@ class DuplicateSite extends AbstractJob
     protected $entityManager;
 
     /**
-     * @var \Doctrine\DBAL\Connection
+     * @var \Laminas\Log\Logger
      */
-    protected $connection;
+    protected $logger;
+
+    /**
+     * @var \Omeka\Api\Adapter\SitePageAdapter
+     */
+    protected $pageAdapter;
 
     /**
      * @var array
@@ -212,9 +212,9 @@ class DuplicateSite extends AbstractJob
     protected function removeSettings(Site $site, array $settings = null): void
     {
         $sql = <<<SQL
-DELETE FROM `site_setting`
-WHERE `site_id` = {$site->getId()};
-SQL;
+            DELETE FROM `site_setting`
+            WHERE `site_id` = {$site->getId()};
+            SQL;
         $this->connection->executeStatement($sql);
 
         if (!$settings) {
@@ -256,9 +256,9 @@ SQL;
     protected function removeSitePermissions(Site $site): void
     {
         $sql = <<<SQL
-DELETE FROM `site_permission`
-WHERE `site_id` = {$site->getId()};
-SQL;
+            DELETE FROM `site_permission`
+            WHERE `site_id` = {$site->getId()};
+            SQL;
         $result = $this->connection->executeStatement($sql);
         $this->entityManager->refresh($site);
 
@@ -271,9 +271,9 @@ SQL;
     protected function removeSiteItemSets(Site $site): void
     {
         $sql = <<<SQL
-DELETE FROM `site_item_set`
-WHERE `site_id` = {$site->getId()};
-SQL;
+            DELETE FROM `site_item_set`
+            WHERE `site_id` = {$site->getId()};
+            SQL;
         $this->connection->executeStatement($sql);
         $this->entityManager->refresh($site);
     }
@@ -282,22 +282,22 @@ SQL;
     {
         // FIXME There is no "on delete cascade" on db level currently!
         $sql = <<<SQL
-DELETE `site_block_attachment` FROM `site_block_attachment`
-INNER JOIN `site_page_block` ON `site_page_block`.`id` = `site_block_attachment`.`block_id`
-INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
-WHERE `site_page`.`site_id` = {$site->getId()};
-SQL;
+            DELETE `site_block_attachment` FROM `site_block_attachment`
+            INNER JOIN `site_page_block` ON `site_page_block`.`id` = `site_block_attachment`.`block_id`
+            INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
+            WHERE `site_page`.`site_id` = {$site->getId()};
+            SQL;
         $this->connection->executeStatement($sql);
         $sql = <<<SQL
-DELETE `site_page_block` FROM `site_page_block`
-INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
-WHERE `site_page`.`site_id` = {$site->getId()};
-SQL;
+            DELETE `site_page_block` FROM `site_page_block`
+            INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
+            WHERE `site_page`.`site_id` = {$site->getId()};
+            SQL;
         $this->connection->executeStatement($sql);
         $sql = <<<SQL
-DELETE FROM `site_page`
-WHERE `site_id` = {$site->getId()};
-SQL;
+            DELETE FROM `site_page`
+            WHERE `site_id` = {$site->getId()};
+            SQL;
         $result = $this->connection->executeStatement($sql);
         $this->entityManager->refresh($site);
 
@@ -310,9 +310,9 @@ SQL;
     protected function removeCollecting(Site $site): void
     {
         $sql = <<<SQL
-DELETE FROM `collecting_form`
-WHERE `site_id` = {$site->getId()};
-SQL;
+            DELETE FROM `collecting_form`
+            WHERE `site_id` = {$site->getId()};
+            SQL;
         $result = $this->connection->executeStatement($sql);
 
         $this->logger->notice(
@@ -331,12 +331,12 @@ SQL;
     protected function copySettings(Site $source, Site $target, array $settings = null): void
     {
         $sql = <<<SQL
-INSERT INTO `site_setting` (`id`, `site_id`, `value`)
-SELECT `t2`.`id`, {$target->getId()} AS 'site_id', `t2`.`value` FROM (
-    SELECT `t`.`id`, `t`.`value` FROM `site_setting` AS `t` WHERE `site_id` = {$source->getId()}
-) AS `t2`
-ON DUPLICATE KEY UPDATE `id`=`t2`.`id`, `site_id`={$target->getId()}, `value`=`t2`.`value`;
-SQL;
+            INSERT INTO `site_setting` (`id`, `site_id`, `value`)
+            SELECT `t2`.`id`, {$target->getId()} AS 'site_id', `t2`.`value` FROM (
+                SELECT `t`.`id`, `t`.`value` FROM `site_setting` AS `t` WHERE `site_id` = {$source->getId()}
+            ) AS `t2`
+            ON DUPLICATE KEY UPDATE `id`=`t2`.`id`, `site_id`={$target->getId()}, `value`=`t2`.`value`;
+            SQL;
         $this->connection->executeStatement($sql);
 
         if (!$settings) {
@@ -437,12 +437,12 @@ SQL;
     protected function copySitePermissions(Site $source, Site $target): void
     {
         $sql = <<<SQL
-INSERT INTO `site_permission` (`site_id`, `user_id`, `role`)
-SELECT {$target->getId()} AS 'site_id', `t2`.`user_id`, `t2`.`role` FROM (
-    SELECT `t`.`site_id`, `t`.`user_id`, `t`.`role` FROM `site_permission` AS `t` WHERE `site_id` = {$source->getId()}
-) AS `t2`
-ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `user_id`=`t2`.`user_id`, `role`=`t2`.`role`;
-SQL;
+            INSERT INTO `site_permission` (`site_id`, `user_id`, `role`)
+            SELECT {$target->getId()} AS 'site_id', `t2`.`user_id`, `t2`.`role` FROM (
+                SELECT `t`.`site_id`, `t`.`user_id`, `t`.`role` FROM `site_permission` AS `t` WHERE `site_id` = {$source->getId()}
+            ) AS `t2`
+            ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `user_id`=`t2`.`user_id`, `role`=`t2`.`role`;
+            SQL;
         $this->connection->executeStatement($sql);
         $this->entityManager->refresh($target);
     }
@@ -456,12 +456,12 @@ SQL;
     protected function copySiteItemSets(Site $source, Site $target): void
     {
         $sql = <<<SQL
-INSERT INTO `site_item_set` (`site_id`, `item_set_id`, `position`)
-SELECT {$target->getId()} AS 'site_id', `t2`.`item_set_id`, `t2`.`position` FROM (
-    SELECT `t`.`site_id`, `t`.`item_set_id`, `t`.`position` FROM `site_item_set` AS `t` WHERE `site_id` = {$source->getId()}
-) AS `t2`
-ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `item_set_id`=`t2`.`item_set_id`, `position`=`t2`.`position`;
-SQL;
+            INSERT INTO `site_item_set` (`site_id`, `item_set_id`, `position`)
+            SELECT {$target->getId()} AS 'site_id', `t2`.`item_set_id`, `t2`.`position` FROM (
+                SELECT `t`.`site_id`, `t`.`item_set_id`, `t`.`position` FROM `site_item_set` AS `t` WHERE `site_id` = {$source->getId()}
+            ) AS `t2`
+            ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `item_set_id`=`t2`.`item_set_id`, `position`=`t2`.`position`;
+            SQL;
         $this->connection->executeStatement($sql);
         $this->entityManager->refresh($target);
     }
@@ -524,11 +524,11 @@ SQL;
     protected function copyCollecting(Site $source, Site $target): void
     {
         $sql = <<<SQL
-INSERT INTO `collecting_form` (`item_set_id`, `site_id`, `owner_id`, `label`, `anon_type`, `success_text`, `email_text`)
-SELECT  `t2`.`item_set_id`, {$target->getId()} AS 'site_id', `t2`.`owner_id`, `t2`.`label`, `t2`.`anon_type`, `t2`.`success_text`, `t2`.`email_text` FROM (
-    SELECT `t`.`item_set_id`, `t`.`site_id`, `t`.`owner_id`, `t`.`label`, `t`.`anon_type`, `t`.`success_text`, `t`.`email_text` FROM `collecting_form` AS `t` WHERE `site_id` = {$source->getId()}
-) AS `t2`;
-SQL;
+            INSERT INTO `collecting_form` (`item_set_id`, `site_id`, `owner_id`, `label`, `anon_type`, `success_text`, `email_text`)
+            SELECT  `t2`.`item_set_id`, {$target->getId()} AS 'site_id', `t2`.`owner_id`, `t2`.`label`, `t2`.`anon_type`, `t2`.`success_text`, `t2`.`email_text` FROM (
+                SELECT `t`.`item_set_id`, `t`.`site_id`, `t`.`owner_id`, `t`.`label`, `t`.`anon_type`, `t`.`success_text`, `t`.`email_text` FROM `collecting_form` AS `t` WHERE `site_id` = {$source->getId()}
+            ) AS `t2`;
+            SQL;
         try {
             $result = $this->connection->executeStatement($sql);
         } catch (\Exception $e) {
@@ -545,19 +545,19 @@ SQL;
 
         // Check if the module is the fork one with column multiple or the basic one.
         $sql = <<<'SQL'
-SHOW COLUMNS FROM `collecting_prompt` LIKE 'multiple';
-SQL;
+            SHOW COLUMNS FROM `collecting_prompt` LIKE 'multiple';
+            SQL;
         try {
             $multiple = $this->connection->executeStatement($sql) ? ', `multiple`' : '';
         } catch (\Exception $e) {
             $multiple = '';
         }
         $sql = <<<SQL
-INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple)
-SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple FROM `collecting_prompt`
-JOIN `collecting_form` ON `collecting_form`.`id` = `collecting_prompt`.`form_id`
-WHERE `collecting_form`.`site_id` = {$source->getId()};
-SQL;
+            INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple)
+            SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple FROM `collecting_prompt`
+            JOIN `collecting_form` ON `collecting_form`.`id` = `collecting_prompt`.`form_id`
+            WHERE `collecting_form`.`site_id` = {$source->getId()};
+            SQL;
         try {
             $result = $this->connection->executeStatement($sql);
         } catch (\Exception $e) {

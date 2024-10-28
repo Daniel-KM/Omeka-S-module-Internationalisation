@@ -93,7 +93,7 @@ class LocaleToCountry extends AbstractHelper
      * @param string $locale
      * @return string Uppercase two letters code, or empty string.
      */
-    public function __invoke($string locale): string
+    public function __invoke(string $locale): string
     {
         if (isset($this->countriesByLocale[$locale])) {
             return $this->countriesByLocale[$locale];

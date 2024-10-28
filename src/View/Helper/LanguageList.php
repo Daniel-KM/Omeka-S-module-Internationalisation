@@ -84,14 +84,11 @@ class LanguageList extends AbstractHelper
         if (!is_array(reset($siteGroup))) {
             $siteGroupKeys = array_flip($siteGroup);
         } else {
-            $siteGroupKeys = [];
-            foreach ($siteGroup as $key => $siteGroupElement) {
-                $siteGroupKeys[$key] = true;
-            }
+            $siteGroupKeys = array_fill_keys(array_keys($siteGroup), true);
         }
         $locales = array_intersect_key($this->localeSites, $siteGroupKeys);
 
-        $urlHelper = $view->plugin('Url');
+        $urlHelper = $view->plugin('url');
 
         // No check is done: we suppose that the translated sites have the same
         // item pool, etc.

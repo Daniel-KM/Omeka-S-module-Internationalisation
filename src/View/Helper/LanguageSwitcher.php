@@ -27,19 +27,18 @@ class LanguageSwitcher extends AbstractHelper
     /**
      * Render the language switcher.
      *
-     * @param array|string|null $options If a string, this is the name of the
-     * view script, or a view model. In array, this is the key 'template'.
-     * Possible options:
+     * @param array $options Possible options:
      * - template (string)
      * - displayLocale: "code" (the 2 or 3 letters language code, default) or "flag".
      * Other options are passed to the template.
      * @return string
      */
-    public function __invoke($options = null)
+    public function __invoke($options = []): string
     {
         $site = $this->currentSite();
         $data = $this->languageList->currentPage();
 
+        // TODO Remove support of very old themes.
         if (empty($options) || is_string($options)) {
             $options = ['template' => $options, 'displayLocale' => 'code'];
         } else {
@@ -56,21 +55,15 @@ class LanguageSwitcher extends AbstractHelper
         ] + $options);
     }
 
+    /**
+     * Get the current site from the view or the root view (main layout).
+     */
     protected function currentSite(): ?\Omeka\Api\Representation\SiteRepresentation
     {
-        static $site;
-        if (!$site) {
-            $vars = $this->view->vars();
-            $site = $vars->offsetGet('site');
-            if (!$site) {
-                $site = $this->view
-                    ->getHelperPluginManager()
-                    ->get('Laminas\View\Helper\ViewModel')
-                    ->getRoot()
-                    ->getVariable('site');
-                $vars->offsetSet('site', $site);
-            }
-        }
-        return $site;
+        return $this->view->site ?? $this->view->site = $this->view
+            ->getHelperPluginManager()
+            ->get('Laminas\View\Helper\ViewModel')
+            ->getRoot()
+            ->getVariable('site');
     }
 }

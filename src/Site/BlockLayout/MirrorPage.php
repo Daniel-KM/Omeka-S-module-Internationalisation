@@ -13,9 +13,9 @@ use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Omeka\Stdlib\ErrorStore;
 
 /**
- * Copy of the same block from module BlockPlus.
- *
+ * Copy in:
  * @see \BlockPlus\Site\BlockLayout\MirrorPage
+ * @see \Internationalisation\Site\BlockLayout\MirrorPage
  */
 class MirrorPage extends AbstractBlockLayout
 {
@@ -83,7 +83,7 @@ class MirrorPage extends AbstractBlockLayout
         $defaultSettings = $services->get('Config')['blockplus']['block_settings']['mirrorPage'];
         $blockFieldset = \BlockPlus\Form\MirrorPageFieldset::class;
 
-        $data = $block ? $block->data() + $defaultSettings : $defaultSettings;
+        $data = $block ? ($block->data() ?? []) + $defaultSettings : $defaultSettings;
 
         $dataForm = [];
         foreach ($data as $key => $value) {
