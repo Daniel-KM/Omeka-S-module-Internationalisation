@@ -8,8 +8,8 @@ Internationalisation (module for Omeka S)
 [Internationalisation] is a module for [Omeka S] that allows visitors to switch
 between sites pages, when the sites are managed by language.
 
-This module provides the same features than the [Omeka Classic] plugins [MultiLanguage]
-and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
+A language switcher is available as a page or resource block, so the user has
+only one click to see the translated page.
 
 
 Installation
@@ -19,27 +19,28 @@ It is recommended to install the php extension `intl` to localize some strings,
 in particular dates. It may or may not be installed by default on your server,
 so check the system information in the bottom of the admin board of Omeka.
 
-This module may use the optional module [Generic] if installed.
+See general end user documentation for [installing a module].
+
+This module requires the module [Common], that should be installed first.
 
 The module uses external libraries, so use the release zip to install it, or use
 and init the source.
 
-See general end user documentation for [installing a module].
-
 * From the zip
 
-Download the last release [Internationalisation.zip] from the list of releases
-(the master does not contain the dependency), and uncompress it in the `modules`
-directory.
+Download the last release [Internationalisation.zip] from the list of releases (the master
+does not contain the dependency), and uncompress it in the `modules` directory.
 
 * From the source and for development
 
 If the module was installed from the source, rename the name of the folder of
-the module to `Internationalisation`, go to the root of the module, and run:
+the module to `Internationalisation`, and go to the root module, and run:
 
 ```sh
 composer install --no-dev
 ```
+
+Then install it like any other Omeka module and follow the config instructions.
 
 **Important**: Read below to display all translations for interface and metadata.
 
@@ -105,16 +106,23 @@ Then, in public front-end, the visitor can switch between sites via a flag.
 Integration of the module
 -------------------------
 
+The language switcher is not added automatically to the theme. So use blocks or
+the view helper.
+
+### Page block and resource block Language Switcher
+
+Simply add the page block or the resource block to your pages and your theme to
+display the language switcher.
+
 ### Interface
 
-The language switcher is not added automatically to the theme. So you need to
-add the view helper somewhere in the file `layout.phtml`, generally in the
-header:
+The view helper can be use too, so put it somewhere in the file `layout.phtml`,
+generally in the header:
 
 ```php
 <?= $this->languageSwitcher() ?>
 <?php // Or better, to make the theme more generic and resilient in case of an upgrade: ?>
-<?php if ($this->getHelperPluginManager()->has('languageSwitcher')) echo $this->languageSwitcher(); ?>
+<?= $this->getHelperPluginManager()->has('languageSwitcher') ? $this->languageSwitcher() : '' ?>
 ```
 
 The partial `common/helper/language-switcher.phtml` view can be themed: simply
@@ -226,8 +234,11 @@ Copyright
 
 This module was built for [Watau].
 
-* Copyright Daniel Berthereau, 2019-2023 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2019-2024 (see [Daniel-KM] on GitLab)
 * Copyright BibLibre, 2017 (see [BibLibre] on GitLab), for the switcher
+
+This module provides the same features than the [Omeka Classic] plugins [MultiLanguage]
+and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 
 
 [Internationalisation]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation
@@ -237,7 +248,7 @@ This module was built for [Watau].
 [Omeka Classic]: https://omeka.org/classic
 [Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
 [Internationalisation.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/releases
-[Installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
+[installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L489
 [#1506]: https://github.com/omeka/omeka-s/pull/1506/files
