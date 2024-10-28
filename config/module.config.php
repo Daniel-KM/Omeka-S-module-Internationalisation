@@ -47,6 +47,11 @@ return [
             'mirrorPage' => Service\BlockLayout\MirrorPageFactory::class,
         ],
     ],
+    'resource_page_block_layouts' => [
+        'invokables' => [
+            'languageSwitcher' => Site\ResourcePageBlockLayout\LanguageSwitcher::class,
+        ],
+    ],
     'form_elements' => [
         'invokables' => [
             Form\LanguageSwitcherFieldset::class => Form\LanguageSwitcherFieldset::class,
