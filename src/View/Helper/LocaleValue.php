@@ -31,7 +31,7 @@ class LocaleValue extends AbstractHelper
      */
     public function __construct($defaultLocale, array $defaultFallbacks)
     {
-        $this->defaultLocale = $defaultLocale ? [$defaultLocale] : [];
+        $this->defaultLocales = $defaultLocale ? [$defaultLocale] : [];
         $this->defaultFallbacks = $defaultFallbacks;
     }
 
@@ -100,7 +100,7 @@ class LocaleValue extends AbstractHelper
             }
             if ($optionLang) {
                 if ($options['lang'] === true) {
-                    $langs = $this->defaultLocale;
+                    $langs = $this->defaultLocales;
                     $options['fallbacks'] = $this->defaultFallbacks;
                 } else {
                     $langs = is_array($options['lang']) ? $options['lang'] : [$options['lang']];
