@@ -48,13 +48,18 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
     public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore): void
     {
         /** @var \Internationalisation\Entity\SitePageRelation $entity */
+
         $data = $request->getContent();
+
         if (Request::CREATE === $request->getOperation()) {
-            $sitePageAdapter = $this->getAdapter('site_pages');
-            $page = $sitePageAdapter->findEntity($data['o:page']['o:id']);
-            $relatedPage = $sitePageAdapter->findEntity($data['o-module-internationalisation:related_page']['o:id']);
-            // Useless, but cleaner.
-            if ($data['o:page']['o:id'] > $data['o-module-internationalisation:related_page']['o:id']) {
+            $entityManager = $this->getEntityManager();
+            $page = $entityManager->find(\Omeka\Entity\SitePage::class, $data['o:page']['o:id']);
+            $relatedPage = $page = $entityManager->find(\Omeka\Entity\SitePage::class, data['o-module-internationalisation:related_page']['o:id']);
+            if ($page
+                && $relatedPage
+                // Useless, but cleaner.
+                && $data['o:page']['o:id'] > $data['o-module-internationalisation:related_page']['o:id']
+            ) {
                 $entity
                     ->setPage($relatedPage)
                     ->setRelatedPage($page);
