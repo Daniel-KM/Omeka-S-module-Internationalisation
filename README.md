@@ -234,7 +234,7 @@ Copyright
 
 This module was built for [Watau].
 
-* Copyright Daniel Berthereau, 2019-2024 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2019-2025 (see [Daniel-KM] on GitLab)
 * Copyright BibLibre, 2017 (see [BibLibre] on GitLab), for the switcher
 
 This module provides the same features than the [Omeka Classic] plugins [MultiLanguage]
