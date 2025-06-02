@@ -18,7 +18,7 @@ use Omeka\Module\AbstractModule;
 /**
  * Internationalisation.
  *
- * @copyright Daniel Berthereau, 2019-2024
+ * @copyright Daniel Berthereau, 2019-2025
  * @copyright BibLibre, 2017
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
@@ -68,10 +68,10 @@ class Module extends AbstractModule
         $translate = $plugins->get('translate');
         $translator = $services->get('MvcTranslator');
 
-        if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.63')) {
+        if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.69')) {
             $message = new \Omeka\Stdlib\Message(
                 $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
-                'Common', '3.4.63'
+                'Common', '3.4.69'
             );
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
