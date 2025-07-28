@@ -73,14 +73,7 @@ class Module extends AbstractModule
     public function onBootstrap(MvcEvent $event): void
     {
         parent::onBootstrap($event);
-        $this->addAclRules();
-    }
 
-    /**
-     * Add ACL rules for this module.
-     */
-    protected function addAclRules(): void
-    {
         /** @var \Omeka\Permissions\Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
         $acl
@@ -731,9 +724,9 @@ class Module extends AbstractModule
 
         if (count($existingIds)) {
             $sql = <<<SQL
-DELETE FROM site_page_relation
-WHERE page_id IN (:page_ids) OR related_page_id IN (:page_ids)
-SQL;
+                DELETE FROM site_page_relation
+                WHERE page_id IN (:page_ids) OR related_page_id IN (:page_ids)
+                SQL;
             $connection->executeQuery($sql, ['page_ids' => $existingIds], ['page_ids' => $connection::PARAM_INT_ARRAY]);
         }
 
@@ -743,9 +736,9 @@ SQL;
 
         // Add all pairs.
         $sql = <<<SQL
-INSERT INTO site_page_relation (page_id, related_page_id)
-VALUES
-SQL;
+            INSERT INTO site_page_relation (page_id, related_page_id)
+            VALUES
+            SQL;
 
         $ids = $selected;
         $ids[] = $pageId;
@@ -997,7 +990,7 @@ SQL;
         $view = $event->getTarget();
         $expand = json_encode($view->translate('Expand'), 320);
         $legend = json_encode($view->translate('Remove and copy data'), 320);
-        echo <<<INLINE
+        echo <<<CSS
             <style>
             .collapse + #duplicate.collapsible {
                 overflow: initial;
@@ -1011,7 +1004,7 @@ SQL;
                     .before('<a href="#" class="expand" aria-label=$expand>' + $legend + ' </a> ');
             });
             </script>
-            INLINE;
+            CSS;
     }
 
     public function handleSitePost(Event $event): void
