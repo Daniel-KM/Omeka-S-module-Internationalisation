@@ -77,6 +77,11 @@ return [
         ],
     ],
     'translator' => [
+        'remote_translation' => [
+            [
+                'type' => 'tables',
+            ],
+        ],
         'translation_file_patterns' => [
             [
                 'type' => 'gettext',
@@ -88,9 +93,11 @@ return [
     ],
     'internationalisation' => [
         'settings' => [
+            'internationaliation_translation_tables' => [],
             'internationalisation_site_groups' => [],
         ],
         'site_settings' => [
+            'internationaliation_translation_tables' => [],
             'internationalisation_display_values' => 'all',
             'internationalisation_fallbacks' => [],
             'internationalisation_required_languages' => [],

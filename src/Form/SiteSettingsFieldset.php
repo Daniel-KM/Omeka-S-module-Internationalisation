@@ -2,6 +2,7 @@
 
 namespace Internationalisation\Form;
 
+use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\Form\Element as OmekaElement;
@@ -45,6 +46,23 @@ class SiteSettingsFieldset extends Fieldset
         $this
             ->setAttribute('id', 'internationalisation')
             ->setOption('element_groups', $this->elementGroups)
+
+            ->add([
+                'name' => 'internationaliation_translation_tables',
+                'type' => CommonElement\ArrayText::class,
+                'options' => [
+                    'element_group' => 'internationalisation',
+                    'label' => 'Tables to use for translation', // @translate
+                    'info' => 'The module Table allows to translate strings in admin board. Separate table slugs with a space. The table should be associative and should have a language.', // @translate
+                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation#tables-of-translations',
+                    'value_separator' => ' ',
+                ],
+                'attributes' => [
+                    'id' => 'internationaliation_translation_tables',
+                    'placeholder' => 'translation-fr translation-el-gr',
+                ],
+            ])
+
             ->add([
                 'name' => 'internationalisation_display_values',
                 'type' => Element\Select::class,
