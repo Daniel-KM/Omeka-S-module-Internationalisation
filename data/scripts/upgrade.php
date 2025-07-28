@@ -119,3 +119,12 @@ if (version_compare($oldVersion, '3.4.14', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.16', '<')) {
+    $message = new PsrMessage(
+        'It is now possible to translate strings in admin via the module {link}Table{link_end}.', // @translate
+        ['link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-Table" target="_blank">', 'link_end' => '</a>']
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addSuccess($message);
+}
