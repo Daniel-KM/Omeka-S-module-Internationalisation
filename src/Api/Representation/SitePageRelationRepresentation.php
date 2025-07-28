@@ -19,8 +19,8 @@ class SitePageRelationRepresentation extends AbstractEntityRepresentation
     public function getJsonLd()
     {
         return [
-            'o:page' => $this->page()->getReference(),
-            'o-module-internationalisation:related_page' => $this->relatedPage()->getReference(),
+            'o:page' => $this->page()->getReference()->jsonSerialize(),
+            'o-module-internationalisation:related_page' => $this->relatedPage()->getReference()->jsonSerialize(),
         ];
     }
 

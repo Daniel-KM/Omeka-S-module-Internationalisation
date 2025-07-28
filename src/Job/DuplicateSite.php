@@ -400,6 +400,7 @@ class DuplicateSite extends AbstractJob
                     ]],
                 ];
             } else {
+                // TODO Don't use json_decode(json_encode()).
                 // Use json_encode() instead of jsonSerialize() to get only arrays.
                 $targetPage = json_decode(json_encode($this->pageAdapter->getRepresentation($sourcePage)), true);
                 $targetPage['o:site'] = ['o:id' => $target->getId()];

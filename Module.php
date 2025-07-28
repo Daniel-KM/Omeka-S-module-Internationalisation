@@ -571,6 +571,7 @@ class Module extends AbstractModule
                         ? $translator->translate($class->label())
                         : $class->label();
                 }
+                // TODO Don't use json_decode(json_encode()).
                 $jsonLd['o:resource_class'] = json_decode(json_encode($jsonLd['o:resource_class']), true);
                 $jsonLd['o:resource_class']['o:label'] = $resourceClassLabels[$classId];
             }
@@ -672,9 +673,9 @@ class Module extends AbstractModule
         $relations = array_map(function (SitePageRelationRepresentation $relation) use ($pageId) {
             $related = $relation->relatedPage();
             $relatedPage = $pageId === $related->id()
-                ? $relation->page()->getReference()
-                : $related->getReference();
-            return $relatedPage->jsonSerialize();
+                ? $relation->page()->getReference()->jsonSerialize()
+                : $related->getReference()->jsonSerialize();
+            return $relatedPage;
         }, $relations);
         $jsonLd['o-module-internationalisation:related_page'] = $relations;
         $event->setParam('jsonLd', $jsonLd);
