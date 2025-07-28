@@ -1,21 +1,24 @@
-ul.language-switcher {
-    font-size: 120%;
-}
+@media all {
+    ul.language-switcher {
+        font-size: 120%;
+    }
 
-ul.language-switcher li {
-    display: inline-block;
-    margin: 2px;
-}
+    ul.language-switcher li {
+        display: inline-block;
+        margin: 2px;
+    }
 
-ul.language-switcher a {
-    display: block;
-}
+    ul.language-switcher span,
+    ul.language-switcher a {
+        display: block;
+    }
 
-ul.language-switcher .flag-icon {
-    border: 1px solid lightgrey;
-    box-sizing: content-box;
-}
+    ul.language-switcher .flag-icon {
+        border: 1px solid lightgrey;
+        box-sizing: content-box;
+    }
 
-ul.language-switcher .flag-icon.active {
-    box-shadow: 0px 0px 3px 1px rgba(128, 128, 128, 0.9);
+    ul.language-switcher .flag-icon.active {
+        box-shadow: 0px 0px 3px 1px rgba(128, 128, 128, 0.9);
+    }
 }
