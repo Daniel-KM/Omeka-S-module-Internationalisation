@@ -29,6 +29,8 @@ $entityManager = $services->get('Omeka\EntityManager');
 
 $localConfig = require dirname(__DIR__, 2) . '/config/module.config.php';
 
+$this->checkExtensionIntl();
+
 if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.69')) {
     $message = new \Omeka\Stdlib\Message(
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate

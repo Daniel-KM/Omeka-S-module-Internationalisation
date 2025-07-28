@@ -108,6 +108,20 @@ class Module extends AbstractModule
             );
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
         }
+
+        $this->checkExtensionIntl();
+    }
+
+    protected function checkExtensionIntl(): void
+    {
+        if (!extension_loaded('intl')) {
+            /** @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger */
+            $services = $this->getServiceLocator();
+            $messenger = $services->get('ControllerPluginManager')->get('messenger');
+            $messenger->addWarning(
+                'The php extension "intl" is not available. It is recommended to install it to manage diacritics and non-latin characters and to translate dates, numbers and more.' // @translate
+            );
+        }
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
