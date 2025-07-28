@@ -23,6 +23,8 @@ class SiteSettingsFieldset extends Fieldset
 
     public function init(): void
     {
+        $hasModuleTable = class_exists('Table\Module', false);
+
         $locale = $this->siteSetting->__invoke('locale');
         if ($locale) {
             $valueOptions = [
@@ -49,17 +51,27 @@ class SiteSettingsFieldset extends Fieldset
 
             ->add([
                 'name' => 'internationaliation_translation_tables',
-                'type' => CommonElement\ArrayText::class,
+                'type' => $hasModuleTable
+                    ? \Table\Form\Element\TablesSelect::class
+                    : CommonElement\ArrayText::class,
                 'options' => [
                     'element_group' => 'internationalisation',
                     'label' => 'Tables to use for translation', // @translate
                     'info' => 'The module Table allows to translate strings in admin board. Separate table slugs with a space. The table should be associative and should have a language.', // @translate
                     'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation#tables-of-translations',
+                    // When Table is available.
+                    'disable_group_by_owner' => true,
+                    'slug_as_value' => true,
+                    'empty_option' => '',
+                    // When Table is not available.
                     'value_separator' => ' ',
                 ],
                 'attributes' => [
                     'id' => 'internationaliation_translation_tables',
+                    'multiple' => $hasModuleTable,
+                    'class' => $hasModuleTable ? 'chosen-select' : '',
                     'placeholder' => 'translation-fr translation-el-gr',
+                    'data-placeholder' => 'Select tables…' // @translate,
                 ],
             ])
 

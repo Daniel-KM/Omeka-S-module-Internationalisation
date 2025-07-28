@@ -76,10 +76,23 @@ return [
             'listSiteGroups' => Service\ControllerPlugin\ListSiteGroupsFactory::class,
         ],
     ],
+    /**
+     * To manage translation directly from the database, see:
+     * @see https://docs.laminas.dev/laminas-i18n/translator/factory
+     * @see https://stackoverflow.com/questions/44406391/zend-framework-3-translator-from-db#answer-44413709
+     */
     'translator' => [
+        'loaderpluginmanager' => [
+            'invokables' => [
+                // TODO Create a PhpTableArray that load the current locale only and the other locales on demand.
+                // TODO But it is not so important, because tables are generally few and small, only for missing or specific translations.
+                Translator\Loader\PhpSimpleArray::class => Translator\Loader\PhpSimpleArray::class,
+            ],
+        ],
         'remote_translation' => [
             [
                 'type' => 'tables',
+                'text_domain' => null,
             ],
         ],
         'translation_file_patterns' => [
