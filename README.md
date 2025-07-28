@@ -196,6 +196,7 @@ TODO
 ----
 
 - [ ] Return original page when it is not translated in a site, instead of an error (virtual instant mirror page).
+- [ ] Add navigation link for the language switcher.
 - [ ] Add links for easier browsing between translated pages.
 - [x] Add a button to duplicate a site (item pool, pages and navigation, relations).
 - [ ] Add a button to duplicate a page or to append blocks of a page to another one.
@@ -210,7 +211,7 @@ TODO
 - [x] Duplicate settings and pages for an existing site.
 - [ ] Modify the internal urls with the target site one when copying blocks.
 - [ ] Copy of pages: there is no mapping for collecting forms.
-- [ ] Add navigation link for the language switcher.
+- [ ] Simplify the process to manage fallbacks when there is only one fallback (managed by default).
 
 
 Warning

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-28 00:00+0000\n"
+"POT-Creation-Date: 2025-07-28 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,16 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/scripts/upgrade.php:34 Module.php:73
+#: data/scripts/upgrade.php:36 Module.php:96
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
 
-#: Module.php:954
-msgid "Remove and copy data"
-msgstr ""
-
-#: src/Api/Adapter/SitePageRelationAdapter.php:257
+#: src/Api/Adapter/SitePageRelationAdapter.php:262
 #, php-format
 msgid "The \"%s\" field is not available in the %s entity class."
 msgstr ""
@@ -45,53 +41,72 @@ msgstr ""
 msgid "The current page and recursive pages are forbidden."
 msgstr ""
 
-#: data/scripts/upgrade.php:109
+#: data/scripts/upgrade.php:111
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 
-#: data/scripts/upgrade.php:116
+#: data/scripts/upgrade.php:118
 msgid ""
 "The language switcher is now available as a page block and as a resource "
 "block."
 msgstr ""
 
-#: Module.php:82
+#: data/scripts/upgrade.php:125
+msgid ""
+"It is now possible to translate strings in admin via the module {link}"
+"Table{link_end}."
+msgstr ""
+
+#: Module.php:105
 msgid ""
 "The composer vendor is not ready. See module’s installation documentation."
 msgstr ""
 
-#: Module.php:852 src/Form/SettingsFieldset.php:29
-#: src/Form/SettingsFieldset.php:31
+#: Module.php:120
+msgid ""
+"The php extension \"intl\" is not available. It is recommended to install it "
+"to manage diacritics and non-latin characters and to translate dates, "
+"numbers and more."
+msgstr ""
+
+#: Module.php:890 src/Form/SettingsFieldset.php:58
+#: src/Form/SettingsFieldset.php:60
 msgid "Remove all groups"
 msgstr ""
 
-#: Module.php:897
+#: Module.php:935
 msgid "Translations"
 msgstr ""
 
-#: Module.php:898
+#: Module.php:936
 msgid ""
 "The selected pages will be translations of the current page within a site "
 "group, that must be defined. The language switcher displays only one related "
 "page by site."
 msgstr ""
 
-#: Module.php:907
+#: Module.php:945
 msgid "Select translations of this page…"
 msgstr ""
 
-#: Module.php:1019 src/Job/DuplicateSite.php:88
+#: Module.php:1056 src/Job/DuplicateSite.php:88
 msgid "The site #{site_id} cannot be copied. Check your rights."
 msgstr ""
 
-#: Module.php:1050
+#: Module.php:1087
 msgid "Remove/copy processes have been done for site \"{site_slug}\"."
 msgstr ""
 
-#: Module.php:1056
+#: Module.php:1093
 msgid ""
 "A job was launched in background to copy site data: ({link_job}job #{job_id}"
 "{link_end}, {link_log}logs{link_end})."
+msgstr ""
+
+#: src/Mvc/MvcListeners.php:80
+msgid ""
+"The following tables are included for internationalisation, but have no "
+"defined language: {table_slugs}."
 msgstr ""
 
 #: src/Job/DuplicateSite.php:73
@@ -123,107 +138,122 @@ msgid ""
 "Site settings of \"{site_slug}\" successfully copied into \"{site_slug_2}\"."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:416
+#: src/Job/DuplicateSite.php:417
 msgid ""
 "The page slug \"{page_slug}\" from the source has been renamed \"{slug}\"."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:422
+#: src/Job/DuplicateSite.php:423
 msgid ""
 "Unable to copy page \"{page_slug}\" of site \"{site_slug}\". The page is "
 "skipped."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:432
+#: src/Job/DuplicateSite.php:433
 msgid ""
 "{total} site pages of \"{site_slug}\" successfully copied into "
 "\"{site_slug_2}\" (mode \"{mode}\")."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:536 src/Job/DuplicateSite.php:565
+#: src/Job/DuplicateSite.php:537 src/Job/DuplicateSite.php:566
 msgid ""
 "The module Collecting is a new version and is not copiable for now. Copy "
 "forms manually if needed."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:542
+#: src/Job/DuplicateSite.php:543
 msgid ""
 "{total} collecting forms from site \"{site_slug}\" were successfully copied "
 "into \"{site_slug_2}\"."
 msgstr ""
 
-#: src/Job/DuplicateSite.php:587
+#: src/Job/DuplicateSite.php:588
 msgid ""
 "The full text for page {page_slug} was not saved. Run indexation of full "
 "text manually in main settings or in tasks of Easy Admin. Exception: "
 "{exception}"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:17 src/Form/SiteSettingsFieldset.php:20
-#: src/Form/SettingsFieldset.php:10
+#: src/Form/SiteSettingsFieldset.php:18 src/Form/SiteSettingsFieldset.php:21
+#: src/Form/SettingsFieldset.php:11 src/Form/SettingsFieldset.php:14
 msgid "Internationalisation"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:28 src/Form/SiteSettingsFieldset.php:40
+#: src/Form/SiteSettingsFieldset.php:31 src/Form/SiteSettingsFieldset.php:43
 msgid "All values"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:29
+#: src/Form/SiteSettingsFieldset.php:32
 msgid "All values, with language of the site first"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:30
+#: src/Form/SiteSettingsFieldset.php:33
 msgid "All values, with language of the site or iso fallback first"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:31
+#: src/Form/SiteSettingsFieldset.php:34
 msgid "All values, with language of the site or custom fallback first"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:32
+#: src/Form/SiteSettingsFieldset.php:35
 msgid "Only values with the language of the site"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:33
+#: src/Form/SiteSettingsFieldset.php:36
 msgid "Only values with the language of the site, with iso fallback"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:34
+#: src/Form/SiteSettingsFieldset.php:37
 msgid "Only values with the language of the site, with custom fallback"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:37
+#: src/Form/SiteSettingsFieldset.php:40
 msgid ""
 "Display only the values in the specified language. It applies only for "
 "properties that contains at least one value with a language. The option can "
 "be overridden in the theme."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:42
+#: src/Form/SiteSettingsFieldset.php:45
 msgid ""
 "Display only the values in the specified language. This option is available "
 "only when the site has a language."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:53
+#: src/Form/SiteSettingsFieldset.php:59 src/Form/SettingsFieldset.php:33
+msgid "Tables to use for translation"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:60 src/Form/SettingsFieldset.php:34
+msgid ""
+"The module Table allows to translate strings in admin board. Separate table "
+"slugs with a space. The table should be associative and should have a "
+"language."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:74 src/Form/SettingsFieldset.php:48
+msgid "Select tables…"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:83
 msgid "Language of values"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:68
+#: src/Form/SiteSettingsFieldset.php:98
 msgid "Custom language fallbacks"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:69
+#: src/Form/SiteSettingsFieldset.php:99
 msgid ""
 "Specify values to display when a property has no value with the language of "
 "the site. Set one language code by line."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:87
+#: src/Form/SiteSettingsFieldset.php:117
 msgid "Required languages"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:88
+#: src/Form/SiteSettingsFieldset.php:118
 msgid ""
 "Specify values to display in all cases. Values without language are "
 "displayed in all cases. Set one language code by line."
@@ -285,11 +315,11 @@ msgstr ""
 msgid "Leave blank to use the global locale setting."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:27
+#: src/Form/SettingsFieldset.php:56
 msgid "Site groups"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:28
+#: src/Form/SettingsFieldset.php:57
 msgid ""
 "Group some sites with a different language so they can be managed together "
 "as a whole. Set all site slugs by group, one by line, with or without comma "
@@ -315,15 +345,15 @@ msgstr ""
 msgid "Language flag"
 msgstr ""
 
-#: src/Api/Adapter/SitePageRelationAdapter.php:76
+#: src/Api/Adapter/SitePageRelationAdapter.php:81
 msgid "A relation between pages must have a page."
 msgstr ""
 
-#: src/Api/Adapter/SitePageRelationAdapter.php:79
+#: src/Api/Adapter/SitePageRelationAdapter.php:84
 msgid "A relation between pages must have a related page."
 msgstr ""
 
-#: src/Api/Adapter/SitePageRelationAdapter.php:81
+#: src/Api/Adapter/SitePageRelationAdapter.php:86
 msgid ""
 "The page and the related page of a relation between pages must be different."
 msgstr ""
