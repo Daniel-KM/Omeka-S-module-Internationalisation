@@ -74,14 +74,6 @@ class MvcListeners extends AbstractListenerAggregate
                         $tableSlugsNoLang[] = $table->slug();
                     }
                 }
-
-                // Unlike files, all locales should be loaded here.
-                // If another domain is needed, it may be added as "tables_xxx".
-                $translator->getPluginManager()->setService(
-                    'tables',
-                    new PhpSimpleArray(['default' => $locales])
-                );
-
                 if ($tableSlugsNoLang) {
                     $logger = $services->get('Omeka\Logger');
                     $logger->warn(
@@ -91,6 +83,19 @@ class MvcListeners extends AbstractListenerAggregate
                 }
             }
         }
+
+        // The translator service for remote translator "tables" must be set,
+        // whatever there are locales or not, and whatever the presence of an
+        // existing one loaded during bootstrap.
+        // It avoids a second issue in case of error during bootstrap, in
+        // particular duiring the upgrade of Common. It allows to finish the
+        // upgrade.
+        // Unlike files, all locales should be loaded here.
+        // If another domain is needed, it may be added as "tables_xxx".
+        $translator->getPluginManager()->setService(
+            'tables',
+            new PhpSimpleArray(['default' => $locales])
+        );
 
         if ($isSiteRequest) {
             /** @var \Omeka\Api\Representation\SiteRepresentation $currentSIte */

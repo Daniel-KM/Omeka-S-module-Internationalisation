@@ -42,22 +42,27 @@ class Module extends AbstractModule
      */
     protected $lastQuerySort = [];
 
-    public function getServiceConfig(): array
+    /**
+     * This method is disabled for now, but may be used for a futur usage if a
+     * module as an issue during an upgrade.
+     * @return array
+     */
+    public function _getServiceConfig(): array
     {
         // The translator service for remote translator "tables" must be set,
         // whatever there are locales or not.
         // It avoids a second issue in case of error during bootstrap, in
         // particular duiring the upgrade of Common. It allows to finish the
-        // upgrde.
+        // upgrade.
         // The real content of the plugin is injected via MvcListeners.
+        /** @see \Internationalisation\Mvc\MvcListeners */
         return [
             'factories' => [
                 TranslatorInterface::class => function ($services) {
                     $translator = $services->get(TranslatorInterface::class)->getDelegatedTranslator();
-                    $pluginManager = $translator->getPluginManager();
-                    $pluginManager->setService(
+                    $translator->getPluginManager()->setService(
                         'tables',
-                        new PhpSimpleArray([])
+                        new PhpSimpleArray()
                     );
                     return $translator;
                 },

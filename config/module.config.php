@@ -89,6 +89,8 @@ return [
                 Translator\Loader\PhpSimpleArray::class => Translator\Loader\PhpSimpleArray::class,
             ],
         ],
+        // The translations for "tables" are prepared as "remote_translation"
+        // during bootstrap to avoid issue during upgrade of the module.
         'remote_translation' => [
             [
                 'type' => 'tables',

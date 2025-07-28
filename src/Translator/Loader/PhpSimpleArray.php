@@ -34,7 +34,7 @@ class PhpSimpleArray implements RemoteLoaderInterface
     /**
      * @param array $messages
      */
-    public function __construct(array $messages)
+    public function __construct(array $messages = [])
     {
         $this->messages = $messages;
     }
