@@ -11,6 +11,9 @@ between sites pages, when the sites are managed by language.
 A language switcher is available as a page or resource block, so the user has
 only one click to see the translated page.
 
+Any string in any language can be added for translation in the admin board via
+the module [Table].
+
 
 Installation
 ------------
@@ -22,6 +25,8 @@ so check the system information in the bottom of the admin board of Omeka.
 See general end user documentation for [installing a module].
 
 This module requires the module [Common], that should be installed first.
+
+The module [Table] can be used to add translations in admin board.
 
 The module uses external libraries, so use the release zip to install it, or use
 and init the source.
@@ -48,17 +53,49 @@ Then install it like any other Omeka module and follow the config instructions.
 Usage
 -----
 
+### Tables of translations
+
+To add specific strings to the translator, you need to install the module [Table].
+
+Create a table for each language, setting them as "associative". The locale set
+for the table should be a managed one, for example "fr" or "el_GR". Then fill
+the text area with translations from American to the locale, for example for a
+site in international British English:
+
+```ini
+Color = Colour
+Internationalization = Internationalisation
+License = Licence
+Movie = Film
+```
+
+The name of the table can be anything. The tables whose name is "translation-xx"
+or "translation-xx-yy", for example "translation-fr" or "translation-el-gr", are
+automatically included, else include them in main settings and in site settings.
+
+Of course, only strings passed to the function `$translate()` will be translated,
+so you need to check all hard coded strings in themes and to translate them to
+American inside the theme, then into a specific language in the module part.
+
+Note that the specific translations of the tables override the default
+translations of Omeka, for example for vocabularies.
+
+### Translations by site
+
 In Omeka, each site can have one language and only one. The idea of this module
 is to manage sites by group, each of them (sites) with a specific language. So
 even if you have multiple sites, you can translate them all and keep them
 separately by group of sites.
+
+This feature is useful only if the language switcher is added to the theme, that
+requires custom change to pages or resources pages (see below).
 
 1. Duplicate a site
 
 It is sometime simpler to start from a clean site instead of to try to fix each
 page. When you add a site, an option allow to duplicate another site with all
 pages and settings. Furthermore, each page are related together, even if the
-site has multiple trnaslations. If the site exists already, you can copy all
+site has multiple translations. If the site exists already, you can copy all
 pages and settings between sites via the site form in the page "Site info".
 
 2. In site admin board
@@ -102,19 +139,17 @@ all the sites too (about, terms and conditions…).
 
 Then, in public front-end, the visitor can switch between sites via a flag.
 
-
-Integration of the module
--------------------------
+### Integration of the module
 
 The language switcher is not added automatically to the theme. So use blocks or
 the view helper.
 
-### Page block and resource block Language Switcher
+#### Page block and resource block Language Switcher
 
 Simply add the page block or the resource block to your pages and your theme to
 display the language switcher.
 
-### Interface
+#### Interface
 
 The view helper can be use too, so put it somewhere in the file `layout.phtml`,
 generally in the header:
@@ -129,10 +164,10 @@ The partial `common/helper/language-switcher.phtml` view can be themed: simply
 copy it in your theme and customize it. The helper supports options "template"
 and "locale_as_code". Other options are passed to the template.
 
-### Properties
+#### Properties
 
 Before the module version 3.3 (Omeka < 3.0), some changes were required in the
-core or in the them. See older readme for them.
+core or in the theme. See older readme for them.
 
 ### API external requests
 
@@ -168,14 +203,14 @@ TODO
 - [ ] Add automatic selection of the site with the browser language.
 - [ ] Manage sites by group instead of sync manually.
 - [ ] Add a view to display all the languages that are used.
-- [ ] Add a bulk edit to normalize all languages, so fallbacks won't be necessary in
-  most of the cases.
+- [ ] Add a bulk edit to normalize all languages, so fallbacks won't be necessary in  most of the cases.
 - [ ] Add a view to manage fallbacks (site settings?).
 - [ ] Sort by the translated value.
 - [ ] Sort by the translated resource class and template labels.
 - [x] Duplicate settings and pages for an existing site.
 - [ ] Modify the internal urls with the target site one when copying blocks.
 - [ ] Copy of pages: there is no mapping for collecting forms.
+- [ ] Add navigation link for the language switcher.
 
 
 Warning
@@ -243,10 +278,7 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 
 [Internationalisation]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation
 [Omeka S]: https://omeka.org/s
-[MultiLanguage]: https://github.com/patrickmj/multilanguage
-[Locale Switcher]: https://gitlab.com/Daniel-KM/Omeka-plugin-LocaleSwitcher
-[Omeka Classic]: https://omeka.org/classic
-[Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
+[Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-COmmon
 [Internationalisation.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/releases
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
@@ -263,5 +295,8 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 [flag icons]: https://github.com/lipis/flag-icon-css
 [Watau]: https://watau.fr
 [BibLibre]: https://github.com/BibLibre
+[MultiLanguage]: https://github.com/patrickmj/multilanguage
+[Locale Switcher]: https://gitlab.com/Daniel-KM/Omeka-plugin-LocaleSwitcher
+[Omeka Classic]: https://omeka.org/classic
 [GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
