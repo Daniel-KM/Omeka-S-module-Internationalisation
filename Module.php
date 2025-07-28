@@ -9,8 +9,10 @@ if (!class_exists('Common\TraitModule', false)) {
 use Common\Stdlib\PsrMessage;
 use Common\TraitModule;
 use Internationalisation\Api\Representation\SitePageRelationRepresentation;
+use Internationalisation\Translator\Loader\PhpSimpleArray;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Mvc\MvcEvent;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Module\AbstractModule;
@@ -39,6 +41,29 @@ class Module extends AbstractModule
      * @var array
      */
     protected $lastQuerySort = [];
+
+    public function getServiceConfig(): array
+    {
+        // The translator service for remote translator "tables" must be set,
+        // whatever there are locales or not.
+        // It avoids a second issue in case of error during bootstrap, in
+        // particular duiring the upgrade of Common. It allows to finish the
+        // upgrde.
+        // The real content of the plugin is injected via MvcListeners.
+        return [
+            'factories' => [
+                TranslatorInterface::class => function ($services) {
+                    $translator = $services->get(TranslatorInterface::class)->getDelegatedTranslator();
+                    $pluginManager = $translator->getPluginManager();
+                    $pluginManager->setService(
+                        'tables',
+                        new PhpSimpleArray([])
+                    );
+                    return $translator;
+                },
+            ],
+        ];
+    }
 
     public function onBootstrap(MvcEvent $event): void
     {

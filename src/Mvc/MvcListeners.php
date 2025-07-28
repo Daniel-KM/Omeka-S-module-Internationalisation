@@ -38,6 +38,10 @@ class MvcListeners extends AbstractListenerAggregate
          * The current locale is set in:
          * @see \Omeka\Mvc\MvcListeners::bootstrapLocale()
          * @see \Omeka\Mvc\MvcListeners::preparePublicSite()
+         *
+         * @fixme Load only the current domain/language and load other ones on request. So don't preload other locales.
+         * Else the translation files in another language are not loaded on demand (even if never asked).
+         * It may make an issue with fallback.
          */
         $services = $event->getApplication()->getServiceManager();
         $status = $services->get('Omeka\Status');
@@ -70,6 +74,14 @@ class MvcListeners extends AbstractListenerAggregate
                         $tableSlugsNoLang[] = $table->slug();
                     }
                 }
+
+                // Unlike files, all locales should be loaded here.
+                // If another domain is needed, it may be added as "tables_xxx".
+                $translator->getPluginManager()->setService(
+                    'tables',
+                    new PhpSimpleArray(['default' => $locales])
+                );
+
                 if ($tableSlugsNoLang) {
                     $logger = $services->get('Omeka\Logger');
                     $logger->warn(
@@ -79,15 +91,6 @@ class MvcListeners extends AbstractListenerAggregate
                 }
             }
         }
-
-        // The translator service for remote translator "tables" must be set,
-        // whatever there are locales or not.
-        // Unlike files, all locales should be loaded here.
-        // If another domain is needed, it may be added as "tables_xxx".
-        $translator->getPluginManager()->setService(
-            'tables',
-            new PhpSimpleArray(['default' => $locales])
-        );
 
         if ($isSiteRequest) {
             /** @var \Omeka\Api\Representation\SiteRepresentation $currentSIte */
