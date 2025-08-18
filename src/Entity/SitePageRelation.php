@@ -37,7 +37,7 @@ use Omeka\Entity\SitePage;
  * @Table(
  *     uniqueConstraints={
  *         @UniqueConstraint(
- *             name="site_page_relation_idx",
+ *             name="idx_site_page_relation",
  *             columns={
  *                 "page_id",
  *                 "related_page_id"
