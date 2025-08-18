@@ -54,7 +54,7 @@ class MvcListeners extends AbstractListenerAggregate
             // Include automatic translations, from generic to specific.
             $api = $services->get('Omeka\ApiManager');
             $tableSlugs = $api->search('tables', [], ['returnScalar' => 'slug'])->getContent();
-            $tables = preg_grep('/^(?:translation|translation-([a-z]{2,3})(-[a-z0-9]{2,3})?)$/i', $tableSlugs);
+            $tables = preg_grep('~^(?:translation|translation-([a-zA-Z]{2,3})((-|_)[a-zA-Z0-9]{2,4})?)$~', $tableSlugs);
             usort($tables, fn($a, $b) => strlen($a) <=> strlen($b));
             $settings= $services->get('Omeka\Settings');
             $tables = array_merge($tables, $settings->get('internationaliation_translation_tables', []));
