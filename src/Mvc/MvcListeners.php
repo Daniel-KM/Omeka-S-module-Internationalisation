@@ -57,10 +57,10 @@ class MvcListeners extends AbstractListenerAggregate
             $tables = preg_grep('~^(?:translation|translation-([a-zA-Z]{2,3})((-|_)[a-zA-Z0-9]{2,4})?)$~', $tableSlugs);
             usort($tables, fn($a, $b) => strlen($a) <=> strlen($b));
             $settings= $services->get('Omeka\Settings');
-            $tables = array_merge($tables, $settings->get('internationaliation_translation_tables', []));
+            $tables = array_merge($tables, $settings->get('internationalisation_translation_tables', []));
             if ($isSiteRequest) {
                 $siteSettings = $services->get('Omeka\Settings\Site');
-                $tables = array_merge($tables, $siteSettings->get('internationaliation_translation_tables', []));
+                $tables = array_merge($tables, $siteSettings->get('internationalisation_translation_tables', []));
             }
             if (count($tables)) {
                 // TODO Maybe a direct fetch via an entity manager query?

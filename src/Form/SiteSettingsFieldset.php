@@ -50,7 +50,7 @@ class SiteSettingsFieldset extends Fieldset
             ->setOption('element_groups', $this->elementGroups)
 
             ->add([
-                'name' => 'internationaliation_translation_tables',
+                'name' => 'internationalisation_translation_tables',
                 'type' => $hasModuleTable
                     ? \Table\Form\Element\TablesSelect::class
                     : CommonElement\ArrayText::class,
@@ -69,7 +69,7 @@ class SiteSettingsFieldset extends Fieldset
                     'value_separator' => ' ',
                 ],
                 'attributes' => [
-                    'id' => 'internationaliation_translation_tables',
+                    'id' => 'internationalisation_translation_tables',
                     'multiple' => $hasModuleTable,
                     'class' => $hasModuleTable ? 'chosen-select' : '',
                     'placeholder' => 'translation-fr translation-el-gr',

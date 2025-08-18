@@ -108,11 +108,11 @@ return [
     ],
     'internationalisation' => [
         'settings' => [
-            'internationaliation_translation_tables' => [],
+            'internationalisation_translation_tables' => [],
             'internationalisation_site_groups' => [],
         ],
         'site_settings' => [
-            'internationaliation_translation_tables' => [],
+            'internationalisation_translation_tables' => [],
             'internationalisation_display_values' => 'all',
             'internationalisation_fallbacks' => [],
             'internationalisation_required_languages' => [],
