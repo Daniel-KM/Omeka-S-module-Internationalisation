@@ -20,7 +20,8 @@
         display: list-item;
         cursor: pointer;
     }
-    .action-details summary::marker {
+    .action-details summary::marker,
+    .action-details summary::-webkit-details-marker {
         content: none;
     }
     .action-details summary::after {
