@@ -2,6 +2,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var string $defaultLocale The default locale set in main settings or config (xx_YY).
  * @var array $locales
  * @var array $localeLabels
  * @var string $displayLocale "code" (the 2 or 3 letters language code, default) or "flag".
@@ -21,7 +22,7 @@ if ($this->resolver('common/helper/language-switcher')) {
     return;
 }
 
-$currentLocale = $this->siteSetting('locale') ?: 'en_US';
+$currentLocale = $this->siteSetting('locale') ?: $defaultLocale;
 ?>
 
 <ul class="language-switcher locale-<?= $displayLocale ?>">

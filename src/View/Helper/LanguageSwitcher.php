@@ -15,12 +15,20 @@ class LanguageSwitcher extends AbstractHelper
     const PARTIAL_NAME = 'common/language-switcher';
 
     /**
+     * @var string
+     */
+    protected $defaultLocale;
+
+    /**
      * @var \Internationalisation\View\Helper\LanguageList
      */
     protected $languageList;
 
-    public function __construct(LanguageList $languageList)
-    {
+    public function __construct(
+        LanguageList $languageList,
+        string $defaultLocale
+    ) {
+        $this->defaultLocale = $defaultLocale;
         $this->languageList = $languageList;
     }
 
@@ -50,6 +58,7 @@ class LanguageSwitcher extends AbstractHelper
 
         return $this->view->partial($template, [
                 'site' => $site,
+                'defaultLocale' => $this->defaultLocale,
                 'locales' => $data,
                 'localeLabels' => $this->languageList->__invoke('locale_labels'),
         ] + $options);
