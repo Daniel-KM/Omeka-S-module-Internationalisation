@@ -20,6 +20,7 @@ use Common\Stdlib\PsrMessage;
 $plugins = $services->get('ControllerPluginManager');
 $url = $services->get('ViewHelperManager')->get('url');
 $api = $plugins->get('api');
+$config = $services->get('Config');
 $settings = $services->get('Omeka\Settings');
 $translate = $plugins->get('translate');
 $translator = $services->get('MvcTranslator');
@@ -120,11 +121,63 @@ if (version_compare($oldVersion, '3.4.14', '<')) {
     $messenger->addSuccess($message);
 }
 
-if (version_compare($oldVersion, '3.4.16', '<')) {
+if (version_compare($oldVersion, '3.4.17', '<')) {
+    $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+    if (!$this->checkDestinationDir($basePath . '/language')) {
+        $message = new PsrMessage(
+            'The directory "{path}" is not writeable.', // @translate
+            ['path' => $basePath . '/language']
+        );
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+    }
+
+    $sql = <<<'SQL'
+        ALTER TABLE `site_page_relation` DROP INDEX `site_page_relation_idx`;
+         CREATE UNIQUE INDEX `idx_site_page_relation` ON `site_page_relation` (`page_id`, `related_page_id`);
+        SQL;
+    // Use single statements for execution.
+    // See core commit #2689ce92f.
+    $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
+    foreach ($sqls as $sql) {
+        try {
+            $connection->executeStatement($sql);
+        } catch (\Exception $e) {
+            // Skip.
+        }
+    }
+
+    $sql = <<<'SQL'
+        CREATE TABLE `translating` (
+            `id` INT AUTO_INCREMENT NOT NULL,
+            `lang` VARCHAR(8) NOT NULL,
+            `string` LONGTEXT NOT NULL,
+            `translation` LONGTEXT NOT NULL,
+            INDEX `idx_translating_lang_string` (`lang`, `string`(190)),
+            PRIMARY KEY(`id`)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
+        SQL;
+    $connection->executeStatement($sql);
+
+    // Fix a name in the config.
+    $sql = <<<'SQL'
+        UPDATE `setting` SET `id` = "internationalisation_translation_tables" WHERE `id` = "internationaliation_translation_tables";
+        UPDATE `site_setting` SET `id` = "internationalisation_translation_tables" WHERE `id` = "internationaliation_translation_tables";
+        SQL;
+    $connection->executeStatement($sql);
+
     $message = new PsrMessage(
-        'It is now possible to translate strings in admin via the module {link}Table{link_end}.', // @translate
-        ['link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-Table" target="_blank">', 'link_end' => '</a>']
+        'It is now possible to translate strings in admin via the {link}page of translations{link_end}.', // @translate
+        ['link' => '<a href="' . $url('admin') . '/translation">', 'link_end' => '</a>']
     );
+    $message->setEscapeHtml(false);
+    $messenger->addSuccess($message);
+
+    if ($oldVersion === '3.4.16') {
+        $message = new PsrMessage(
+            'If you used the module {link}Table{link_end} to manage translations, just copy them manually in the new form, remove tables and update settings. The settings are kept to manage specific translations.', // @translate
+            ['link' => '<a href="' . $url('admin') . '/translation">', 'link_end' => '</a>']
+        );
+    }
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
 }
