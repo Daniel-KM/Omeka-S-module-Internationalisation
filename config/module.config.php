@@ -23,7 +23,7 @@ return [
     'api_adapters' => [
         'invokables' => [
             'site_page_relations' => Api\Adapter\SitePageRelationAdapter::class,
-            'translations' => Api\Adapter\TranslationAdapter::class,
+            'translatings' => Api\Adapter\TranslatingAdapter::class,
         ],
     ],
     'entity_manager' => [

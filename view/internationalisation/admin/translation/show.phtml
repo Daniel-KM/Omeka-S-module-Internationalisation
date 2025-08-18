@@ -19,8 +19,8 @@ $this->htmlElement('body')->appendAttribute('class', 'translations show');
 $this->headLink()
     ->appendStylesheet($assetUrl('css/internationalisation.css', 'Internationalisation'));
 
-$canUpdate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'update');
-$canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'delete');
+$canUpdate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'update');
+$canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'delete');
 ?>
 
 <?= $this->pageTitle($localeName, 1, $translate('Translations')) ?>

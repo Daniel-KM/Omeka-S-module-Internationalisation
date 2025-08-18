@@ -42,7 +42,7 @@ class TranslationController extends AbstractActionController
         $formDeleteAll->setAttribute('id', 'confirm-delete-all');
         $formDeleteAll->get('submit')->setAttribute('disabled', true);
 
-        $languages = $this->api()->search('translations', [], ['returnScalar' => 'lang'])->getContent();
+        $languages = $this->api()->search('translatings', [], ['returnScalar' => 'lang'])->getContent();
         $languages = array_unique($languages);
         $languages = array_combine($languages, $languages);
 
@@ -169,16 +169,16 @@ class TranslationController extends AbstractActionController
             $post = $this->params()->fromPost();
             $form->setData($post);
             if ($form->isValid()) {
-                $removedLanguages = [];
+                // $removedLanguages = [];
                 $data = $form->getData();
                 $translations = $data['translations'];
                 if (!$translations) {
                     $this->connection
                         ->executeStatement(
-                            'DELETE FROM `translation` WHERE `lang` = :lang',
+                            'DELETE FROM `translating` WHERE `lang` = :lang',
                             ['lang' => $language]
                         );
-                    $removedLanguages = [$language];
+                    // $removedLanguages = [$language];
                 } else {
                     asort($translations);
 
@@ -191,7 +191,7 @@ class TranslationController extends AbstractActionController
                         // Update translations that are updated.
                         $updatedTranslations = array_intersect_key($translations, $existingTranslations);
                         if ($updatedTranslations) {
-                            $sql = 'UPDATE `translation` SET `translated` = :translated WHERE `lang` = :lang AND `string` = :string';
+                            $sql = 'UPDATE `translating` SET `translated` = :translated WHERE `lang` = :lang AND `string` = :string';
                             foreach ($updatedTranslations as $string => $translated) {
                                 $bind = ['lang' => $language, 'string' => $string, 'translated' => $translated];
                                 $this->connection->executeStatement($sql, $bind);
@@ -205,18 +205,18 @@ class TranslationController extends AbstractActionController
                         if ($deletedTranslations) {
                             $this->connection
                                 ->executeStatement(
-                                    'DELETE FROM `translation` WHERE `lang` = :lang AND `string` IN (:strings)',
+                                    'DELETE FROM `translating` WHERE `lang` = :lang AND `string` IN (:strings)',
                                     ['lang' => $language, 'strings' => array_values(array_map('strval', array_keys($deletedTranslations)))],
                                     ['lang' => \Doctrine\DBAL\ParameterType::STRING, 'strings' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
                                 );
                             $existingTranslations = array_diff_key($existingTranslations, $deletedTranslations);
                             // Normally, there is no existing translations here.
-                            $removedLanguages = $deletedTranslations;
+                            // $removedLanguages = $deletedTranslations;
                         }
 
                         // Create new translations.
                         if ($translations) {
-                            $sql = 'INSERT INTO `translation` (`lang`, `string`, `translated`) VALUES(:lang, :string, :translated)';
+                            $sql = 'INSERT INTO `translating` (`lang`, `string`, `translated`) VALUES(:lang, :string, :translated)';
                             foreach ($translations as $string => $translated) {
                                 $bind = ['lang' => $language, 'string' => $string, 'translated' => $translated];
                                 $this->connection->executeStatement($sql, $bind);
@@ -283,7 +283,7 @@ class TranslationController extends AbstractActionController
 
     public function deleteAction()
     {
-        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'delete')) {
+        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'delete')) {
             $this->messenger()->addError('You are not allowed to delete translations.'); // @translate
         } elseif ($this->getRequest()->isPost()) {
             $form = $this->getForm(ConfirmForm::class);
@@ -295,7 +295,7 @@ class TranslationController extends AbstractActionController
                 // are no event.
                 $this->connection
                     ->executeStatement(
-                        'DELETE FROM `translation` WHERE `lang` = :lang',
+                        'DELETE FROM `translating` WHERE `lang` = :lang',
                         ['lang' => $language]
                     );
                 $this->updateTranslationFiles();
@@ -308,7 +308,7 @@ class TranslationController extends AbstractActionController
 
     public function batchDeleteAction()
     {
-        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'batch_delete')) {
+        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'batch_delete')) {
             $this->messenger()->addError('You are not allowed to delete translations.'); // @translate
             return $this->redirect()->toRoute('admin/translation');
         }
@@ -327,7 +327,7 @@ class TranslationController extends AbstractActionController
         if ($form->isValid()) {
             $this->connection
                 ->executeStatement(
-                    'DELETE FROM `translation` WHERE `lang` IN (:langs)',
+                    'DELETE FROM `translating` WHERE `lang` IN (:langs)',
                     ['langs' => array_values($languages)],
                     ['langs' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
                 );
@@ -340,7 +340,7 @@ class TranslationController extends AbstractActionController
 
     public function batchDeleteAllAction()
     {
-        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'batch_delete_all')) {
+        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'batch_delete_all')) {
             $this->messenger()->addError('You are not allowed to delete all translations.'); // @translate
             return $this->redirect()->toRoute('admin/translation');
         }
@@ -349,7 +349,7 @@ class TranslationController extends AbstractActionController
         $form->setData($this->getRequest()->getPost());
         if ($form->isValid()) {
             $this->connection
-                ->executeStatement('DELETE FROM `translation`');
+                ->executeStatement('DELETE FROM `translating`');
             $this->updateTranslationFiles();
         } else {
             $this->messenger()->addFormErrors($form);
@@ -389,7 +389,7 @@ class TranslationController extends AbstractActionController
         // Use a direct query to avoid to load representations for a simple
         // two-column table.
         return $this->connection
-            ->executeQuery('SELECT `string`, `translated` FROM `translation` WHERE `lang` = :lang', ['lang' => $language])
+            ->executeQuery('SELECT `string`, `translated` FROM `translating` WHERE `lang` = :lang', ['lang' => $language])
             ->fetchAllKeyValue();
     }
 }

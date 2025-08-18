@@ -70,7 +70,7 @@ class Module extends AbstractModule
             ->allow(
                 null,
                 [
-                    \Internationalisation\Api\Adapter\TranslationAdapter::class,
+                    \Internationalisation\Api\Adapter\TranslatingAdapter::class,
                 ],
                 [
                     'search',
@@ -80,7 +80,7 @@ class Module extends AbstractModule
             ->allow(
                 null,
                 [
-                    \Internationalisation\Entity\Translation::class,
+                    \Internationalisation\Entity\Translating::class,
                 ],
                 [
                     'read',
@@ -92,8 +92,8 @@ class Module extends AbstractModule
                 $defaultRoles,
                 [
                     \Internationalisation\Controller\Admin\TranslationController::class,
-                    \Internationalisation\Api\Adapter\TranslationAdapter::class,
-                    \Internationalisation\Entity\Translation::class,
+                    \Internationalisation\Api\Adapter\TranslatingAdapter::class,
+                    \Internationalisation\Entity\Translating::class,
                 ]
             )
         ;

@@ -9,7 +9,7 @@ use Omeka\Api\Request;
 use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
 
-class TranslationAdapter extends AbstractEntityAdapter
+class TranslatingAdapter extends AbstractEntityAdapter
 {
     protected $sortFields = [
         'lang' => 'lang',
@@ -25,17 +25,17 @@ class TranslationAdapter extends AbstractEntityAdapter
 
     public function getResourceName()
     {
-        return 'translations';
+        return 'translatings';
     }
 
     public function getRepresentationClass()
     {
-        return \Internationalisation\Api\Representation\TranslationRepresentation::class;
+        return \Internationalisation\Api\Representation\TranslatingRepresentation::class;
     }
 
     public function getEntityClass()
     {
-        return \Internationalisation\Entity\Translation::class;
+        return \Internationalisation\Entity\Translating::class;
     }
 
     public function buildQuery(QueryBuilder $qb, array $query): void
@@ -108,7 +108,7 @@ class TranslationAdapter extends AbstractEntityAdapter
 
     public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore): void
     {
-        /** @var \Internationalisation\Entity\Translation $entity */
+        /** @var \Internationalisation\Entity\Translating $entity */
 
         $data = $request->getContent();
 
@@ -129,7 +129,7 @@ class TranslationAdapter extends AbstractEntityAdapter
 
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
     {
-        /** @var \Internationalisation\Entity\Translation $entity */
+        /** @var \Internationalisation\Entity\Translating $entity */
 
         $language = $entity->getLang();
         $string = $entity->getString();

@@ -4,18 +4,33 @@ namespace Internationalisation\Api\Representation;
 
 use Omeka\Api\Representation\AbstractEntityRepresentation;
 
-class TranslationRepresentation extends AbstractEntityRepresentation
+class TranslatingRepresentation extends AbstractEntityRepresentation
 {
     /**
-     * @var \Internationalisation\Entity\Translation
+     * @var \Internationalisation\Entity\Translating
      */
     protected $resource;
 
+    /**
+     * @todo The name should not be the same than module Translator, that has no controller for now.
+     * @see \Internationalisation\Api\Representation\TranslatingRepresentation
+     * @see \Translator\Api\Representation\TranslationRepresentation
+     *
+     * {@inheritDoc}
+     * @see \Omeka\Api\Representation\AbstractResourceRepresentation::getControllerName()
+     */
     public function getControllerName()
     {
         return 'translation';
     }
 
+    /**
+     * The Json-LD name is Translation or TranslationSimple or TranslationEnglish externally, not
+     * Translating, for compatibility with module Translator.
+     *
+     * {@inheritDoc}
+     * @see \Omeka\Api\Representation\AbstractResourceRepresentation::getJsonLdType()
+     */
     public function getJsonLdType()
     {
         return 'o-module-internationalisation:Translation';

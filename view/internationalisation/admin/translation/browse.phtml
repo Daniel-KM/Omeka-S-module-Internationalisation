@@ -20,11 +20,11 @@ $this->htmlElement('body')->appendAttribute('class', 'translations browse');
 $this->headLink()
     ->appendStylesheet($assetUrl('css/internationalisation.css', 'Internationalisation'));
 
-$canCreate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'create');
-$canUpdate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'update');
-$canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'delete');
-$canBatchDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'batch_delete');
-$canBatchDeleteAll = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'batch_delete_all');
+$canCreate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'create');
+$canUpdate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'update');
+$canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'delete');
+$canBatchDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'batch_delete');
+$canBatchDeleteAll = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'batch_delete_all');
 ?>
 
 <?= $this->pageTitle($translate('Languages for sites'), 1, $translate('Translations')) ?>

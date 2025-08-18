@@ -17,7 +17,7 @@ $this->htmlElement('body')->appendAttribute('class', 'translations edit');
 $this->headLink()
     ->appendStylesheet($assetUrl('css/internationalisation.css', 'Internationalisation'));
 
-$canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'delete');
+$canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatingAdapter::class, 'delete');
 $deleteButton = $canDelete
     ? '<a href="#" class="delete button">' . $translate('Delete') . '</a>'
     : null;
