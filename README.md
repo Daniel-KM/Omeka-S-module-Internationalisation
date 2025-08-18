@@ -5,28 +5,38 @@ Internationalisation (module for Omeka S)
 > are available on [GitLab], which seems to respect users and privacy better
 > than the previous repository.__
 
-[Internationalisation] is a module for [Omeka S] that allows visitors to switch
-between sites pages, when the sites are managed by language.
+[Internationalisation] is a module for [Omeka S] to manage translations of the
+public interface and any strings in themes. It allows to switch between sites
+pages and resource pages directly when the sites are managed by language.
 
 A language switcher is available as a page or resource block, so the user has
-only one click to see the translated page.
+only one click to see the translated page. It can be added manually to the theme
+too.
 
-Any string in any language can be added for translation in the admin board via
-the module [Table].
+A quick and simple interface can be used to add new strings and translations, in
+any language. The languages in themes are automatically included too.
+
+This module is designed to translate short strings for sites and admin board
+when the translations are in American English, the default languague or Omeka.
+
+To translate the records of the resources automatically, you can use the module
+[Translate].
 
 
 Installation
 ------------
 
 It is recommended to install the php extension `intl` to localize some strings,
-in particular dates. It may or may not be installed by default on your server,
-so check the system information in the bottom of the admin board of Omeka.
+in particular numbers and dates. It may or may not be installed by default on
+your server, so check the system information in the bottom of the admin board of
+Omeka. A warning is added in the config of the module too.
 
 See general end user documentation for [installing a module].
 
 This module requires the module [Common], that should be installed first.
 
-The module [Table] can be used to add translations in admin board.
+The module [Table] can be used for complex cases where translations are
+different between sites.
 
 The module uses external libraries, so use the release zip to install it, or use
 and init the source.
@@ -53,14 +63,28 @@ Then install it like any other Omeka module and follow the config instructions.
 Usage
 -----
 
-### Tables of translations
+The module allows to:
+- add translations not provided by omeka, modules or themes;
+- switch between sites directly to the right page or resource;
+- get translations from the api.
 
-To add specific strings to the translator, you need to install the module [Table].
+### Add translations
 
-Create a table for each language, setting them as "associative". The locale set
-for the table should be a managed one, for example "fr" or "el_GR". Then fill
-the text area with translations from American to the locale, for example for a
-site in international British English:
+Ideally, the translations should be managed by each module. So if you translate
+a module, it is recommended to do a pull request to the maintainer of the module
+to integrate it directly in the module, so all users will have a translated
+module.
+
+#### Translations managed by the module
+
+To add specific strings to the translator, you need to go to the main menu
+"Translations", where you can add any needed language.
+
+To add a new language, set its normalized name according to [BCP 47] and many
+subsequents standards, for example "fr" for international French or "el-gr"
+greek as spoken in Greece. Then fill the text area with translations from
+American English, that is the default in Omeka S, to the locale, for example for
+a site in international British English:
 
 ```ini
 Color = Colour
@@ -69,18 +93,40 @@ License = Licence
 Movie = Film
 ```
 
-The name of the table can be anything. The tables whose name is "translation-xx"
-or "translation-xx-yy", for example "translation-fr" or "translation-el-gr", are
-automatically included, else include them in main settings and in site settings.
-
 Of course, only strings passed to the function `$translate()` will be translated,
 so you need to check all hard coded strings in themes and to translate them to
-American inside the theme, then into a specific language in the module part.
+American English inside the theme, then into a specific language in the module
+part.
 
-Note that the specific translations of the tables override the default
+Note that the specific translations of the modules override the default
 translations of Omeka, for example for vocabularies.
 
+#### Tables of translations
+
+For complex cases, in particular when the same string is translated differently
+between sites, it is possible to manage some translations via the module [Table].
+
+The process is the same than with this module: add a table then translations.
+If the slug of the table begins with "translation", for example "translation-fr",
+it will be added automatically in sites with this language. Other tables can be
+added via a main setting and a site setting.
+
+**Warning**: When a table is updated, the translations should be reindexed via
+the button in the main page of translations.
+
+#### Translations via the theme
+
+Translations can be added in the directory "/language/" of the theme. The files
+should be named with the locale. Two formats as supported: po/mo. For po/mo, use
+the same tools than omeka to edit them. For php, use a simple text editor and
+include an array to return, with strings as keys and the translations as values.
+
+Since Omeka S v4, the directory language/ is automatically managed when the file
+config/theme.ini contains "has_translations = true".
+
 ### Translations by site
+
+#### Preparation of linked sites
 
 In Omeka, each site can have one language and only one. The idea of this module
 is to manage sites by group, each of them (sites) with a specific language. So
@@ -139,17 +185,17 @@ all the sites too (about, terms and conditions…).
 
 Then, in public front-end, the visitor can switch between sites via a flag.
 
-### Integration of the module
+#### Integration of the language switcher
 
 The language switcher is not added automatically to the theme. So use blocks or
 the view helper.
 
-#### Page block and resource block Language Switcher
+##### Page block and resource block Language Switcher
 
 Simply add the page block or the resource block to your pages and your theme to
 display the language switcher.
 
-#### Interface
+##### Theme
 
 The view helper can be use too, so put it somewhere in the file `layout.phtml`,
 generally in the header:
@@ -164,7 +210,7 @@ The partial `common/helper/language-switcher.phtml` view can be themed: simply
 copy it in your theme and customize it. The helper supports options "template"
 and "locale_as_code". Other options are passed to the template.
 
-#### Properties
+##### Properties
 
 Before the module version 3.3 (Omeka < 3.0), some changes were required in the
 core or in the theme. See older readme for them.
@@ -204,7 +250,7 @@ TODO
 - [ ] Add automatic selection of the site with the browser language.
 - [ ] Manage sites by group instead of sync manually.
 - [ ] Add a view to display all the languages that are used.
-- [ ] Add a bulk edit to normalize all languages, so fallbacks won't be necessary in  most of the cases.
+- [ ] Add a bulk edit to normalize all languages, so fallbacks won't be necessary in  most of the cases. For now, use Bulk Edit.
 - [ ] Add a view to manage fallbacks (site settings?).
 - [ ] Sort by the translated value.
 - [ ] Sort by the translated resource class and template labels.
@@ -268,7 +314,8 @@ The [flag icons] are released under the MIT license.
 Copyright
 ---------
 
-This module was built for [Watau].
+This module was built initialy for [Watau]. Next features were added for various
+digital libraries, in particular the [Curiothèque] of the [Musée Curie].
 
 * Copyright Daniel Berthereau, 2019-2025 (see [Daniel-KM] on GitLab)
 * Copyright BibLibre, 2017 (see [BibLibre] on GitLab), for the switcher
@@ -279,8 +326,11 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 
 [Internationalisation]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation
 [Omeka S]: https://omeka.org/s
-[Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-COmmon
+[Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
+[Translate]: https://gitlab.com/Daniel-KM/Omeka-S-module-Translate
+[Table]: https://gitlab.com/Daniel-KM/Omeka-S-module-Table
 [Internationalisation.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/releases
+[BCP 47]: https://en.wikipedia.org/wiki/IETF_language_tag
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L489
@@ -295,6 +345,8 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 [OSI]: http://opensource.org
 [flag icons]: https://github.com/lipis/flag-icon-css
 [Watau]: https://watau.fr
+[Curiothèque]: https://curiotheque.musee.curie.fr
+[Musée Curie]: https://musee.curie.fr
 [BibLibre]: https://github.com/BibLibre
 [MultiLanguage]: https://github.com/patrickmj/multilanguage
 [Locale Switcher]: https://gitlab.com/Daniel-KM/Omeka-plugin-LocaleSwitcher
