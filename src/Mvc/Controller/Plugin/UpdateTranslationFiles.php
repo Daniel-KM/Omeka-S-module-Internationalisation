@@ -93,6 +93,12 @@ class UpdateTranslationFiles extends AbstractPlugin
 
         $hasError = false;
         foreach ($translationsByLanguage as $lang => $strings) {
+            // In laminas, the language code should be "xx" or "xx_YY".
+            $lang = strtr(mb_strtolower($lang), '-', '_');
+            $positionSeparator = mb_strpos($lang, '_');
+            if ($positionSeparator) {
+                $lang = mb_substr($lang, 0, $positionSeparator) . '_' . mb_strtoupper(mb_substr($lang, $positionSeparator + 1));
+            }
             $file = "$dir/$lang.php";
             if (file_exists($file) && is_file($file)) {
                 if (!is_writeable($file)) {
