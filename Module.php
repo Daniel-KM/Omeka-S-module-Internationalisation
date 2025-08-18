@@ -153,6 +153,18 @@ class Module extends AbstractModule
         }
 
         $this->checkExtensionIntl();
+
+        $config = $services->get('Config');
+        $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+        $translator = $services->get('MvcTranslator');
+
+        if (!$this->checkDestinationDir($basePath . '/internationalisation')) {
+            $message = new PsrMessage(
+                'The directory "{path}" is not writeable.', // @translate
+                ['path' => $basePath . '/internationalisation']
+            );
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
     }
 
     protected function checkExtensionIntl(): void

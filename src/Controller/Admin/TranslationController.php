@@ -169,7 +169,7 @@ class TranslationController extends AbstractActionController
             $post = $this->params()->fromPost();
             $form->setData($post);
             if ($form->isValid()) {
-                $message = new PsrMessage('Translations successfully updated.'); // @translate
+                $removedLanguages = [];
                 $data = $form->getData();
                 $translations = $data['translations'];
                 if (!$translations) {
@@ -178,55 +178,61 @@ class TranslationController extends AbstractActionController
                             'DELETE FROM `translation` WHERE `lang` = :lang',
                             ['lang' => $language]
                         );
-                    $this->messenger()->addSuccess($message);
-                    return $this->redirect()->toRoute('admin/translation/id', ['language' => $language]);
-                }
+                    $removedLanguages = [$language];
+                } else {
+                    asort($translations);
 
-                asort($translations);
+                    // Do not update translations that are not updated.
+                    $kept = array_intersect_assoc($existingTranslations, $translations);
+                    $translations = array_diff_key($translations, $kept);
+                    $existingTranslations = array_diff_key($existingTranslations, $kept);
 
-                // Do not update translations that are not updated.
-                $kept = array_intersect_assoc($existingTranslations, $translations);
-                $translations = array_diff_key($translations, $kept);
-                $existingTranslations = array_diff_key($existingTranslations, $kept);
-                if (!$translations && !$existingTranslations) {
-                    $this->messenger()->addSuccess($message);
-                    return $this->redirect()->toRoute('admin/translation/id', ['language' => $language]);
-                }
+                    if ($translations || $existingTranslations) {
+                        // Update translations that are updated.
+                        $updatedTranslations = array_intersect_key($translations, $existingTranslations);
+                        if ($updatedTranslations) {
+                            $sql = 'UPDATE `translation` SET `translated` = :translated WHERE `lang` = :lang AND `string` = :string';
+                            foreach ($updatedTranslations as $string => $translated) {
+                                $bind = ['lang' => $language, 'string' => $string, 'translated' => $translated];
+                                $this->connection->executeStatement($sql, $bind);
+                            }
+                            $translations = array_diff_key($translations, $updatedTranslations);
+                            $existingTranslations = array_diff_key($existingTranslations, $updatedTranslations);
+                        }
 
-                // Update translations that are updated.
-                $updatedTranslations = array_intersect_key($translations, $existingTranslations);
-                if ($updatedTranslations) {
-                    $sql = 'UPDATE `translation` SET `translated` = :translated WHERE `lang` = :lang AND `string` = :string';
-                    foreach ($updatedTranslations as $string => $translated) {
-                        $bind = ['lang' => $language, 'string' => $string, 'translated' => $translated];
-                        $this->connection->executeStatement($sql, $bind);
-                    }
-                    $translations = array_diff_key($translations, $updatedTranslations);
-                    $existingTranslations = array_diff_key($existingTranslations, $updatedTranslations);
-                }
+                        // Delete translations that are deleted.
+                        $deletedTranslations = array_diff_key($existingTranslations, $translations);
+                        if ($deletedTranslations) {
+                            $this->connection
+                                ->executeStatement(
+                                    'DELETE FROM `translation` WHERE `lang` = :lang AND `string` IN (:strings)',
+                                    ['lang' => $language, 'strings' => array_values(array_map('strval', array_keys($deletedTranslations)))],
+                                    ['lang' => \Doctrine\DBAL\ParameterType::STRING, 'strings' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
+                                );
+                            $existingTranslations = array_diff_key($existingTranslations, $deletedTranslations);
+                            // Normally, there is no existing translations here.
+                            $removedLanguages = $deletedTranslations;
+                        }
 
-                // Delete translations that are deleted.
-                $deletedTranslations = array_diff_key($existingTranslations, $translations);
-                if ($deletedTranslations) {
-                    $this->connection
-                        ->executeStatement(
-                            'DELETE FROM `translation` WHERE `lang` = :lang AND `string` IN (:strings)',
-                            ['lang' => $language, 'strings' => array_values(array_map('strval', array_keys($deletedTranslations)))],
-                            ['lang' => \Doctrine\DBAL\ParameterType::STRING, 'strings' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
-                        );
-                    $existingTranslations = array_diff_key($existingTranslations, $deletedTranslations);
-                    // Normally, there is no existing translations here.
-                }
-
-                // Create new translations.
-                if ($translations) {
-                    $sql = 'INSERT INTO `translation` (`lang`, `string`, `translated`) VALUES(:lang, :string, :translated)';
-                    foreach ($translations as $string => $translated) {
-                        $bind = ['lang' => $language, 'string' => $string, 'translated' => $translated];
-                        $this->connection->executeStatement($sql, $bind);
+                        // Create new translations.
+                        if ($translations) {
+                            $sql = 'INSERT INTO `translation` (`lang`, `string`, `translated`) VALUES(:lang, :string, :translated)';
+                            foreach ($translations as $string => $translated) {
+                                $bind = ['lang' => $language, 'string' => $string, 'translated' => $translated];
+                                $this->connection->executeStatement($sql, $bind);
+                            }
+                        }
                     }
                 }
-                $this->messenger()->addSuccess($message);
+                $this->messenger()->addSuccess(new PsrMessage(
+                    'Translations successfully updated.' // @translate
+                ));
+                $result = $this->updateTranslationFiles();
+                if (!$result) {
+                    $this->messenger()->addError(new PsrMessage(
+                        'An error occurred when saving translations as file.' // @translate
+                    ));
+                }
                 return $this->redirect()->toRoute('admin/translation/id', ['language' => $language]);
             } else {
                 $this->messenger()->addFormErrors($form);
@@ -292,6 +298,7 @@ class TranslationController extends AbstractActionController
                         'DELETE FROM `translation` WHERE `lang` = :lang',
                         ['lang' => $language]
                     );
+                $this->updateTranslationFiles();
             } else {
                 $this->messenger()->addFormErrors($form);
             }
@@ -324,6 +331,7 @@ class TranslationController extends AbstractActionController
                     ['langs' => array_values($languages)],
                     ['langs' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
                 );
+            $this->updateTranslationFiles();
         } else {
             $this->messenger()->addFormErrors($form);
         }
@@ -342,6 +350,7 @@ class TranslationController extends AbstractActionController
         if ($form->isValid()) {
             $this->connection
                 ->executeStatement('DELETE FROM `translation`');
+            $this->updateTranslationFiles();
         } else {
             $this->messenger()->addFormErrors($form);
         }

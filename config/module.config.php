@@ -2,6 +2,15 @@
 
 namespace Internationalisation;
 
+// Instead of checking config for specific storage path during an event, check it manually here.
+$configLocal = include OMEKA_PATH . '/config/local.config.php';
+if (empty($configLocal['file_store']['local']['base_path'])) {
+    $configLocal = include OMEKA_PATH . '/application/config/module.config.php';
+    $localPath = $configLocal['file_store']['local']['base_path'] ?: OMEKA_PATH . '/files';
+} else {
+    $localPath = $configLocal['file_store']['local']['base_path'];
+}
+
 return [
     'listeners' => [
         Mvc\MvcListeners::class,
@@ -81,6 +90,7 @@ return [
     'controller_plugins' => [
         'factories' => [
             'listSiteGroups' => Service\ControllerPlugin\ListSiteGroupsFactory::class,
+            'updateTranslationFiles' => Service\ControllerPlugin\UpdateTranslationFilesFactory::class,
         ],
     ],
     'router' => [
@@ -167,6 +177,7 @@ return [
      * To manage translation directly from the database, see:
      * @see https://docs.laminas.dev/laminas-i18n/translator/factory
      * @see https://stackoverflow.com/questions/44406391/zend-framework-3-translator-from-db#answer-44413709
+     * But it will be slower than using prepared files.
      */
     'translator' => [
         'loaderpluginmanager' => [
@@ -185,10 +196,18 @@ return [
             ],
         ],
         'translation_file_patterns' => [
+            // Translations of the module itself.
             [
                 'type' => 'gettext',
                 'base_dir' => dirname(__DIR__) . '/language',
                 'pattern' => '%s.mo',
+                'text_domain' => null,
+            ],
+            // Translations files are automatically updated by this module.
+            [
+                'type' => \Laminas\I18n\Translator\Loader\PhpArray::class,
+                'base_dir' => $localPath . '/language',
+                'pattern' => '%s.php',
                 'text_domain' => null,
             ],
         ],
