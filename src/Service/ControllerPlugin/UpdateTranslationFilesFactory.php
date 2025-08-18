@@ -10,12 +10,15 @@ class UpdateTranslationFilesFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
+        $config = $services->get('Config');
+
         return new UpdateTranslationFiles(
+            $services->get('Omeka\ApiManager'),
             $services->get('Omeka\Connection'),
             $services->get('Omeka\Logger'),
             $services->get('Omeka\Settings'),
             $services->get('Omeka\Settings\Site'),
-            $services->get('Config')['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files')
+            $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files')
         );
     }
 }

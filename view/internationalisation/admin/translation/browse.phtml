@@ -82,13 +82,13 @@ $canBatchDeleteAll = $this->userIsAllowed(\Internationalisation\Api\Adapter\Tran
                     <?php if ($canBatchDelete && $canDelete): ?>
                     <input type="checkbox" name="languages[]" value="<?= $escapeAttr($language) ?>" aria-label="<?= $translate('Select language') ?>">
                     <?php endif; ?>
-                    <?= $escape($localeName) ?>
+                    <?= $hyperlink($localeName, $url('admin/translation/id', ['action' => 'show', 'language' => $language])) ?>
                     <ul class="actions">
                         <?php if ($canUpdate): ?>
                         <li><?= $hyperlink('', $url('admin/translation/id', ['action' => 'edit', 'language' => $language]), [
                             'class' => 'o-icon-edit',
                             'title' => $translate('Edit'),
-                        ]); ?></li>
+                        ]) ?></li>
                         <?php endif; ?>
                         <?php if ($canDelete): ?>
                         <li><?= $hyperlink('', '#', [
@@ -96,14 +96,14 @@ $canBatchDeleteAll = $this->userIsAllowed(\Internationalisation\Api\Adapter\Tran
                             'data-sidebar-content-url' => $url('admin/translation/id', ['action' => 'delete-confirm', 'language' => $language]),
                             'class' => 'o-icon-delete sidebar-content',
                             'title' => $translate('Delete'),
-                        ]); ?></li>
+                        ]) ?></li>
                         <?php endif; ?>
                         <li><?= $hyperlink('', '#', [
                             'data-sidebar-selector' => '#sidebar',
                             'data-sidebar-content-url' => $url('admin/translation/id', ['action' => 'show-details', 'language' => $language]),
                             'class' => 'o-icon-more sidebar-content',
                             'title' => $translate('Details'),
-                        ]); ?></li>
+                        ]) ?></li>
                     </ul>
                 </td>
             </tr>

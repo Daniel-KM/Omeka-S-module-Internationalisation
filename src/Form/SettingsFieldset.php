@@ -30,8 +30,10 @@ class SettingsFieldset extends Fieldset
                     : CommonElement\ArrayText::class,
                 'options' => [
                     'element_group' => 'internationalisation',
-                    'label' => 'Tables to use for translation', // @translate
-                    'info' => 'The module Table allows to translate strings in admin board. Separate table slugs with a space. The table should be associative and should have a language.', // @translate
+                    'label' => 'Tables to use for translation in admin', // @translate
+                    'info' => $hasModuleTable
+                        ? 'The module Table allows to translate strings in admin board. The tables should have a language.' // @translate
+                        : 'The module Table allows to translate strings in admin board. Separate tables slugs with a space. The tables should have a language.', // @translate
                     'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation#tables-of-translations',
                     // When Table is available.
                     'disable_group_by_owner' => true,

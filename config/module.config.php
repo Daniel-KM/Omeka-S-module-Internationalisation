@@ -180,19 +180,16 @@ return [
      * But it will be slower than using prepared files.
      */
     'translator' => [
+        // The translations for "tables" are no more prepared early as "remote_translation",
+        // because it creates complex issues, in particular during upgrade or when
+        // an error occurs early in the bootstrap. Furthermore, it may be slow.
+        // See version 3.4.16 for the mechanism used, with a specific translator loader plugin and events.
+        // Now, simply add a directory of files by language updated on save.
         'loaderpluginmanager' => [
             'invokables' => [
                 // TODO Create a PhpTableArray that load the current locale only and the other locales on demand.
                 // TODO But it is not so important, because tables are generally few and small, only for missing or specific translations.
                 Translator\Loader\PhpSimpleArray::class => Translator\Loader\PhpSimpleArray::class,
-            ],
-        ],
-        // The translations for "tables" are prepared as "remote_translation"
-        // during bootstrap to avoid issue during upgrade of the module.
-        'remote_translation' => [
-            [
-                'type' => 'tables',
-                'text_domain' => null,
             ],
         ],
         'translation_file_patterns' => [
