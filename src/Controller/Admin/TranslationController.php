@@ -191,9 +191,9 @@ class TranslationController extends AbstractActionController
                         // Update translations that are updated.
                         $updatedTranslations = array_intersect_key($translations, $existingTranslations);
                         if ($updatedTranslations) {
-                            $sql = 'UPDATE `translating` SET `translated` = :translated WHERE `lang` = :lang AND `string` = :string';
-                            foreach ($updatedTranslations as $string => $translated) {
-                                $bind = ['lang' => $language, 'string' => $string, 'translated' => $translated];
+                            $sql = 'UPDATE `translating` SET `translation` = :translation WHERE `lang` = :lang AND `string` = :string';
+                            foreach ($updatedTranslations as $string => $translation) {
+                                $bind = ['lang' => $language, 'string' => $string, 'translation' => $translation];
                                 $this->connection->executeStatement($sql, $bind);
                             }
                             $translations = array_diff_key($translations, $updatedTranslations);
@@ -216,9 +216,9 @@ class TranslationController extends AbstractActionController
 
                         // Create new translations.
                         if ($translations) {
-                            $sql = 'INSERT INTO `translating` (`lang`, `string`, `translated`) VALUES(:lang, :string, :translated)';
-                            foreach ($translations as $string => $translated) {
-                                $bind = ['lang' => $language, 'string' => $string, 'translated' => $translated];
+                            $sql = 'INSERT INTO `translating` (`lang`, `string`, `translation`) VALUES(:lang, :string, :translation)';
+                            foreach ($translations as $string => $translation) {
+                                $bind = ['lang' => $language, 'string' => $string, 'translation' => $translation];
                                 $this->connection->executeStatement($sql, $bind);
                             }
                         }
@@ -389,7 +389,7 @@ class TranslationController extends AbstractActionController
         // Use a direct query to avoid to load representations for a simple
         // two-column table.
         return $this->connection
-            ->executeQuery('SELECT `string`, `translated` FROM `translating` WHERE `lang` = :lang', ['lang' => $language])
+            ->executeQuery('SELECT `string`, `translation` FROM `translating` WHERE `lang` = :lang', ['lang' => $language])
             ->fetchAllKeyValue();
     }
 }

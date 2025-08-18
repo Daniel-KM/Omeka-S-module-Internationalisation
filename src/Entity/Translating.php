@@ -74,7 +74,7 @@ class Translating extends AbstractEntity
      *     nullable=false
      * )
      */
-    protected $translated;
+    protected $translation;
 
     public function getId()
     {
@@ -103,14 +103,14 @@ class Translating extends AbstractEntity
         return $this->string;
     }
 
-    public function setTranslated(string $translated): self
+    public function setTranslation(string $translation): self
     {
-        $this->translated = $translated;
+        $this->translation = $translation;
         return $this;
     }
 
-    public function getTranslated(): string
+    public function getTranslation(): string
     {
-        return $this->translated;
+        return $this->translation;
     }
 }

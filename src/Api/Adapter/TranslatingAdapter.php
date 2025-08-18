@@ -14,13 +14,13 @@ class TranslatingAdapter extends AbstractEntityAdapter
     protected $sortFields = [
         'lang' => 'lang',
         'string' => 'string',
-        'translated' => 'translated',
+        'translation' => 'translation',
     ];
 
     protected $scalarFields = [
         'lang' => 'lang',
         'string' => 'string',
-        'translated' => 'translated',
+        'translation' => 'translation',
     ];
 
     public function getResourceName()
@@ -71,17 +71,17 @@ class TranslatingAdapter extends AbstractEntityAdapter
         }
 
         // Normally, the translated string is not used.
-        if (isset($query['translated']) && $query['translated'] !== '') {
+        if (isset($query['translation']) && $query['translation'] !== '') {
             // Should not return anything when invalid.
-            if (is_string($query['translated'])) {
+            if (is_string($query['translation'])) {
                 $qb
                     ->andWhere($expr->eq(
-                        'omeka_root.translated',
-                        $this->adapter->createNamedParameter($qb, $query['translated'])
+                        'omeka_root.translation',
+                        $this->adapter->createNamedParameter($qb, $query['translation'])
                     ));
             } else {
                 $qb
-                    ->andWhere($expr->isNull('omeka_root.translated'));
+                    ->andWhere($expr->isNull('omeka_root.translation'));
             }
         }
     }
@@ -100,9 +100,9 @@ class TranslatingAdapter extends AbstractEntityAdapter
             $errorStore->addError('o-module-internationalisation:string', 'The string to translate is not set.'); // @translate
         }
 
-        $translated = $request->getValue('o-module-internationalisation:translated');
-        if (!$translated|| !is_string($translated) || !strlen($translated)) {
-            $errorStore->addError('o-module-internationalisation:translated', 'The translated string is not set.'); // @translate
+        $translation = $request->getValue('o-module-internationalisation:translation');
+        if (!$translation || !is_string($translation) || !strlen($translation)) {
+            $errorStore->addError('o-module-internationalisation:translation', 'The translation is not set.'); // @translate
         }
     }
 
@@ -122,8 +122,8 @@ class TranslatingAdapter extends AbstractEntityAdapter
             $entity->setString((string) $data['o-module-internationalisation:string']);
         }
 
-        if ($this->shouldHydrate($request, 'o-module-internationalisation:translated')) {
-            $entity->setTranslated((string) $data['o-module-internationalisation:translated']);
+        if ($this->shouldHydrate($request, 'o-module-internationalisation:translation')) {
+            $entity->setTranslation((string) $data['o-module-internationalisation:translation']);
         }
     }
 

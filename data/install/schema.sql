@@ -12,7 +12,7 @@ CREATE TABLE `translating` (
     `id` INT AUTO_INCREMENT NOT NULL,
     `lang` VARCHAR(8) NOT NULL,
     `string` LONGTEXT NOT NULL,
-    `translated` LONGTEXT NOT NULL,
+    `translation` LONGTEXT NOT NULL,
     INDEX `idx_translating_lang_string` (`lang`, `string`(190)),
     PRIMARY KEY(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;

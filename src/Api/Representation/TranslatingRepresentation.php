@@ -42,7 +42,7 @@ class TranslatingRepresentation extends AbstractEntityRepresentation
             'o:id' => $this->id(),
             'o:lang' => $this->lang(),
             'o-module-internationalisation:string' => $this->string(),
-            'o-module-internationalisation:translated' => $this->translated(),
+            'o-module-internationalisation:translation' => $this->translation(),
         ];
     }
 
@@ -56,8 +56,8 @@ class TranslatingRepresentation extends AbstractEntityRepresentation
         return $this->resource->getString();
     }
 
-    public function translated(): string
+    public function translation(): string
     {
-        return $this->resource->getTranslated();
+        return $this->resource->getTranslation();
     }
 }

@@ -83,12 +83,12 @@ class UpdateTranslationFiles extends AbstractPlugin
         }
 
         $translations = $this->connection
-            ->executeQuery('SELECT `lang`, `lang`, `string`, `translated` FROM `translating` ORDER BY `lang` ASC, `string` ASC')
+            ->executeQuery('SELECT `lang`, `lang`, `string`, `translation` FROM `translating` ORDER BY `lang` ASC, `string` ASC')
             ->fetchAllAssociative();
 
         $translationsByLanguage = [];
         foreach ($translations as $translation) {
-            $translationsByLanguage[$translation['lang']][$translation['string']] = $translation['translated'];
+            $translationsByLanguage[$translation['lang']][$translation['string']] = $translation['translation'];
         }
 
         $content = <<<'PHP'
