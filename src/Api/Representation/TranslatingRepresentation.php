@@ -36,13 +36,21 @@ class TranslatingRepresentation extends AbstractEntityRepresentation
         return 'o-module-internationalisation:Translation';
     }
 
+    /**
+     * @todo Make similar the Translation of Internationalisation and Translator.
+     * @see \Internationalisation\Api\Representation\TranslatingRepresentation
+     * @see \Translator\Api\Representation\TranslationRepresentation
+     *
+     * {@inheritDoc}
+     * @see \Omeka\Api\Representation\AbstractResourceRepresentation::getJsonLd()
+     */
     public function getJsonLd()
     {
         return [
             'o:id' => $this->id(),
             'o:lang' => $this->lang(),
-            'o-module-internationalisation:string' => $this->string(),
-            'o-module-internationalisation:translation' => $this->translation(),
+            'o:string' => $this->string(),
+            'o:translation' => $this->translation(),
         ];
     }
 

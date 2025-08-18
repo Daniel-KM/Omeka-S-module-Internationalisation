@@ -90,19 +90,19 @@ class TranslatingAdapter extends AbstractEntityAdapter
     {
         $language = $request->getValue('o:lang');
         if (!$language || !is_string($language) || strlen($language) > 8) {
-            $errorStore->addError('o-module-internationalisation:language', 'The language should be a valid string shorter than 8 characters.'); // @translate
+            $errorStore->addError('o:lang', 'The language should be a valid string shorter than 8 characters.'); // @translate
         } elseif (!preg_match('~^[a-zA-Z]{2,3}((-|_)[a-zA-Z0-9]{2,4})?$~', $language)) {
-            $errorStore->addError('o-module-internationalisation:language', 'The language should be a valid locale, so a two character code with an optional localization code separated with a "-" or "_".'); // @translate
+            $errorStore->addError('o:lang', 'The language should be a valid locale, so a two character code with an optional localization code separated with a "-" or "_".'); // @translate
         }
 
-        $string = $request->getValue('o-module-internationalisation:string');
+        $string = $request->getValue('o:string');
         if (!$string || !is_string($string) || !strlen($string)) {
-            $errorStore->addError('o-module-internationalisation:string', 'The string to translate is not set.'); // @translate
+            $errorStore->addError('o:string', 'The string to translate is not set.'); // @translate
         }
 
-        $translation = $request->getValue('o-module-internationalisation:translation');
+        $translation = $request->getValue('o:translation');
         if (!$translation || !is_string($translation) || !strlen($translation)) {
-            $errorStore->addError('o-module-internationalisation:translation', 'The translation is not set.'); // @translate
+            $errorStore->addError('o:translation', 'The translation is not set.'); // @translate
         }
     }
 
@@ -118,12 +118,12 @@ class TranslatingAdapter extends AbstractEntityAdapter
             $entity->setlang($language);
         }
 
-        if ($this->shouldHydrate($request, 'o-module-internationalisation:string')) {
-            $entity->setString((string) $data['o-module-internationalisation:string']);
+        if ($this->shouldHydrate($request, 'o:string')) {
+            $entity->setString((string) $data['o:string']);
         }
 
-        if ($this->shouldHydrate($request, 'o-module-internationalisation:translation')) {
-            $entity->setTranslation((string) $data['o-module-internationalisation:translation']);
+        if ($this->shouldHydrate($request, 'o:translation')) {
+            $entity->setTranslation((string) $data['o:translation']);
         }
     }
 
@@ -134,7 +134,7 @@ class TranslatingAdapter extends AbstractEntityAdapter
         $language = $entity->getLang();
         $string = $entity->getString();
         if (!$this->isUnique($entity, ['lang' => $language, 'string' => $string])) {
-            $errorStore->addError('o-module-internationalisation:string', new PsrMessage(
+            $errorStore->addError('o:string', new PsrMessage(
                 'The string "{string}" and language "{language}" to translate must be unique.', // @translate
                 ['string' => $string, 'language' => $language]
             ));
