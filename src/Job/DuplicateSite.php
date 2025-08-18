@@ -2,6 +2,7 @@
 
 namespace Internationalisation\Job;
 
+use Doctrine\DBAL\ParameterType;
 use Internationalisation\Entity\SitePageRelation;
 use Omeka\Entity\Site;
 use Omeka\Entity\SitePage;
@@ -117,8 +118,7 @@ class DuplicateSite extends AbstractJob
         // First step: remove data.
 
         if (in_array('settings', $removeData)) {
-            $settings = $this->getArg('settings', []);
-            $this->removeSettings($target, $settings);
+            $this->removeSettings($target);
         }
         if (in_array('permissions', $removeData)) {
             $this->removeSitePermissions($target);
@@ -145,8 +145,9 @@ class DuplicateSite extends AbstractJob
         // Second step: copy data.
 
         if (in_array('settings', $copyData)) {
+            $this->copySettings($source, $target);
             $settings = $this->getArg('settings', []);
-            $this->copySettings($source, $target, $settings);
+            $this->updateSettings($target, $settings);
         }
         if (in_array('permissions', $copyData)) {
             $this->copySitePermissions($source, $target);
@@ -183,7 +184,6 @@ class DuplicateSite extends AbstractJob
             $services->get(\Omeka\Job\DispatchStrategy\Synchronous::class)
         );
 
-
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
             $this->logger->warn(
                 'Check logs: an error occurred.' // @translate
@@ -209,24 +209,13 @@ class DuplicateSite extends AbstractJob
         $settings->set('internationalisation_site_groups', $siteGroups);
     }
 
-    protected function removeSettings(Site $site, array $settings = null): void
+    protected function removeSettings(Site $site): void
     {
         $sql = <<<SQL
             DELETE FROM `site_setting`
             WHERE `site_id` = {$site->getId()};
             SQL;
         $this->connection->executeStatement($sql);
-
-        if (!$settings) {
-            return;
-        }
-
-        /** @var \Omeka\Settings\SiteSettings $siteSettings */
-        $siteSettings = $this->getServiceLocator()->get('Omeka\Settings\Site');
-        $siteSettings->setTargetId($site->getId());
-        foreach ($settings as $id => $value) {
-            $siteSettings->set($id, $value);
-        }
 
         $this->logger->notice(
             'Site settings of "{site_slug}" successfully removed.', // @translate
@@ -323,37 +312,54 @@ class DuplicateSite extends AbstractJob
 
     /**
      * Duplicate settings of a site.
-     *
-     * @param Site $source
-     * @param Site $target
-     * @param array $settings
      */
-    protected function copySettings(Site $source, Site $target, array $settings = null): void
+    protected function copySettings(Site $source, Site $target): void
     {
         $sql = <<<SQL
             INSERT INTO `site_setting` (`id`, `site_id`, `value`)
             SELECT `t2`.`id`, {$target->getId()} AS 'site_id', `t2`.`value` FROM (
                 SELECT `t`.`id`, `t`.`value` FROM `site_setting` AS `t` WHERE `site_id` = {$source->getId()}
             ) AS `t2`
-            ON DUPLICATE KEY UPDATE `id`=`t2`.`id`, `site_id`={$target->getId()}, `value`=`t2`.`value`;
+            ON DUPLICATE KEY UPDATE
+                `id` = `t2`.`id`,
+                `site_id` = {$target->getId()},
+                `value` = `t2`.`value`;
             SQL;
         $this->connection->executeStatement($sql);
-
-        if (!$settings) {
-            return;
-        }
-
-        /** @var \Omeka\Settings\SiteSettings $siteSettings */
-        $siteSettings = $this->getServiceLocator()->get('Omeka\Settings\Site');
-        $siteSettings->setTargetId($target->getId());
-        foreach ($settings as $id => $value) {
-            $siteSettings->set($id, $value);
-        }
 
         $this->logger->notice(
             'Site settings of "{site_slug}" successfully copied into "{site_slug_2}".', // @translate
             ['site_slug' => $source->getSlug(), 'site_slug_2' => $target->getSlug()]
         );
+    }
+
+    protected function updateSettings(Site $target, array $settings): void
+    {
+        // Don't use the sservice siteSetting, because other parts use direct
+        // sql and the action may not update any settings.
+
+        if (!$settings) {
+            return;
+        }
+
+        // Most of the time, there is only one setting (locale).
+
+        $siteIdTarget = (int) $target->getId();
+        foreach ($settings as $id => $value) {
+            $sql = <<<SQL
+                INSERT INTO `site_setting` (`id`, `site_id`, `value`)
+                VALUES (:id, :site_id, :value)
+                ON DUPLICATE KEY UPDATE
+                    `id` = :id,
+                    `site_id` = :site_id,
+                    `value` = :value;
+                SQL;
+            $this->connection->executeStatement(
+                $sql,
+                ['id' => $id, 'site_id' => $siteIdTarget, 'value' => json_encode($value)],
+                ['id' => ParameterType::STRING, 'site_id' => ParameterType::INTEGER, 'value' => ParameterType::STRING]
+            );
+        }
     }
 
     /**
