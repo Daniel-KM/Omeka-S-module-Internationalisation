@@ -12,6 +12,8 @@ class SettingsFieldset extends Fieldset
 
     protected $elementGroups = [
         'internationalisation' => 'Internationalisation', // @translate
+        // Unused here, but for a better ux order with module Translator.
+        'internationalisation_resources' => 'Internationalisation: Resources', // @translate
     ];
 
     public function init(): void
@@ -35,6 +37,7 @@ class SettingsFieldset extends Fieldset
                         ? 'The module Table allows to translate strings in admin board. The tables should have a language.' // @translate
                         : 'The module Table allows to translate strings in admin board. Separate tables slugs with a space. The tables should have a language.', // @translate
                     'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation#tables-of-translations',
+                    'disabled' => !$hasModuleTable,
                     // When Table is available.
                     'disable_group_by_owner' => true,
                     'slug_as_value' => true,
@@ -67,7 +70,7 @@ class SettingsFieldset extends Fieldset
                             my-exhibit-fra my-exhibit-rus
                             other-exhibit-fra other-exhibit-rus
                             TXT,
-                        'rows' => 10,
+                        'rows' => 5,
                     ],
             ])
         ;

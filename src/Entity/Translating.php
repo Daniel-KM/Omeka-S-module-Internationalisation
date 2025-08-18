@@ -6,6 +6,7 @@ use Omeka\Entity\AbstractEntity;
 
 /**
  * Translations have no owner, like resource values. They should be simple and fast.
+ * The source language is always English in Omeka, so it is not stored.
  *
  * @todo Find a way to index the first subtag, so the two or three letters language code (rare, but used in watau.fr).
  * Anyway, there are a few number of translations in a site interface.

@@ -592,7 +592,7 @@ class DuplicateSite extends AbstractJob
                 // background tasks.
                 $this->logger->warn(
                     'The full text for page {page_slug} was not saved. Run indexation of full text manually in main settings or in tasks of Easy Admin. Exception: {exception}', // @translate
-                    ['page_slug', $page->getSlug(), 'exception' => $e]
+                    ['page_slug' => $page->getSlug(), 'exception' => $e]
                 );
             }
         }

@@ -187,7 +187,7 @@ return [
         // Now, simply add a directory of files by language updated on save.
         'loaderpluginmanager' => [
             'invokables' => [
-                // TODO Create a PhpTableArray that load the current locale only and the other locales on demand.
+                // TODO Create a PhpTableArray that loads the current locale only and the other locales on demand.
                 // TODO But it is not so important, because tables are generally few and small, only for missing or specific translations.
                 Translator\Loader\PhpSimpleArray::class => Translator\Loader\PhpSimpleArray::class,
             ],
@@ -195,7 +195,7 @@ return [
         'translation_file_patterns' => [
             // Translations of the module itself.
             [
-                'type' => 'gettext',
+                'type' => \Laminas\I18n\Translator\Loader\Gettext::class,
                 'base_dir' => dirname(__DIR__) . '/language',
                 'pattern' => '%s.mo',
                 'text_domain' => null,

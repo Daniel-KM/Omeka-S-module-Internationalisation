@@ -19,30 +19,69 @@ class SiteSettingsFieldset extends Fieldset
 
     protected $elementGroups = [
         'internationalisation' => 'Internationalisation', // @translate
+        'internationalisation_resources' => 'Internationalisation: Resources', // @translate
     ];
 
     public function init(): void
     {
         $hasModuleTable = class_exists('Table\Module', false);
 
+        /**
+         * The same options for internationalisation resources are used in
+         * module Internationalisation and Translator.
+         * When the two modules are present, the settings of the module
+         * Translator are skipped.
+         *
+         * @see \Internationalisation\Form\SiteSettingsFieldset
+         * @see \Translator\Form\SiteSettingsFieldset
+         */
+
+        $valueOptions = [
+            'all' => [
+                'value' => 'all',
+                'label' => 'All values', // @translate
+            ],
+            'all_site' => [
+                'value' => 'all_site',
+                'label' => 'All values, with language of the site first', // @translate
+            ],
+            'all_site_iso' => [
+                'value' => 'all_site_iso',
+                'label' => 'All values, with language of the site or iso fallback first', // @translate
+            ],
+            'all_site_fallback' => [
+                'value' => 'all_site_fallback',
+                'label' => 'All values, with language of the site or custom fallback first', // @translate
+            ],
+            'site' => [
+                'value' => 'site',
+                'label' => 'Only values with the language of the site', // @translate
+            ],
+            'site_iso' => [
+                'value' => 'site_iso',
+                'label' => 'Only values with the language of the site, with iso fallback', // @translate
+            ],
+            'site_fallback' => [
+                'value' => 'site_fallback',
+                'label' => 'Only values with the language of the site, with custom fallback', // @translate
+            ],
+            /*
+            'user_defined' => [
+                'value' => 'user_defined',
+                'label' => 'User choice in the public front-end (if theme allows it)', // @translate
+            ],
+            */
+        ];
+
         $locale = $this->siteSetting->__invoke('locale');
-        if ($locale) {
-            $valueOptions = [
-                'all' => 'All values', // @translate
-                'all_site' => 'All values, with language of the site first', // @translate
-                'all_site_iso' => 'All values, with language of the site or iso fallback first', // @translate
-                'all_site_fallback' => 'All values, with language of the site or custom fallback first', // @translate
-                'site' => 'Only values with the language of the site', // @translate
-                'site_iso' => 'Only values with the language of the site, with iso fallback', // @translate
-                'site_fallback' => 'Only values with the language of the site, with custom fallback', // @translate
-                // 'user_defined' => 'User choice in the public front-end (if theme allows it)', // @translate
-            ];
-            $info = 'Display only the values in the specified language. It applies only for properties that contains at least one value with a language. The option can be overridden in the theme.'; // @translate
-        } else {
-            $valueOptions = [
-                'all' => 'All values', // @translate
-            ];
-            $info = 'Display only the values in the specified language. This option is available only when the site has a language.'; // @translate
+        if (!$locale) {
+            $valueOptions['all']['label'] = 'All values (set a locale for more options)'; // @translate
+            foreach ($valueOptions as &$valueOption) {
+                if ($valueOption['value'] !== 'all') {
+                    $valueOption['attributes']['disabled'] = true;
+                }
+            }
+            unset($valueOption);
         }
 
         $this
@@ -61,6 +100,7 @@ class SiteSettingsFieldset extends Fieldset
                         ? 'The module Table allows to translate strings in admin board. The tables should have a language.' // @translate
                         : 'The module Table allows to translate strings in admin board. Separate tables slugs with a space. The tables should have a language.', // @translate
                     'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation#tables-of-translations',
+                    'disabled' => !$hasModuleTable,
                     // When Table is available.
                     'disable_group_by_owner' => true,
                     'slug_as_value' => true,
@@ -81,9 +121,9 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'internationalisation_display_values',
                 'type' => Element\Select::class,
                 'options' => [
-                    'element_group' => 'internationalisation',
+                    'element_group' => 'internationalisation_resources',
                     'label' => 'Language of values', // @translate
-                    'info' => $info,
+                    'info' => 'Display only the values in the specified language. It applies only for properties that contains at least one value with a language. The option can be overridden in the theme.', // @translate
                     'value_options' => $valueOptions,
                 ],
                 'attributes' => [
@@ -96,12 +136,13 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'internationalisation_fallbacks',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
-                    'element_group' => 'internationalisation',
+                    'element_group' => 'internationalisation_resources',
                     'label' => 'Custom language fallbacks', // @translate
                     'info' => 'Specify values to display when a property has no value with the language of the site. Set one language code by line.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'internationalisation_fallbacks',
+                    'rows' => 5,
                     'placeholder' => <<<'TXT'
                         way
                         fra
@@ -115,12 +156,13 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'internationalisation_required_languages',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
-                    'element_group' => 'internationalisation',
+                    'element_group' => 'internationalisation_resources',
                     'label' => 'Required languages', // @translate
                     'info' => 'Specify values to display in all cases. Values without language are displayed in all cases. Set one language code by line.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'internationalisation_required_languages',
+                    'rows' => 5,
                     'placeholder' => <<<'TXT'
                         apy
                         way

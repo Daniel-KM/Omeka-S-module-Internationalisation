@@ -19,7 +19,7 @@ use Omeka\Module\AbstractModule;
  * Internationalisation.
  *
  * @copyright Daniel Berthereau, 2019-2025
- * @copyright BibLibre, 2017
+ * @copyright See commits.
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
 class Module extends AbstractModule
@@ -151,6 +151,7 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
+        // TODO Find a better event or identifier to add css/js in public side.
         $sharedEventManager->attach(
             '*',
             'view.layout',
@@ -367,16 +368,23 @@ class Module extends AbstractModule
         // When we want a translated title, we don’t care of the existing title.
         // Just get the title via value(), that takes care of the language.
         // Similar logic can be found in \Omeka\Api\Representation\AbstractResourceEntityRepresentation::displayDescription()
+
+        /**
+         * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
+         */
         $resource = $event->getTarget();
         $template = $resource->resourceTemplate();
         if ($template && $property = $template->titleProperty()) {
-            $title = $resource->value($property->term());
-            if ($title === null) {
-                $title = $resource->value('dcterms:title');
-            }
+            $title = $resource->value($property->term())
+                ?? $resource->value('dcterms:title');
         } else {
             $title = $resource->value('dcterms:title');
         }
+
+        if (!$title) {
+            return;
+        }
+
         $event->setParam('title', (string) $title);
     }
 
@@ -596,8 +604,10 @@ class Module extends AbstractModule
                         ? $translator->translate($class->label())
                         : $class->label();
                 }
-                // TODO Don't use json_decode(json_encode()).
-                $jsonLd['o:resource_class'] = json_decode(json_encode($jsonLd['o:resource_class']), true);
+                // Manage Omeka < 4.2.
+                if (is_object($jsonLd['o:resource_class'])) {
+                    $jsonLd['o:resource_class'] = $jsonLd['o:resource_class']->jsonSerialize();
+                }
                 $jsonLd['o:resource_class']['o:label'] = $resourceClassLabels[$classId];
             }
 
@@ -617,7 +627,9 @@ class Module extends AbstractModule
                         }
                     }
                 }
-                $jsonLd['o:resource_template'] = json_decode(json_encode($jsonLd['o:resource_template']), true);
+                if (is_object($jsonLd['o:resource_template'])) {
+                    $jsonLd['o:resource_template'] = $jsonLd['o:resource_template']->jsonSerialize();
+                }
                 $jsonLd['o:resource_template']['o:label'] = $resourceTemplateLabels[$templateId];
             } elseif (!$locale) {
                 return;
@@ -1226,32 +1238,47 @@ class Module extends AbstractModule
     }
 
     /**
-     * List locales according to the request.
+     * List locales according to the request for a site.
      *
-     * @return array
+     * @fixme Remove the exception that occurs with background job and api during update: job seems to set status as site.
+     *
+     * Adapted:
+     * @see \Internationalisation\Module::getLocales()
+     * @see \Translator\Module::getLocaleCurrentSite()
+     * @see \Translator\Module::getLanguagePairsOfSite()
      */
-    protected function getLocales()
+    protected function getLocales(): array
     {
         static $locales;
 
-        if (is_null($locales)) {
-            $locales = [];
+        if (is_array($locales)) {
+            return $locales;
+        }
 
-            // Currently limited to public front-end.
-            // TODO In admin, use the user settings or add some main settings.
-            $services = $this->getServiceLocator();
+        $locales = [];
 
-            /** @var \Omeka\Mvc\Status $status */
-            $status = $services->get('Omeka\Status');
-            if ($status->isSiteRequest()) {
-                /** @var \Omeka\Settings\SiteSettings $siteSettings */
-                $siteSettings = $services->get('Omeka\Settings\Site');
+        /**
+         * @var \Omeka\Mvc\Status $status
+         * @var \Omeka\Settings\SiteSettings $siteSettings
+         * @var \Common\View\Helper\DefaultSite $defaultSite
+         * @var \Omeka\Mvc\Controller\Plugin\CurrentSite $currentSite
+         */
+        $services = $this->getServiceLocator();
+        $status = $services->get('Omeka\Status');
 
-                // FIXME Remove the exception that occurs with background job and api during update: job seems to set status as site.
-                try {
-                    $locales = $siteSettings->get('internationalisation_locales', []);
-                } catch (\Exception $e) {
-                    // Probably a background process.
+        // Currently limited to public front-end.
+        // TODO In admin, use the user settings or add some main settings.
+        if ($status->isSiteRequest()) {
+            $siteSettings = $services->get('Omeka\Settings\Site');
+            try {
+                $locales = $siteSettings->get('internationalisation_locales', []);
+            } catch (\Exception $e) {
+                // Probably a background process.
+                // TODO Is the exception for current site fixed?
+                $site = $services->get('ControllerPluginManager')->get('currentSite')()
+                    ?: $services->get('ViewHelperManager')->get('defaultSite')();
+                if ($site) {
+                    $locales = $siteSettings->get('internationalisation_locales', [], $site->id());
                 }
             }
         }

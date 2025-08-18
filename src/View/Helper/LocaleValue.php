@@ -6,6 +6,11 @@ use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 
 /**
+ * This helper allows to get a specific value of a resource in the configured
+ * language.
+ *
+ * This helper is not used in the module, but may be used in themes.
+ *
  * @todo Use a filter (rep.value.html or rep.resource.display_values, entity level) to display the good locale anywhere, even in admin.
  * @todo Override the method value() with a new option for language fallback.
  * @todo Override the method value() to display the title and the description in the language of the user.

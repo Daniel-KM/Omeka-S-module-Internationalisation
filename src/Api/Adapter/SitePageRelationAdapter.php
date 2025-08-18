@@ -45,48 +45,6 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         return \Internationalisation\Entity\SitePageRelation::class;
     }
 
-    public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore): void
-    {
-        /** @var \Internationalisation\Entity\SitePageRelation $entity */
-
-        $data = $request->getContent();
-
-        if (Request::CREATE === $request->getOperation()) {
-            $entityManager = $this->getEntityManager();
-            $page = $entityManager->find(\Omeka\Entity\SitePage::class, $data['o:page']['o:id']);
-            $relatedPage = $page = $entityManager->find(\Omeka\Entity\SitePage::class, data['o-module-internationalisation:related_page']['o:id']);
-            if ($page
-                && $relatedPage
-                // Useless, but cleaner.
-                && $data['o:page']['o:id'] > $data['o-module-internationalisation:related_page']['o:id']
-            ) {
-                $entity
-                    ->setPage($relatedPage)
-                    ->setRelatedPage($page);
-            } else {
-                $entity
-                    ->setPage($page)
-                    ->setRelatedPage($relatedPage);
-            }
-        }
-        // This entity cannot be updated currently.
-    }
-
-    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void
-    {
-        /** @var \Internationalisation\Entity\SitePageRelation $entity */
-        $page = $entity->getPage();
-        $relatedPage = $entity->getRelatedPage();
-        if (!$page) {
-            $errorStore->addError('o:page', 'A relation between pages must have a page.'); // @translate
-        }
-        if (!$relatedPage) {
-            $errorStore->addError('o-module-internationalisation:related_page', 'A relation between pages must have a related page.'); // @translate
-        } elseif ($page && $page->getId() === $relatedPage->getId()) {
-            $errorStore->addError('o:page', 'The page and the related page of a relation between pages must be different.'); // @translate
-        }
-    }
-
     public function buildQuery(QueryBuilder $qb, array $query): void
     {
         // TODO Check if the join with the site allows really to check rights/visibility and is really needed.
@@ -288,5 +246,47 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         $response = new Response($entities);
         $response->setTotalResults($countPaginator->count());
         return $response;
+    }
+
+    public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore): void
+    {
+        /** @var \Internationalisation\Entity\SitePageRelation $entity */
+
+        $data = $request->getContent();
+
+        if (Request::CREATE === $request->getOperation()) {
+            $entityManager = $this->getEntityManager();
+            $page = $entityManager->find(\Omeka\Entity\SitePage::class, $data['o:page']['o:id']);
+            $relatedPage = $page = $entityManager->find(\Omeka\Entity\SitePage::class, data['o-module-internationalisation:related_page']['o:id']);
+            if ($page
+                && $relatedPage
+                // Useless, but cleaner.
+                && $data['o:page']['o:id'] > $data['o-module-internationalisation:related_page']['o:id']
+            ) {
+                $entity
+                    ->setPage($relatedPage)
+                    ->setRelatedPage($page);
+            } else {
+                $entity
+                    ->setPage($page)
+                    ->setRelatedPage($relatedPage);
+            }
+        }
+        // This entity cannot be updated currently.
+    }
+
+    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void
+    {
+        /** @var \Internationalisation\Entity\SitePageRelation $entity */
+        $page = $entity->getPage();
+        $relatedPage = $entity->getRelatedPage();
+        if (!$page) {
+            $errorStore->addError('o:page', 'A relation between pages must have a page.'); // @translate
+        }
+        if (!$relatedPage) {
+            $errorStore->addError('o-module-internationalisation:related_page', 'A relation between pages must have a related page.'); // @translate
+        } elseif ($page && $page->getId() === $relatedPage->getId()) {
+            $errorStore->addError('o:page', 'The page and the related page of a relation between pages must be different.'); // @translate
+        }
     }
 }
