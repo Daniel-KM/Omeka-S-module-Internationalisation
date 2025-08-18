@@ -79,7 +79,7 @@ class TranslationController extends AbstractActionController
                 'name' => 'submit',
                 'type' => \Laminas\Form\Element\Button::class,
                 'options' => [
-                    'label' => 'Add language',
+                    'label' => 'Submit',
                 ],
                 'attributes' => [
                     'id' => 'add-language-submit',
@@ -346,6 +346,17 @@ class TranslationController extends AbstractActionController
             $this->messenger()->addFormErrors($form);
         }
         return $this->redirect()->toRoute('admin/translation');
+    }
+
+    public function reindexAction()
+    {
+        $result = $this->updateTranslationFiles();
+        if ($result) {
+            $this->messenger()->addSuccess('Translations were reindexed.'); // @translate
+        } else {
+            $this->messenger()->addError('Translations were reindexed, but an issue occurred. Check logs.'); // @translate
+        }
+       return $this->redirect()->toRoute('admin/translation');
     }
 
     /**

@@ -29,6 +29,18 @@ $canBatchDeleteAll = $this->userIsAllowed(\Internationalisation\Api\Adapter\Tran
 
 <?= $this->pageTitle($translate('Languages for sites'), 1, $translate('Translations')) ?>
 
+<div id="page-actions">
+    <?php if ($canCreate): ?>
+    <details class="action-details add-language">
+        <summary class="selection-summary group-name button" aria-expanded="false">
+			<span class="button-summary"><?= $translate('Add language') ?></span>
+        </summary>
+        <?= $this->form($formLanguage) ?>
+    </details>
+    <?= $hyperlink($translate('Reindex'), $url('admin/translation/default', ['action' => 'reindex'], true), ['class' => 'button']); ?>
+    <?php endif; ?>
+</div>
+
 <?php $this->trigger('view.browse.before'); ?>
 
 <?php if ($languages): ?>
@@ -188,10 +200,3 @@ $('#sidebar-delete-all').on('click', 'input[name="confirm-delete-all-check"]', f
 </div>
 
 <?php endif; ?>
-
-<div id="global-actions">
-    <?php if ($canCreate): ?>
-    <h3><?= $translate('Add a new language') ?></h3>
-    <?= $this->form($formLanguage) ?>
-    <?php endif; ?>
-</div>

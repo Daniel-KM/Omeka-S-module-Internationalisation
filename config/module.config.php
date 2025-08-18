@@ -104,7 +104,7 @@ return [
                                 'options' => [
                                     'route' => '/:action',
                                     'constraints' => [
-                                        'action' => 'add|browse|edit|index|batch-delete-all|batch-delete-confirm|batch-delete',
+                                        'action' => 'add|browse|edit|show|index|batch-delete-all|batch-delete-confirm|batch-delete|reindex',
                                     ],
                                     'defaults' => [
                                         'action' => 'browse',
