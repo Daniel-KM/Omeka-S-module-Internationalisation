@@ -42,8 +42,23 @@ class MvcListeners extends AbstractListenerAggregate
             $site = $services->get('ControllerPluginManager')->get('currentSite')();
             $themeLanguagePath = OMEKA_PATH . '/themes/' . $site->theme() . '/language';
             if (file_exists($themeLanguagePath) && is_dir($themeLanguagePath)) {
-                $translator
-                    ->addTranslationFilePattern('gettext', $themeLanguagePath, '%s.mo', 'default');
+                // Since version 4.0, the theme language is loaded automatically
+                // when theme.ini has the option "has_translation" set to true.
+                if (version_compare(\Omeka\Module::VERSION, '4.0.0', '<')) {
+                    $translator
+                        ->addTranslationFilePattern('gettext', $themeLanguagePath, '%s.mo', 'default')
+                        ->addTranslationFilePattern('phpArray', $themeLanguagePath, '%s.php', 'default');
+                } else {
+                    $theme = $site->theme() ?: 'default';
+                    $themeManager = $services->get('Omeka\Site\ThemeManager');
+                    $currentTheme = $themeManager->getTheme($theme);
+                    if ($currentTheme && $currentTheme->getIni('has_translations')) {
+                        $translator
+                            // Already added via MvcListeners.
+                            // ->addTranslationFilePattern('gettext', $themeLanguagePath, '%s.mo', 'default')
+                            ->addTranslationFilePattern('phpArray', $themeLanguagePath, '%s.php', 'default');
+                    }
+                }
             }
 
             if (class_exists('Table\Module', false)) {
