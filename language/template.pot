@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-28 00:00+0000\n"
+"POT-Creation-Date: 2025-08-18 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/scripts/upgrade.php:36 Module.php:96
+#: data/scripts/upgrade.php:37 Module.php:111
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
 
-#: src/Api/Adapter/SitePageRelationAdapter.php:262
+#: src/Api/Adapter/SitePageRelationAdapter.php:220
 #, php-format
 msgid "The \"%s\" field is not available in the %s entity class."
 msgstr ""
@@ -41,72 +41,183 @@ msgstr ""
 msgid "The current page and recursive pages are forbidden."
 msgstr ""
 
-#: data/scripts/upgrade.php:111
+#: view/internationalisation/admin/translation/add.phtml:19
+msgid "New language"
+msgstr ""
+
+#: view/internationalisation/admin/translation/add.phtml:19
+#: view/internationalisation/admin/translation/browse.phtml:30
+#: view/internationalisation/admin/translation/edit.phtml:26
+#: view/internationalisation/admin/translation/show-details.phtml:27
+#: view/internationalisation/admin/translation/show.phtml:26
+msgid "Translations"
+msgstr ""
+
+#: view/internationalisation/admin/translation/browse.phtml:30
+msgid "Languages for sites"
+msgstr ""
+
+#: view/internationalisation/admin/translation/browse.phtml:36
+msgid "Add language"
+msgstr ""
+
+#: view/internationalisation/admin/translation/browse.phtml:40
+msgid "Reindex"
+msgstr ""
+
+#: view/internationalisation/admin/translation/browse.phtml:83
+msgid "Select language"
+msgstr ""
+
+#: view/internationalisation/admin/translation/browse.phtml:135
+#: view/internationalisation/admin/translation/browse.phtml:155
+msgid "Delete languages"
+msgstr ""
+
+#: view/internationalisation/admin/translation/browse.phtml:136
+msgid "Are you sure you would like to delete the selected languages?"
+msgstr ""
+
+#: view/internationalisation/admin/translation/browse.phtml:138
+#: view/internationalisation/admin/translation/browse.phtml:158
+#, php-format
+msgid ""
+"%1$s: this action will permanently delete %2$s languages and cannot be "
+"undone."
+msgstr ""
+
+#: view/internationalisation/admin/translation/browse.phtml:156
+msgid "Are you sure you would like to delete all languages?"
+msgstr ""
+
+#: view/internationalisation/admin/translation/browse.phtml:199
+msgid "Omeka could not find any languages."
+msgstr ""
+
+#: view/internationalisation/admin/translation/delete-confirm-details.phtml:31
+#, php-format
+msgid "Delete language \"%s\""
+msgstr ""
+
+#: view/internationalisation/admin/translation/delete-confirm-details.phtml:33
+#, php-format
+msgid ""
+"Are you sure you would like to delete %d translation for language \"%s\"?"
+msgstr ""
+
+#: view/internationalisation/admin/translation/delete-confirm-details.phtml:34
+#, php-format
+msgid ""
+"Are you sure you would like to delete %d translations for language \"%s\"?"
+msgstr ""
+
+#: view/internationalisation/admin/translation/delete-confirm.phtml:27
+#, php-format
+msgid "Delete translations for \"%s\""
+msgstr ""
+
+#: view/internationalisation/admin/translation/show-details.phtml:37
+#: view/internationalisation/admin/translation/show.phtml:58
+msgid "No translated strings."
+msgstr ""
+
+#: view/internationalisation/admin/translation/show.phtml:44
+msgid "String"
+msgstr ""
+
+#: view/internationalisation/admin/translation/show.phtml:45
+msgid "Translation"
+msgstr ""
+
+#: data/scripts/upgrade.php:112
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 
-#: data/scripts/upgrade.php:118
+#: data/scripts/upgrade.php:119
 msgid ""
 "The language switcher is now available as a page block and as a resource "
 "block."
 msgstr ""
 
-#: data/scripts/upgrade.php:125
-msgid ""
-"It is now possible to translate strings in admin via the module {link}"
-"Table{link_end}."
+#: data/scripts/upgrade.php:128 Module.php:133
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:277
+msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: Module.php:105
+#: data/scripts/upgrade.php:169
+msgid ""
+"It is now possible to translate strings in admin via the {link}page of "
+"translations{link_end}."
+msgstr ""
+
+#: data/scripts/upgrade.php:177
+msgid ""
+"If you used the module {link}Table{link_end} to manage translations, just "
+"copy them manually in the new form, remove tables and update settings. The "
+"settings are kept to manage specific translations."
+msgstr ""
+
+#: Module.php:120
 msgid ""
 "The composer vendor is not ready. See module’s installation documentation."
 msgstr ""
 
-#: Module.php:120
+#: Module.php:147
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
 "numbers and more."
 msgstr ""
 
-#: Module.php:890 src/Form/SettingsFieldset.php:58
-#: src/Form/SettingsFieldset.php:60
+#: Module.php:921 src/Form/SettingsFieldset.php:60
+#: src/Form/SettingsFieldset.php:62
 msgid "Remove all groups"
 msgstr ""
 
-#: Module.php:935
-msgid "Translations"
-msgstr ""
-
-#: Module.php:936
+#: Module.php:967
 msgid ""
 "The selected pages will be translations of the current page within a site "
 "group, that must be defined. The language switcher displays only one related "
 "page by site."
 msgstr ""
 
-#: Module.php:945
+#: Module.php:976
 msgid "Select translations of this page…"
 msgstr ""
 
-#: Module.php:1056 src/Job/DuplicateSite.php:88
+#: Module.php:1087 src/Job/DuplicateSite.php:88
 msgid "The site #{site_id} cannot be copied. Check your rights."
 msgstr ""
 
-#: Module.php:1087
+#: Module.php:1118
 msgid "Remove/copy processes have been done for site \"{site_slug}\"."
 msgstr ""
 
-#: Module.php:1093
+#: Module.php:1124
 msgid ""
 "A job was launched in background to copy site data: ({link_job}job #{job_id}"
 "{link_end}, {link_log}logs{link_end})."
 msgstr ""
 
-#: src/Mvc/MvcListeners.php:80
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:114
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:223
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:235
+msgid "The file \"{file}\" is not writeable."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:191
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:199
+msgid "The tables \"{tables}\" does not exist."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:258
 msgid ""
-"The following tables are included for internationalisation, but have no "
-"defined language: {table_slugs}."
+"The following tables are included for internationalisation in site settings, "
+"but have no defined language: {table_slugs}."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:288
+msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
 #: src/Job/DuplicateSite.php:73
@@ -220,40 +331,45 @@ msgid ""
 "only when the site has a language."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:59 src/Form/SettingsFieldset.php:33
-msgid "Tables to use for translation"
+#: src/Form/SiteSettingsFieldset.php:59
+msgid "Tables to use for special translations"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:60 src/Form/SettingsFieldset.php:34
+#: src/Form/SiteSettingsFieldset.php:61 src/Form/SettingsFieldset.php:35
 msgid ""
-"The module Table allows to translate strings in admin board. Separate table "
-"slugs with a space. The table should be associative and should have a "
-"language."
+"The module Table allows to translate strings in admin board. The tables "
+"should have a language."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:74 src/Form/SettingsFieldset.php:48
+#: src/Form/SiteSettingsFieldset.php:62 src/Form/SettingsFieldset.php:36
+msgid ""
+"The module Table allows to translate strings in admin board. Separate tables "
+"slugs with a space. The tables should have a language."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:76 src/Form/SettingsFieldset.php:50
 msgid "Select tables…"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:83
+#: src/Form/SiteSettingsFieldset.php:85
 msgid "Language of values"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:98
+#: src/Form/SiteSettingsFieldset.php:100
 msgid "Custom language fallbacks"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:99
+#: src/Form/SiteSettingsFieldset.php:101
 msgid ""
 "Specify values to display when a property has no value with the language of "
 "the site. Set one language code by line."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:117
+#: src/Form/SiteSettingsFieldset.php:119
 msgid "Required languages"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:118
+#: src/Form/SiteSettingsFieldset.php:120
 msgid ""
 "Specify values to display in all cases. Values without language are "
 "displayed in all cases. Set one language code by line."
@@ -315,11 +431,19 @@ msgstr ""
 msgid "Leave blank to use the global locale setting."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:56
+#: src/Form/TranslationForm.php:18
+msgid "List of strings and translations separated by \"=\""
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:33
+msgid "Tables to use for translation in admin"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:58
 msgid "Site groups"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:57
+#: src/Form/SettingsFieldset.php:59
 msgid ""
 "Group some sites with a different language so they can be managed together "
 "as a whole. Set all site slugs by group, one by line, with or without comma "
@@ -345,17 +469,83 @@ msgstr ""
 msgid "Language flag"
 msgstr ""
 
-#: src/Api/Adapter/SitePageRelationAdapter.php:81
+#: src/Api/Adapter/SitePageRelationAdapter.php:284
 msgid "A relation between pages must have a page."
 msgstr ""
 
-#: src/Api/Adapter/SitePageRelationAdapter.php:84
+#: src/Api/Adapter/SitePageRelationAdapter.php:287
 msgid "A relation between pages must have a related page."
 msgstr ""
 
-#: src/Api/Adapter/SitePageRelationAdapter.php:86
+#: src/Api/Adapter/SitePageRelationAdapter.php:289
 msgid ""
 "The page and the related page of a relation between pages must be different."
+msgstr ""
+
+#: src/Api/Adapter/TranslatingAdapter.php:93
+msgid "The language should be a valid string shorter than 8 characters."
+msgstr ""
+
+#: src/Api/Adapter/TranslatingAdapter.php:95
+msgid ""
+"The language should be a valid locale, so a two character code with an "
+"optional localization code separated with a \"-\" or \"_\"."
+msgstr ""
+
+#: src/Api/Adapter/TranslatingAdapter.php:100
+msgid "The string to translate is not set."
+msgstr ""
+
+#: src/Api/Adapter/TranslatingAdapter.php:105
+msgid "The translation is not set."
+msgstr ""
+
+#: src/Api/Adapter/TranslatingAdapter.php:138
+msgid ""
+"The string \"{string}\" and language \"{language}\" to translate must be "
+"unique."
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:69
+msgid "Language with optional locale"
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:228
+msgid "Translations successfully updated."
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:233
+msgid "An error occurred when saving translations as file."
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:274
+msgid "language"
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:287
+#: src/Controller/Admin/TranslationController.php:312
+msgid "You are not allowed to delete translations."
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:321
+msgid "You must select at least one language to delete."
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:344
+msgid "You are not allowed to delete all translations."
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:364
+msgid "Translations were reindexed."
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:366
+msgid "Translations were reindexed, but an issue occurred. Check logs."
+msgstr ""
+
+#: src/Controller/Admin/TranslationController.php:382
+#, php-format
+msgid "%1$s [%2$s]"
 msgstr ""
 
 #: src/Site/ResourcePageBlockLayout/LanguageSwitcher.php:16
