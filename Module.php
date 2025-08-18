@@ -76,12 +76,57 @@ class Module extends AbstractModule
 
         /** @var \Omeka\Permissions\Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
+
+        // Only some roles can manage translations, that are designed for sites.
+        // But it is complex to manage site roles here, so use all default roles.
+        $defaultRoles = [
+            \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_EDITOR,
+            \Omeka\Permissions\Acl::ROLE_REVIEWER,
+            \Omeka\Permissions\Acl::ROLE_AUTHOR,
+            \Omeka\Permissions\Acl::ROLE_RESEARCHER,
+        ];
+
         $acl
             ->allow(
                 null,
                 [\Internationalisation\Api\Adapter\SitePageRelationAdapter::class],
                 ['search', 'read']
             );
+
+        $acl
+            // Anybody can search and read translations (mainly via api endpoint).
+            ->allow(
+                null,
+                [
+                    \Internationalisation\Api\Adapter\TranslationAdapter::class,
+                ],
+                [
+                    'search',
+                    'read',
+                ]
+            )
+            ->allow(
+                null,
+                [
+                    \Internationalisation\Entity\Translation::class,
+                ],
+                [
+                    'read',
+                ]
+            )
+
+            // Admin part.
+            ->allow(
+                $defaultRoles,
+                [
+                    \Internationalisation\Controller\Admin\TranslationController::class,
+                    \Internationalisation\Api\Adapter\TranslationAdapter::class,
+                    \Internationalisation\Entity\Translation::class,
+                ]
+            )
+        ;
     }
 
     protected function preInstall(): void

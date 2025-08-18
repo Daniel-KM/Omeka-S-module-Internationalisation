@@ -1,0 +1,42 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Internationalisation\Form\TranslationForm $form
+ * @var string $language
+ * @var array $translations
+ * @var \Omeka\Form\ConfirmForm $confirmForm
+ */
+
+$plugins = $this->getHelperPluginManager();
+$assetUrl = $plugins->get('assetUrl');
+$translate = $plugins->get('translate');
+
+$this->htmlElement('body')->appendAttribute('class', 'translations edit');
+
+$this->headLink()
+    ->appendStylesheet($assetUrl('css/internationalisation.css', 'Internationalisation'));
+
+$canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'delete');
+$deleteButton = $canDelete
+    ? '<a href="#" class="delete button">' . $translate('Delete') . '</a>'
+    : null;
+?>
+
+<?= $this->pageTitle($language, 1, $translate('Translations'), $translate('Edit')) ?>
+
+<?php $this->trigger('view.edit.before'); ?>
+
+<?= $this->partial('internationalisation/admin/translation/form', [
+    'form' => $form,
+    'language' => $language,
+    'translations' => $translations,
+    'action' => 'edit',
+    'submitLabel' => $translate('Save'),
+    'deleteButton' => $deleteButton,
+]) ?>
+
+<?php if ($canDelete): ?>
+<?= $this->partial('internationalisation/admin/translation/delete-confirm', ['form' => $confirmForm, 'language' => $language, 'resourceLabel' => 'language', 'wrapSidebar' => true]) ?>
+<?php endif; ?>
+
+<?php $this->trigger('view.edit.after'); ?>

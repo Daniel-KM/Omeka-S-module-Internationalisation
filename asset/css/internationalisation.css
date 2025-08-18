@@ -1,0 +1,18 @@
+@media all {
+    header nav .translation::before,
+    .translation .subhead::before,
+    .translations .subhead::before,
+    .translation .no-resources::before,
+    .translations .no-resources::before,
+    #translation .no-translations::before,
+    .translation .no-resources::before {
+        content:"\f1ab"; /* fas fa-language */
+    }
+
+    #global-actions {
+        margin-top: 6em;
+    }
+    label[for="add-language-submit"] {
+        display: none;
+    }
+}

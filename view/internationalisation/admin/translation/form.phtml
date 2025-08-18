@@ -1,0 +1,32 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Table\Form\TableForm $form
+ * @var \Table\Api\Representation\TableRepresentation $table
+ * @var \Table\Api\Representation\TableRepresentation $resource
+ * @var string $action "add" or "edit"
+ * @var string $submitLabel
+ * @var string $deleteButton
+ */
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+
+$form->prepare();
+?>
+
+<?= $this->form()->openTag($form) ?>
+
+<?php $this->trigger("view.$action.form.before", ['form' => $form]); ?>
+
+<?= $this->formCollection($form) ?>
+
+<div id="page-actions">
+    <?= $deleteButton ?? '' ?>
+    <?= $this->cancelButton() ?>
+    <button type="submit" name="table-submit" class="button"><?= $escape($submitLabel) ?></button>
+</div>
+
+<?php $this->trigger("view.$action.form.after", ['form' => $form]); ?>
+
+<?= $this->form()->closeTag(); ?>

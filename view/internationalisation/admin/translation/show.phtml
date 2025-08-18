@@ -1,0 +1,65 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var string $language
+ * @var array $translations
+ * @var \Omeka\Form\ConfirmForm $confirmForm
+ */
+
+$plugins = $this->getHelperPluginManager();
+$url = $plugins->get('url');
+$escape = $plugins->get('escapeHtml');
+$assetUrl = $plugins->get('assetUrl');
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+
+$this->htmlElement('body')->appendAttribute('class', 'translations show');
+
+$this->headLink()
+    ->appendStylesheet($assetUrl('css/internationalisation.css', 'Internationalisation'));
+
+$canUpdate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'update');
+$canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'delete');
+?>
+
+<?= $this->pageTitle($language, 1, $translate('Translations')) ?>
+
+<div id="page-actions">
+    <?php if ($canUpdate): ?>
+    <?= $hyperlink($translate('Edit'), $url('admin/translation/id', ['language' => $language, 'action' => 'edit']), ['class' => 'button']) ?>
+    <?php endif; ?>
+    <?php if ($canDelete): ?>
+    <?= $hyperlink($translate('Delete'), $url('admin/translation/id', ['language' => $language, 'action' => 'delete-confirm']), ['class' => 'button delete']) ?>
+    <?php endif; ?>
+</div>
+
+<?php $this->trigger('view.show.before'); ?>
+
+<div id="item-metadata">
+    <?php if (count($translations)): ?>
+    <table class="tablesaw" data-tablesaw-mode="stack">
+        <thead>
+            <tr>
+                <th><?= $translate('String') ?></th>
+                <th><?= $translate('Translation') ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach($translations as $string => $translated): ?>
+            <tr>
+                <td><?= $escape($string) ?></td>
+                <td><?= $escape($translated) ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php else: ?>
+    <p><?= $translate('No translated strings.') ?></p>
+    <?php endif; ?>
+</div>
+
+<?php if ($canDelete): ?>
+<?= $this->partial('internationalisation/admin/translation/delete-confirm', ['form' => $confirmForm, 'language' => $language, 'resourceLabel' => 'language', 'wrapSidebar' => true]) ?>
+<?php endif; ?>
+
+<?php $this->trigger('view.show.after'); ?>

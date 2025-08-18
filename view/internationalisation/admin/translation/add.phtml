@@ -1,0 +1,31 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Internationalisation\Form\TranslationForm $form
+ * @var string $language
+ * @var array $translations
+ */
+
+$plugins = $this->getHelperPluginManager();
+$assetUrl = $plugins->get('assetUrl');
+$translate = $plugins->get('translate');
+
+$this->htmlElement('body')->appendAttribute('class', 'translations add');
+
+$this->headLink()
+    ->appendStylesheet($assetUrl('css/internationalisation.css', 'Internationalisation'));
+?>
+
+<?= $this->pageTitle($translate('New language'), 1, $translate('Translations')) ?>
+
+<?php $this->trigger('view.add.before'); ?>
+
+<?= $this->partial('internationalisation/admin/translation/form', [
+    'form' => $form,
+    'language' => null,
+    'translations' => [],
+    'action' => 'add',
+    'submitLabel' => $translate('Save'),
+]) ?>
+
+<?php $this->trigger('view.add.after'); ?>

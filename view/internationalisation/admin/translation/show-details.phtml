@@ -1,0 +1,40 @@
+
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var string $language
+ * @var array $translations
+ * @var bool $linkTitle
+ */
+
+$plugins = $this->getHelperPluginManager();
+$url = $plugins->get('url');
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+
+$this->htmlElement('body')->appendAttribute('class', 'translations show');
+?>
+
+<div class="resource-details">
+    <?php if ($linkTitle): ?>
+    <h3 class="o-title"><?= $hyperlink($language, $url('admin/translation/id', ['language' => $language])) ?></h3>
+    <?php else: ?>
+    <h3 class="o-title"><?= $escape($language) ?></h3>
+    <?php endif; ?>
+    <div class="meta-group">
+        <h4><?= $translate('Translations') ?></h4>
+        <?php if (count($translations)): ?>
+        <dl class="value">
+            <?php foreach ($translations as $string => $translated): ?>
+            <dt><?= $escape($string) ?></dt>
+            <dd><?= $escape($translated) ?></dd>
+            <?php endforeach; ?>
+        </dl>
+        <?php else: ?>
+        <div class="value">
+            <p><?= $translate('No translated strings.') ?></p>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>

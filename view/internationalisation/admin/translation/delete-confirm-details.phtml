@@ -1,0 +1,44 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Form\ConfirmForm $form
+ * @var string $language
+ * @var array $translations
+ * @var bool $linkTitle
+ * @var bool $wrapSidebar
+ * @var string $partialPath
+ * @var bool $isActiveSidebar
+ */
+
+$plugins = $this->getHelperPluginManager();
+$url = $plugins->get('url');
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+$translatePlural = $plugins->get('translatePlural');
+
+$this->htmlElement('body')->appendAttribute('class', 'translations show');
+
+$form->setAttribute('action', $url('admin/translation/id', ['action' => 'delete', 'language' => $language]));
+$form->setButtonLabel('Confirm delete'); // @translate
+?>
+
+<?php if ($wrapSidebar): ?>
+<div id="delete" class="sidebar<?= empty($isActiveSidebar) ? '' : ' active' ?>">
+	<?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+<?php endif; ?>
+    <div id="sidebar-confirm">
+        <h3><?= sprintf($translate('Delete language "%s"'), $language) ?></h3>
+        <p><?= sprintf($translatePlural(
+            $translate('Are you sure you would like to delete %d translation for language "%s"?'),
+            $translate('Are you sure you would like to delete %d translations for language "%s"?'),
+            count($translations)
+        ), count($translations), $language) ?></p>
+        <?= $this->form($form) ?>
+    </div>
+<?php if ($wrapSidebar): ?>
+</div>
+<?php endif; ?>
+
+<?php if (isset($partialPath)): ?>
+    <?= $this->partial($partialPath) ?>
+<?php endif; ?>
