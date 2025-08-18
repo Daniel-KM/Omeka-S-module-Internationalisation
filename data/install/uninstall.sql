@@ -1,3 +1,3 @@
-ALTER TABLE site_page_relation DROP FOREIGN KEY FK_B0B528C2C4663E4;
-ALTER TABLE site_page_relation DROP FOREIGN KEY FK_B0B528C2335FA941;
-DROP TABLE site_page_relation;
+SET foreign_key_checks = 0;
+DROP TABLE IF EXISTS `site_page_relation`;
+DROP TABLE IF EXISTS `translation`;
