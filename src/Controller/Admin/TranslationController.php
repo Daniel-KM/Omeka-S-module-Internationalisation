@@ -44,7 +44,18 @@ class TranslationController extends AbstractActionController
 
         $languages = $this->api()->search('translations', [], ['returnScalar' => 'lang'])->getContent();
         $languages = array_unique($languages);
-        sort($languages);
+        $languages = array_combine($languages, $languages);
+
+        if (extension_loaded('intl')) {
+            foreach ($languages as &$language) {
+                $language = $this->getLocaleName($language);
+            }
+            unset($language);
+            $collator = new \Collator("root");
+            $collator->asort($languages);
+        } else {
+            natcasesort($languages);
+        }
 
         /** @var \Table\Form\TableForm $form */
         $formLanguage = new Form();
@@ -106,6 +117,7 @@ class TranslationController extends AbstractActionController
 
         return new ViewModel([
             'language' => $language,
+            'localeName' => $this->getLocaleName($language),
             'translations' => $translations,
             'confirmForm' => $confirmForm,
         ]);
@@ -120,6 +132,7 @@ class TranslationController extends AbstractActionController
 
         $view = new ViewModel([
             'language' => $language,
+            'localeName' => $this->getLocaleName($language),
             'translations' => $translations,
             'linkTitle' => $linkTitle,
         ]);
@@ -225,6 +238,7 @@ class TranslationController extends AbstractActionController
 
         return new ViewModel([
             'language' => $language,
+            'localeName' => $this->getLocaleName($language),
             'translations' => $existingTranslations,
             'form' => $form,
             'confirmForm' => $confirmForm,
@@ -247,6 +261,7 @@ class TranslationController extends AbstractActionController
         $view = new ViewModel([
             'form' => $formDeleteSelected,
             'language' => $language,
+            'localeName' => $this->getLocaleName($language),
             'resource' => 'translations',
             'translations' => $translations,
             'linkTitle' => $linkTitle,
@@ -331,6 +346,22 @@ class TranslationController extends AbstractActionController
             $this->messenger()->addFormErrors($form);
         }
         return $this->redirect()->toRoute('admin/translation');
+    }
+
+    /**
+     * Adapted from
+     * @see \Omeka\Service\Form\Element\LocaleSelectFactory::getValueOption()
+     */
+    protected function getLocaleName(string $localeId): string
+    {
+        $localeName = extension_loaded('intl')
+            ? \Locale::getDisplayName($localeId, $localeId)
+            : $localeId;
+        if ($localeId !== $localeName) {
+            $localeName = mb_convert_case($localeName, MB_CASE_TITLE, 'UTF-8');
+            $localeName = sprintf('%1$s [%2$s]', $localeName, $localeId); // @translate
+        }
+        return $localeName;
     }
 
     protected function getTranslations(string $language): array

@@ -2,6 +2,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var string $language
+ * @var string $localeName
  * @var array $translations
  * @var \Omeka\Form\ConfirmForm $confirmForm
  */
@@ -22,7 +23,7 @@ $canUpdate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationA
 $canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationAdapter::class, 'delete');
 ?>
 
-<?= $this->pageTitle($language, 1, $translate('Translations')) ?>
+<?= $this->pageTitle($localeName, 1, $translate('Translations')) ?>
 
 <div id="page-actions">
     <?php if ($canUpdate): ?>
@@ -59,7 +60,13 @@ $canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslationA
 </div>
 
 <?php if ($canDelete): ?>
-<?= $this->partial('internationalisation/admin/translation/delete-confirm', ['form' => $confirmForm, 'language' => $language, 'resourceLabel' => 'language', 'wrapSidebar' => true]) ?>
+<?= $this->partial('internationalisation/admin/translation/delete-confirm', [
+    'form' => $confirmForm,
+    'language' => $language,
+    'localeName' => $localeName,
+    'resourceLabel' => 'language',
+    'wrapSidebar' => true,
+]) ?>
 <?php endif; ?>
 
 <?php $this->trigger('view.show.after'); ?>

@@ -3,6 +3,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var string $language
+ * @var string $localeName
  * @var array $translations
  * @var bool $linkTitle
  */
@@ -18,9 +19,9 @@ $this->htmlElement('body')->appendAttribute('class', 'translations show');
 
 <div class="resource-details">
     <?php if ($linkTitle): ?>
-    <h3 class="o-title"><?= $hyperlink($language, $url('admin/translation/id', ['language' => $language])) ?></h3>
+    <h3 class="o-title"><?= $hyperlink($localeName, $url('admin/translation/id', ['language' => $language])) ?></h3>
     <?php else: ?>
-    <h3 class="o-title"><?= $escape($language) ?></h3>
+    <h3 class="o-title"><?= $escape($localeName) ?></h3>
     <?php endif; ?>
     <div class="meta-group">
         <h4><?= $translate('Translations') ?></h4>

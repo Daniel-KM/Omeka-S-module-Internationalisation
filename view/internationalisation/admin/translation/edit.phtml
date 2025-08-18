@@ -3,6 +3,7 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Internationalisation\Form\TranslationForm $form
  * @var string $language
+ * @var string $localeName
  * @var array $translations
  * @var \Omeka\Form\ConfirmForm $confirmForm
  */
@@ -22,13 +23,14 @@ $deleteButton = $canDelete
     : null;
 ?>
 
-<?= $this->pageTitle($language, 1, $translate('Translations'), $translate('Edit')) ?>
+<?= $this->pageTitle($localeName, 1, $translate('Translations'), $translate('Edit')) ?>
 
 <?php $this->trigger('view.edit.before'); ?>
 
 <?= $this->partial('internationalisation/admin/translation/form', [
     'form' => $form,
     'language' => $language,
+    'localeName' => $localeName,
     'translations' => $translations,
     'action' => 'edit',
     'submitLabel' => $translate('Save'),
@@ -36,7 +38,13 @@ $deleteButton = $canDelete
 ]) ?>
 
 <?php if ($canDelete): ?>
-<?= $this->partial('internationalisation/admin/translation/delete-confirm', ['form' => $confirmForm, 'language' => $language, 'resourceLabel' => 'language', 'wrapSidebar' => true]) ?>
+<?= $this->partial('internationalisation/admin/translation/delete-confirm', [
+    'form' => $confirmForm,
+    'language' => $language,
+    'localeName' => $localeName,
+    'resourceLabel' => 'language',
+    'wrapSidebar' => true,
+]) ?>
 <?php endif; ?>
 
 <?php $this->trigger('view.edit.after'); ?>

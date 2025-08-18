@@ -4,6 +4,7 @@
  * @var \Omeka\Form\ConfirmForm $form
  * @var string $resourceLabel
  * @var string $language
+ * @var string $localeName
  * @var array $translations
  * @var bool $wrapSidebar
  */
@@ -23,7 +24,7 @@ $form->setButtonLabel('Confirm delete'); // @translate
 <?php endif; ?>
     <div id="sidebar-confirm">
         <?php $resourceLabel = $translate($resourceLabel); ?>
-        <h3><?= sprintf($translate('Delete translations for "%s"'), $language) ?></h3>
+        <h3><?= sprintf($translate('Delete translations for "%s"'), $localeName) ?></h3>
         <p><?= sprintf($translate('Are you sure you would like to delete this %s?'), $resourceLabel) ?></p>
         <?= $this->form($form) ?>
     </div>

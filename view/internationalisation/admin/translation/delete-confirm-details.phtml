@@ -3,6 +3,7 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Form\ConfirmForm $form
  * @var string $language
+ * @var string $localeName
  * @var array $translations
  * @var bool $linkTitle
  * @var bool $wrapSidebar
@@ -27,12 +28,12 @@ $form->setButtonLabel('Confirm delete'); // @translate
 	<?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
 <?php endif; ?>
     <div id="sidebar-confirm">
-        <h3><?= sprintf($translate('Delete language "%s"'), $language) ?></h3>
+        <h3><?= sprintf($translate('Delete language "%s"'), $localeName) ?></h3>
         <p><?= sprintf($translatePlural(
             $translate('Are you sure you would like to delete %d translation for language "%s"?'),
             $translate('Are you sure you would like to delete %d translations for language "%s"?'),
             count($translations)
-        ), count($translations), $language) ?></p>
+        ), count($translations), $localeName) ?></p>
         <?= $this->form($form) ?>
     </div>
 <?php if ($wrapSidebar): ?>

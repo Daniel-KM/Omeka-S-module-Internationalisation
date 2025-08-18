@@ -64,13 +64,13 @@ $canBatchDeleteAll = $this->userIsAllowed(\Internationalisation\Api\Adapter\Tran
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($languages as $language): ?>
+            <?php foreach ($languages as $language => $localeName): ?>
             <tr>
                 <td>
                     <?php if ($canBatchDelete && $canDelete): ?>
                     <input type="checkbox" name="languages[]" value="<?= $escapeAttr($language) ?>" aria-label="<?= $translate('Select language') ?>">
                     <?php endif; ?>
-                    <?= $escape($language) ?>
+                    <?= $escape($localeName) ?>
                     <ul class="actions">
                         <?php if ($canUpdate): ?>
                         <li><?= $hyperlink('', $url('admin/translation/id', ['action' => 'edit', 'language' => $language]), [
