@@ -544,7 +544,7 @@ class Module extends AbstractModule
         $jsonLd = $event->getParam('jsonLd');
 
         // Prepare the translator in all cases.
-        if (is_null($propertyLabels)) {
+        if ($propertyLabels === null) {
             $propertyLabels = [];
             if (extension_loaded('intl')) {
                 \Locale::setDefault($locale);

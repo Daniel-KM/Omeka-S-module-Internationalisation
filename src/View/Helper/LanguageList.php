@@ -44,7 +44,7 @@ class LanguageList extends AbstractHelper
      */
     public function __invoke(string $type = null)
     {
-        if (is_null($type)) {
+        if ($type === null) {
             return $this;
         }
         if ($type === 'current_page') {

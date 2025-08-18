@@ -19,7 +19,7 @@ class LanguageIso extends AbstractHelper
      */
     public function __invoke($language = null)
     {
-        return is_null($language)
+        return $language === null
             ? $this
             : Iso639p3::code($language);
     }
