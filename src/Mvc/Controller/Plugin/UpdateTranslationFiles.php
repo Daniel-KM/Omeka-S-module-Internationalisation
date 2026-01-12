@@ -72,11 +72,10 @@ class UpdateTranslationFiles extends AbstractPlugin
         }
 
         $existingFilenames = glob($dir . '/*.php');
-        $existingFilenames = preg_grep('~^[a-zA-Z]{2,3}((-|_)[a-zA-Z0-9]{2,4})?\.php$~', $existingFilenames);
+        $existingFilenames = preg_grep('~[/\\\\][a-zA-Z]{2,3}((-|_)[a-zA-Z0-9]{2,4})?\.php$~', $existingFilenames);
 
         // Remove all language files.
-        foreach ($existingFilenames as $filename) {
-            $file = "$dir/$filename";
+        foreach ($existingFilenames as $file) {
             if (file_exists($file) && is_file($file) && is_writeable($file)) {
                 @unlink($file);
             }
@@ -130,7 +129,7 @@ class UpdateTranslationFiles extends AbstractPlugin
             $hasError = $hasError || !$result;
         }
 
-        return $hasError;
+        return !$hasError;
     }
 
     /**
@@ -158,13 +157,12 @@ class UpdateTranslationFiles extends AbstractPlugin
 
         $dir = $this->checkDestinationDir($this->localFilesPath . '/language');
         $existingFilenames = glob($dir . '/table-*.php');
-        $existingFilenames = preg_grep('~^table-\d+\.php$~', $existingFilenames);
+        $existingFilenames = preg_grep('~[/\\\\]table-\d+\.php$~', $existingFilenames);
 
         $hasError = false;
 
         // Remove all language files for tables.
-        foreach ($existingFilenames as $filename) {
-            $file = "$dir/$filename";
+        foreach ($existingFilenames as $file) {
             if (file_exists($file) && is_file($file) && is_writeable($file)) {
                 @unlink($file);
             }
@@ -237,7 +235,7 @@ class UpdateTranslationFiles extends AbstractPlugin
                 );
             }
 
-            return $hasError;
+            return !$hasError;
         };
 
         // Manage admin.
@@ -260,7 +258,7 @@ class UpdateTranslationFiles extends AbstractPlugin
             );
         }
 
-        return $hasError;
+        return !$hasError;
     }
 
     /**
