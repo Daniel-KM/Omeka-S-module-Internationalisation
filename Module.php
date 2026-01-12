@@ -956,7 +956,7 @@ class Module extends AbstractModule
         $form
             ->add([
                 'name' => 'o-module-internationalisation:related_page',
-                'type' => \Internationalisation\Form\Element\SitesPageSelect::class,
+                'type' => \Common\Form\Element\SitesPageSelect::class,
                 'options' => [
                     'label' => 'Translations', // @translate
                     'info' => 'The selected pages will be translations of the current page within a site group, that must be defined. The language switcher displays only one related page by site.', // @translate
