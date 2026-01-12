@@ -133,12 +133,31 @@ class LanguageList extends AbstractHelper
 
             // Display a link to all site of the group, even if the locale is
             // not translated (it should).
+            // Cache for checking if a page exists in target sites.
+            $pageExistsCache = [];
             foreach ($locales as $siteSlug => $localeId) {
-                $url = isset($relatedPages[$siteSlug])
-                    ? $urlHelper(null, ['site-slug' => $siteSlug, 'page-slug' => $relatedPages[$siteSlug]], true)
-                    // When a site has no matching page, it returns an error.
-                    // TODO Returns the original page when it is not translated.
-                    : $urlHelper(null, ['site-slug' => $siteSlug], true);
+                if (isset($relatedPages[$siteSlug])) {
+                    // Use the translated page.
+                    $url = $urlHelper(null, ['site-slug' => $siteSlug, 'page-slug' => $relatedPages[$siteSlug]], true);
+                } elseif ($pageSlug) {
+                    // No translation: try to find a page with the same slug in
+                    // the target site, else fallback to current page url.
+                    if (!isset($pageExistsCache[$siteSlug])) {
+                        $relatedSite = $api->searchOne('sites', ['slug' => $siteSlug])->getContent();
+                        if ($relatedSite) {
+                            $samePage = $api->searchOne('site_pages', ['site' => $relatedSite->id(), 'slug' => $pageSlug])->getContent();
+                            $pageExistsCache[$siteSlug] = $samePage ? $pageSlug : null;
+                        } else {
+                            $pageExistsCache[$siteSlug] = null;
+                        }
+                    }
+                    $url = $pageExistsCache[$siteSlug]
+                        ? $urlHelper(null, ['site-slug' => $siteSlug, 'page-slug' => $pageExistsCache[$siteSlug]], true)
+                        : $urlHelper(null, ['site-slug' => $currentSiteSlug, 'page-slug' => $pageSlug], true);
+                } else {
+                    // Homepage: link to the target site homepage.
+                    $url = $urlHelper(null, ['site-slug' => $siteSlug], true);
+                }
                 $data[] = [
                     'site' => $siteSlug,
                     'locale' => $localeId,
