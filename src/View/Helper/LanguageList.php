@@ -133,27 +133,45 @@ class LanguageList extends AbstractHelper
 
             // Display a link to all site of the group, even if the locale is
             // not translated (it should).
-            // Cache for checking if a page exists in target sites.
+            // Pre-load pages with same slug across all sites to avoid N+1 queries.
             $pageExistsCache = [];
+            if ($pageSlug) {
+                $siteSlugsToCheck = array_diff(array_keys($locales), array_keys($relatedPages));
+                if ($siteSlugsToCheck) {
+                    // Get all sites by slug in one query.
+                    $sites = $api->search('sites', ['slug' => $siteSlugsToCheck])->getContent();
+                    $siteIdsBySlug = [];
+                    foreach ($sites as $s) {
+                        $siteIdsBySlug[$s->slug()] = $s->id();
+                    }
+                    // Get all pages with the same slug across these sites in one query.
+                    if ($siteIdsBySlug) {
+                        $pages = $api->search('site_pages', [
+                            'site_id' => array_values($siteIdsBySlug),
+                            'slug' => $pageSlug,
+                        ])->getContent();
+                        $pageSiteIds = [];
+                        foreach ($pages as $p) {
+                            $pageSiteIds[$p->site()->id()] = true;
+                        }
+                        // Build cache: site slug => page slug if exists, else null.
+                        foreach ($siteIdsBySlug as $slug => $siteId) {
+                            $pageExistsCache[$slug] = isset($pageSiteIds[$siteId]) ? $pageSlug : null;
+                        }
+                    }
+                }
+            }
+
             foreach ($locales as $siteSlug => $localeId) {
                 if (isset($relatedPages[$siteSlug])) {
                     // Use the translated page.
                     $url = $urlHelper(null, ['site-slug' => $siteSlug, 'page-slug' => $relatedPages[$siteSlug]], true);
+                } elseif ($pageSlug && isset($pageExistsCache[$siteSlug]) && $pageExistsCache[$siteSlug]) {
+                    // Page with same slug exists in target site.
+                    $url = $urlHelper(null, ['site-slug' => $siteSlug, 'page-slug' => $pageExistsCache[$siteSlug]], true);
                 } elseif ($pageSlug) {
-                    // No translation: try to find a page with the same slug in
-                    // the target site, else fallback to current page url.
-                    if (!isset($pageExistsCache[$siteSlug])) {
-                        $relatedSite = $api->searchOne('sites', ['slug' => $siteSlug])->getContent();
-                        if ($relatedSite) {
-                            $samePage = $api->searchOne('site_pages', ['site' => $relatedSite->id(), 'slug' => $pageSlug])->getContent();
-                            $pageExistsCache[$siteSlug] = $samePage ? $pageSlug : null;
-                        } else {
-                            $pageExistsCache[$siteSlug] = null;
-                        }
-                    }
-                    $url = $pageExistsCache[$siteSlug]
-                        ? $urlHelper(null, ['site-slug' => $siteSlug, 'page-slug' => $pageExistsCache[$siteSlug]], true)
-                        : $urlHelper(null, ['site-slug' => $currentSiteSlug, 'page-slug' => $pageSlug], true);
+                    // No translation and no same-slug page: stay on current page.
+                    $url = $urlHelper(null, ['site-slug' => $currentSiteSlug, 'page-slug' => $pageSlug], true);
                 } else {
                     // Homepage: link to the target site homepage.
                     $url = $urlHelper(null, ['site-slug' => $siteSlug], true);
