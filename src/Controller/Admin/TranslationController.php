@@ -33,13 +33,13 @@ class TranslationController extends AbstractActionController
     {
         $formDeleteSelected = $this->getForm(ConfirmForm::class);
         $formDeleteSelected->setAttribute('action', $this->url()->fromRoute('admin/translation/default', ['action' => 'batch-delete'], true));
-        $formDeleteSelected->setButtonLabel('Confirm Delete'); // @translate
         $formDeleteSelected->setAttribute('id', 'confirm-delete-selected');
+        $formDeleteSelected->setButtonLabel('Confirm Delete'); // @translate
 
         $formDeleteAll = $this->getForm(ConfirmForm::class);
         $formDeleteAll->setAttribute('action', $this->url()->fromRoute('admin/translation/default', ['action' => 'batch-delete-all'], true));
-        $formDeleteAll->setButtonLabel('Confirm Delete'); // @translate
         $formDeleteAll->setAttribute('id', 'confirm-delete-all');
+        $formDeleteAll->setButtonLabel('Confirm Delete'); // @translate
         $formDeleteAll->get('submit')->setAttribute('disabled', true);
 
         $languages = $this->api()->search('translatings', [], ['returnScalar' => 'lang'])->getContent();
@@ -113,7 +113,7 @@ class TranslationController extends AbstractActionController
         $translations = $this->getTranslations($language);
 
         $confirmForm = $this->getForm(ConfirmForm::class);
-        $confirmForm->setAttribute('action', 'admin/translation/id', ['language' => $language, 'action' => 'delete']);
+        $confirmForm->setAttribute('action', $this->url()->fromRoute('admin/translation/id', ['language' => $language, 'action' => 'delete']));
 
         return new ViewModel([
             'language' => $language,
@@ -240,7 +240,7 @@ class TranslationController extends AbstractActionController
         }
 
         $confirmForm = $this->getForm(ConfirmForm::class);
-        $confirmForm->setAttribute('action', 'admin/translation/id', ['language' => $language, 'action' => 'delete']);
+        $confirmForm->setAttribute('action', $this->url()->fromRoute('admin/translation/id', ['language' => $language, 'action' => 'delete']));
 
         return new ViewModel([
             'language' => $language,
@@ -259,8 +259,8 @@ class TranslationController extends AbstractActionController
 
         $formDeleteSelected = $this->getForm(ConfirmForm::class);
         $formDeleteSelected->setAttribute('action', $this->url()->fromRoute('admin/translation/id', ['action' => 'delete', 'language' => $language], true));
-        $formDeleteSelected->setButtonLabel('Confirm Delete'); // @translate
         $formDeleteSelected->setAttribute('id', 'confirm-delete-selected');
+        $formDeleteSelected->setButtonLabel('Confirm Delete'); // @translate
 
         $linkTitle = (bool) $this->params()->fromQuery('link-title', true);
 

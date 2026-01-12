@@ -24,7 +24,7 @@ class DuplicateSiteFieldset extends Fieldset
             'item_sets' => 'Item sets', // @translate
             'permissions' => 'Permissions', // @translate
         ];
-        if ($this->getOptions('collecting')) {
+        if ($this->getOption('collecting')) {
             $data['collecting'] = 'Collecting forms'; // @translate
         }
 

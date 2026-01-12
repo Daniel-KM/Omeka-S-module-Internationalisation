@@ -282,9 +282,10 @@ class UpdateTranslationFiles extends AbstractPlugin
 
         $result = @mkdir($dirPath, 0775, true);
         if (!$result) {
+            $error = error_get_last();
             $this->logger->err(
                 'The directory "{path}" is not writeable: {error}.', // @translate
-                ['path' => $dirPath, 'error' => error_get_last()['message']]
+                ['path' => $dirPath, 'error' => $error['message'] ?? 'unknown error']
             );
             return null;
         }

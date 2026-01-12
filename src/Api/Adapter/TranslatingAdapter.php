@@ -48,7 +48,7 @@ class TranslatingAdapter extends AbstractEntityAdapter
                 $qb
                     ->andWhere($expr->eq(
                         'omeka_root.lang',
-                        $this->adapter->createNamedParameter($qb, $query['lang'])
+                        $this->createNamedParameter($qb, $query['lang'])
                     ));
             } else {
                 $qb
@@ -62,7 +62,7 @@ class TranslatingAdapter extends AbstractEntityAdapter
                 $qb
                     ->andWhere($expr->eq(
                         'omeka_root.string',
-                        $this->adapter->createNamedParameter($qb, $query['string'])
+                        $this->createNamedParameter($qb, $query['string'])
                     ));
             } else {
                 $qb
@@ -77,7 +77,7 @@ class TranslatingAdapter extends AbstractEntityAdapter
                 $qb
                     ->andWhere($expr->eq(
                         'omeka_root.translation',
-                        $this->adapter->createNamedParameter($qb, $query['translation'])
+                        $this->createNamedParameter($qb, $query['translation'])
                     ));
             } else {
                 $qb
@@ -115,7 +115,7 @@ class TranslatingAdapter extends AbstractEntityAdapter
         if ($this->shouldHydrate($request, 'o:lang')) {
             $language = (string) $data['o:lang'];
             $language = strtolower(strtr($language, '_', '-'));
-            $entity->setlang($language);
+            $entity->setLang($language);
         }
 
         if ($this->shouldHydrate($request, 'o:string')) {

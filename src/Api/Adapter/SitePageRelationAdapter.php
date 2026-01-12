@@ -257,7 +257,7 @@ class SitePageRelationAdapter extends AbstractEntityAdapter
         if (Request::CREATE === $request->getOperation()) {
             $entityManager = $this->getEntityManager();
             $page = $entityManager->find(\Omeka\Entity\SitePage::class, $data['o:page']['o:id']);
-            $relatedPage = $page = $entityManager->find(\Omeka\Entity\SitePage::class, data['o-module-internationalisation:related_page']['o:id']);
+            $relatedPage = $entityManager->find(\Omeka\Entity\SitePage::class, $data['o-module-internationalisation:related_page']['o:id']);
             if ($page
                 && $relatedPage
                 // Useless, but cleaner.

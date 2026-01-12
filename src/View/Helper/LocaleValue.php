@@ -82,7 +82,7 @@ class LocaleValue extends AbstractHelper
         // Check if EasyMeta is available to avoid an issue during its upgrade.
         $plugins = $view->getHelperPluginManager();
         if (!$plugins->has('easyMeta')) {
-            return options['default'];
+            return $options['default'];
         }
 
         /** @var \Common\Stdlib\EasyMeta $easyMeta */

@@ -64,7 +64,6 @@ class LocaleToCountry extends AbstractHelper
         'pt_BR' => 'BR',
         'pt-PT' => 'PT',
         'pt_PT' => 'PT',
-        'pt' => 'PT',
         'ro' => 'RO',
         'ru' => 'RU',
         'sr' => 'RS',
@@ -105,7 +104,7 @@ class LocaleToCountry extends AbstractHelper
 
         $matches = [];
         if (preg_match('/^[a-z]+(?:_|-)([A-Z]+)$/i', $locale, $matches)) {
-            return $matches[1];
+            return strtoupper($matches[1]);
         }
 
         return '';

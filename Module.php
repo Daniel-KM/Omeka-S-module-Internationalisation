@@ -12,7 +12,6 @@ use Internationalisation\Api\Representation\SitePageRelationRepresentation;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\MvcEvent;
-use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Module\AbstractModule;
 
 /**
@@ -410,7 +409,10 @@ class Module extends AbstractModule
         if (isset($this->cacheLocaleValues[$resourceId])) {
             $values = $event->getParam('values');
             foreach ($this->cacheLocaleValues[$resourceId] as $term => $valuesByLang) {
-                // TODO Sometime, array_merge of array_values returns a null.
+                // Flatten the values grouped by language into a single array.
+                // Note: array_merge(...array_values($valuesByLang)) fails when
+                // $valuesByLang is empty (no arguments to array_merge before
+                // PHP 7.4).
                 // $values[$term]['values'] = array_merge(...array_values($valuesByLang));
                 $vv = [];
                 foreach ($valuesByLang as $vvalues) {
@@ -427,8 +429,8 @@ class Module extends AbstractModule
         // Order values for each property according to settings.
         $values = $event->getParam('values');
         foreach ($values as $term => &$valueInfo) {
-            // Sometime, the key "values" is null.
-            // TODO Find why the key "values" of the resource can be null. Probably related to templates.
+            // The key "values" can be null when a property is defined in a
+            // template but has no values for the resource.
             if ($valueInfo['values']) {
                 $valuesByLang = $locales;
                 foreach ($valueInfo['values'] as $value) {
@@ -439,8 +441,7 @@ class Module extends AbstractModule
                 $valuesByLang = [];
             }
             $this->cacheLocaleValues[$resourceId][$term] = $valuesByLang;
-            // TODO Sometime, array_merge of array_values returns a null.
-            // $valueInfo['values'] = $valuesByLang ? array_merge(...array_values($valuesByLang)) : [];
+            // Flatten the values grouped by language into a single array.
             $vv = [];
             foreach ($valuesByLang as $vvalues) {
                 $vv = array_merge($vv, array_values($vvalues));
@@ -484,7 +485,7 @@ class Module extends AbstractModule
         // Filter appropriate locales for each property when it is localisable.
         $values = $event->getParam('values');
         foreach ($values as $term => &$valueInfo) {
-            $valuesByLang = $this->cacheLocaleValues[$resourceId][$term];
+            $valuesByLang = $this->cacheLocaleValues[$resourceId][$term] ?? [];
 
             // Check if the property has at least one language (not identifier,
             // etc.).
@@ -581,10 +582,15 @@ class Module extends AbstractModule
         // Prepare the translator in all cases.
         if ($propertyLabels === null) {
             $propertyLabels = [];
-            if (extension_loaded('intl')) {
-                \Locale::setDefault($locale);
-            }
             $translator = $services->get('MvcTranslator');
+        }
+
+        // Set the default locale for intl functions only when a locale is
+        // requested, then restore the original locale to avoid side effects.
+        $originalLocale = null;
+        if ($locale && extension_loaded('intl')) {
+            $originalLocale = \Locale::getDefault();
+            \Locale::setDefault($locale);
         }
 
         // Set the locale.
@@ -674,23 +680,12 @@ class Module extends AbstractModule
             }
         }
 
-        $event->setParam('jsonLd', $jsonLd);
-    }
-
-    protected function prepareTemplateLabels(AbstractResourceEntityRepresentation $resource, $locale)
-    {
-        $templatePropertyLabels = [];
-        $template = $resource->resourceTemplate();
-        // Prepare the template.
-        $templateId = $template->id();
-        if (!isset($template[$template->id()])) {
-            foreach ($template->resourceTemplateProperties() as $templateProperty) {
-                if ($label = $templateProperty->alternateLabel()) {
-                    $templatePropertyLabels[$templateId][$templateProperty->property()->term()] = $label;
-                }
-            }
+        // Restore the original locale if it was changed.
+        if ($originalLocale !== null) {
+            \Locale::setDefault($originalLocale);
         }
-        return $templatePropertyLabels;
+
+        $event->setParam('jsonLd', $jsonLd);
     }
 
     public function filterJsonLdSitePage(Event $event): void
@@ -706,7 +701,7 @@ class Module extends AbstractModule
         $jsonLd = $event->getParam('jsonLd');
         $api = $this->getServiceLocator()->get('Omeka\ApiManager');
         $pageId = $page->id();
-        $relations = $api->search('site_page_relations',['relation' => $pageId])->getContent();
+        $relations = $api->search('site_page_relations', ['relation' => $pageId])->getContent();
         $relations = array_map(function (SitePageRelationRepresentation $relation) use ($pageId) {
             $related = $relation->relatedPage();
             $relatedPage = $pageId === $related->id()
@@ -798,14 +793,14 @@ class Module extends AbstractModule
     {
         $query = $event->getParam('query', []);
         $this->lastQuerySort = [
-            'sort_by' => $query['sort_by'],
+            'sort_by' => $query['sort_by'] ?? null,
             'sort_order' => isset($query['sort_order']) && strtolower((string) $query['sort_order']) === 'desc' ? 'desc' : 'asc',
         ];
     }
 
     public function filterVocabularyMemberSelectValues(Event $event): void
     {
-        if ($this->lastQuerySort['sort_by'] !== 'label') {
+        if (($this->lastQuerySort['sort_by'] ?? null) !== 'label') {
             $this->lastQuerySort = [];
             return;
         }
@@ -819,7 +814,18 @@ class Module extends AbstractModule
         // During this event, the labels are not yet translated by Zend form.
         // They must not be translated twice.
         $translator = $this->getServiceLocator()->get('MvcTranslator');
-        // TODO natcasesort() doesn't manage accented letters ("É" is after "Z") (will be fixed by sql event?).
+
+        // Use Collator for locale-aware sorting (accented letters).
+        // Fallback to natcasesort() when intl extension is not available.
+        $locale = extension_loaded('intl') ? \Locale::getDefault() : null;
+        $collator = $locale ? new \Collator($locale) : null;
+        $localeSort = function (&$array) use ($collator): void {
+            if ($collator) {
+                $collator->asort($array, \Collator::SORT_STRING);
+            } else {
+                natcasesort($array);
+            }
+        };
 
         // Order first level by translated label: don't order prepended values,
         // dcterms and dctype.
@@ -844,7 +850,7 @@ class Module extends AbstractModule
             return is_array($v) ? $translator->translate($v['label']) : $translator->translate($v);
         };
         $appendedTranslated = array_map($translateLabels, $appended);
-        natcasesort($appendedTranslated);
+        $localeSort($appendedTranslated);
         $appended = array_replace($appendedTranslated, $appended);
         $valueOptions = $prepended + $appended;
 
@@ -863,18 +869,15 @@ class Module extends AbstractModule
             $appended = array_diff_key($valueOptions, $prepended);
         }
         $reverted = $this->lastQuerySort['sort_order'] === 'desc';
-        $translateOptionsLabels = function ($v) use ($translator, $reverted) {
+        $translateOptionsLabels = function ($v) use ($translator, $reverted, $localeSort) {
             if (is_scalar($v) || empty($v['options'])) {
                 return $v;
             }
-            $optionLabelsTranslated = array_map(function ($vv) use ($translator) {
-                return $translator->translate($vv['label']);
-            }, $v['options']);
-            natcasesort($optionLabelsTranslated);
+            $optionLabelsTranslated = array_map(fn ($vv) => $translator->translate($vv['label']), $v['options']);
+            $localeSort($optionLabelsTranslated);
             if ($reverted) {
                 $optionLabelsTranslated = array_reverse($optionLabelsTranslated, true);
             }
-            $this->lastQuerySort['sort_by'];
             $v['options'] = array_replace($optionLabelsTranslated, $v['options']);
             return $v;
         };
@@ -1032,7 +1035,7 @@ class Module extends AbstractModule
                 $('[name^="duplicate"]').closest('.field')
                     .wrapAll('<fieldset id="duplicate" class="field-container collapsible">')
                     .closest('#duplicate')
-                    .before('<a href="#" class="expand" aria-label=$expand>' + $legend + ' </a> ');
+                    .before('<a href="#" class="expand" aria-label=' + $expand + '>' + $legend + ' </a> ');
             });
             </script>
             CSS;

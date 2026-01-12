@@ -76,10 +76,7 @@ class LanguageIso extends AbstractHelper
      */
     public function codes($language)
     {
-        $code = self::code($language);
-        return $code
-            ? array_keys(self::CODES, $code)
-            : [];
+        return Iso639p3::codes($language);
     }
 
     /**

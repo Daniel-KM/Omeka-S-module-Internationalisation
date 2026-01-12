@@ -64,6 +64,9 @@ class DuplicateSite extends AbstractJob
         $targetId = $this->getArg('target');
         $sourceId = $this->getArg('source');
 
+        $source = null;
+        $target = null;
+
         try {
             /** @var \Omeka\Entity\Site $target */
             $target = $this->api->read('sites', ['id' => $targetId], [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false])->getContent();
@@ -98,21 +101,6 @@ class DuplicateSite extends AbstractJob
 
         if ($source && count($copyData)) {
             $this->updateSiteGroups($source, $target);
-            // Add the site to the group first to simplify duplication of pages.
-            $settings = $services->get('Omeka\Settings');
-            $siteGroups = $settings->get('internationalisation_site_groups') ?: [];
-            if (isset($siteGroups[$source->getSlug()])) {
-                $sortList = $siteGroups[$source->getSlug()];
-                $sortList[] = $target->getSlug();
-            } else {
-                $sortList = [$source->getSlug(), $target->getSlug()];
-            }
-            $sortList = array_unique($sortList);
-            ksort($sortList, SORT_NATURAL);
-            $siteGroups[$source->getSlug()] = $sortList;
-            $siteGroups[$target->getSlug()] = $sortList;
-            ksort($siteGroups, SORT_NATURAL);
-            $settings->set('internationalisation_site_groups', $siteGroups);
         }
 
         // First step: remove data.
@@ -199,10 +187,11 @@ class DuplicateSite extends AbstractJob
         if (isset($siteGroups[$source->getSlug()])) {
             $sortList = $siteGroups[$source->getSlug()];
             $sortList[] = $target->getSlug();
+            $sortList = array_unique($sortList);
         } else {
             $sortList = [$source->getSlug(), $target->getSlug()];
         }
-        ksort($sortList, SORT_NATURAL);
+        sort($sortList, SORT_NATURAL);
         $siteGroups[$source->getSlug()] = $sortList;
         $siteGroups[$target->getSlug()] = $sortList;
         ksort($siteGroups, SORT_NATURAL);
@@ -211,11 +200,11 @@ class DuplicateSite extends AbstractJob
 
     protected function removeSettings(Site $site): void
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             DELETE FROM `site_setting`
-            WHERE `site_id` = {$site->getId()};
+            WHERE `site_id` = :site_id
             SQL;
-        $this->connection->executeStatement($sql);
+        $this->connection->executeStatement($sql, ['site_id' => $site->getId()], ['site_id' => ParameterType::INTEGER]);
 
         $this->logger->notice(
             'Site settings of "{site_slug}" successfully removed.', // @translate
@@ -226,29 +215,29 @@ class DuplicateSite extends AbstractJob
     protected function removeSiteItemPool(Site $site): void
     {
         $site->setItemPool([]);
-        $this->entityManager->refresh($site);
+        $this->entityManager->flush();
     }
 
     protected function removeSiteTheme(Site $site): void
     {
         $site->setTheme('default');
-        $this->entityManager->refresh($site);
+        $this->entityManager->flush();
     }
 
     protected function removeNavigation(Site $site): void
     {
         $site->setHomepage(null);
         $site->setNavigation([]);
-        $this->entityManager->refresh($site);
+        $this->entityManager->flush();
     }
 
     protected function removeSitePermissions(Site $site): void
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             DELETE FROM `site_permission`
-            WHERE `site_id` = {$site->getId()};
+            WHERE `site_id` = :site_id
             SQL;
-        $result = $this->connection->executeStatement($sql);
+        $result = $this->connection->executeStatement($sql, ['site_id' => $site->getId()], ['site_id' => ParameterType::INTEGER]);
         $this->entityManager->refresh($site);
 
         $this->logger->notice(
@@ -259,35 +248,36 @@ class DuplicateSite extends AbstractJob
 
     protected function removeSiteItemSets(Site $site): void
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             DELETE FROM `site_item_set`
-            WHERE `site_id` = {$site->getId()};
+            WHERE `site_id` = :site_id
             SQL;
-        $this->connection->executeStatement($sql);
+        $this->connection->executeStatement($sql, ['site_id' => $site->getId()], ['site_id' => ParameterType::INTEGER]);
         $this->entityManager->refresh($site);
     }
 
     protected function removeSitePages(Site $site): void
     {
+        $siteId = $site->getId();
         // FIXME There is no "on delete cascade" on db level currently!
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             DELETE `site_block_attachment` FROM `site_block_attachment`
             INNER JOIN `site_page_block` ON `site_page_block`.`id` = `site_block_attachment`.`block_id`
             INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
-            WHERE `site_page`.`site_id` = {$site->getId()};
+            WHERE `site_page`.`site_id` = :site_id
             SQL;
-        $this->connection->executeStatement($sql);
-        $sql = <<<SQL
+        $this->connection->executeStatement($sql, ['site_id' => $siteId], ['site_id' => ParameterType::INTEGER]);
+        $sql = <<<'SQL'
             DELETE `site_page_block` FROM `site_page_block`
             INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
-            WHERE `site_page`.`site_id` = {$site->getId()};
+            WHERE `site_page`.`site_id` = :site_id
             SQL;
-        $this->connection->executeStatement($sql);
-        $sql = <<<SQL
+        $this->connection->executeStatement($sql, ['site_id' => $siteId], ['site_id' => ParameterType::INTEGER]);
+        $sql = <<<'SQL'
             DELETE FROM `site_page`
-            WHERE `site_id` = {$site->getId()};
+            WHERE `site_id` = :site_id
             SQL;
-        $result = $this->connection->executeStatement($sql);
+        $result = $this->connection->executeStatement($sql, ['site_id' => $siteId], ['site_id' => ParameterType::INTEGER]);
         $this->entityManager->refresh($site);
 
         $this->logger->notice(
@@ -298,11 +288,11 @@ class DuplicateSite extends AbstractJob
 
     protected function removeCollecting(Site $site): void
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             DELETE FROM `collecting_form`
-            WHERE `site_id` = {$site->getId()};
+            WHERE `site_id` = :site_id
             SQL;
-        $result = $this->connection->executeStatement($sql);
+        $result = $this->connection->executeStatement($sql, ['site_id' => $site->getId()], ['site_id' => ParameterType::INTEGER]);
 
         $this->logger->notice(
             '{total} collecting forms removed from "{site_slug}".', // @translate
@@ -315,17 +305,27 @@ class DuplicateSite extends AbstractJob
      */
     protected function copySettings(Site $source, Site $target): void
     {
-        $sql = <<<SQL
+        $sourceId = $source->getId();
+        $targetId = $target->getId();
+        $sql = <<<'SQL'
             INSERT INTO `site_setting` (`id`, `site_id`, `value`)
-            SELECT `t2`.`id`, {$target->getId()} AS 'site_id', `t2`.`value` FROM (
-                SELECT `t`.`id`, `t`.`value` FROM `site_setting` AS `t` WHERE `site_id` = {$source->getId()}
+            SELECT `t2`.`id`, :target_id AS 'site_id', `t2`.`value` FROM (
+                SELECT `t`.`id`, `t`.`value` FROM `site_setting` AS `t` WHERE `site_id` = :source_id
             ) AS `t2`
             ON DUPLICATE KEY UPDATE
                 `id` = `t2`.`id`,
-                `site_id` = {$target->getId()},
-                `value` = `t2`.`value`;
+                `site_id` = :target_id2,
+                `value` = `t2`.`value`
             SQL;
-        $this->connection->executeStatement($sql);
+        $this->connection->executeStatement($sql, [
+            'source_id' => $sourceId,
+            'target_id' => $targetId,
+            'target_id2' => $targetId,
+        ], [
+            'source_id' => ParameterType::INTEGER,
+            'target_id' => ParameterType::INTEGER,
+            'target_id2' => ParameterType::INTEGER,
+        ]);
 
         $this->logger->notice(
             'Site settings of "{site_slug}" successfully copied into "{site_slug_2}".', // @translate
@@ -377,8 +377,8 @@ class DuplicateSite extends AbstractJob
         }
 
         // Manage private page slugs.
-        $sql = 'SELECT `id`, `slug` FROM `site_page` WHERE `site_id` = ' . (int) $target->getId();
-        $existingSlugs = $this->connection->executeQuery($sql)->fetchAllKeyValue();
+        $sql = 'SELECT `id`, `slug` FROM `site_page` WHERE `site_id` = :site_id';
+        $existingSlugs = $this->connection->executeQuery($sql, ['site_id' => $target->getId()], ['site_id' => ParameterType::INTEGER])->fetchAllKeyValue();
 
         /**
          * @var \Omeka\Entity\SitePage $sourcePage
@@ -443,33 +443,53 @@ class DuplicateSite extends AbstractJob
 
     protected function copySitePermissions(Site $source, Site $target): void
     {
-        $sql = <<<SQL
+        $sourceId = $source->getId();
+        $targetId = $target->getId();
+        $sql = <<<'SQL'
             INSERT INTO `site_permission` (`site_id`, `user_id`, `role`)
-            SELECT {$target->getId()} AS 'site_id', `t2`.`user_id`, `t2`.`role` FROM (
-                SELECT `t`.`site_id`, `t`.`user_id`, `t`.`role` FROM `site_permission` AS `t` WHERE `site_id` = {$source->getId()}
+            SELECT :target_id AS 'site_id', `t2`.`user_id`, `t2`.`role` FROM (
+                SELECT `t`.`site_id`, `t`.`user_id`, `t`.`role` FROM `site_permission` AS `t` WHERE `site_id` = :source_id
             ) AS `t2`
-            ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `user_id`=`t2`.`user_id`, `role`=`t2`.`role`;
+            ON DUPLICATE KEY UPDATE `site_id`=:target_id2, `user_id`=`t2`.`user_id`, `role`=`t2`.`role`
             SQL;
-        $this->connection->executeStatement($sql);
+        $this->connection->executeStatement($sql, [
+            'source_id' => $sourceId,
+            'target_id' => $targetId,
+            'target_id2' => $targetId,
+        ], [
+            'source_id' => ParameterType::INTEGER,
+            'target_id' => ParameterType::INTEGER,
+            'target_id2' => ParameterType::INTEGER,
+        ]);
         $this->entityManager->refresh($target);
     }
 
     protected function copySiteItemPool(Site $source, Site $target): void
     {
         $target->setItemPool($source->getItemPool());
-        $this->entityManager->refresh($target);
+        $this->entityManager->flush();
     }
 
     protected function copySiteItemSets(Site $source, Site $target): void
     {
-        $sql = <<<SQL
+        $sourceId = $source->getId();
+        $targetId = $target->getId();
+        $sql = <<<'SQL'
             INSERT INTO `site_item_set` (`site_id`, `item_set_id`, `position`)
-            SELECT {$target->getId()} AS 'site_id', `t2`.`item_set_id`, `t2`.`position` FROM (
-                SELECT `t`.`site_id`, `t`.`item_set_id`, `t`.`position` FROM `site_item_set` AS `t` WHERE `site_id` = {$source->getId()}
+            SELECT :target_id AS 'site_id', `t2`.`item_set_id`, `t2`.`position` FROM (
+                SELECT `t`.`site_id`, `t`.`item_set_id`, `t`.`position` FROM `site_item_set` AS `t` WHERE `site_id` = :source_id
             ) AS `t2`
-            ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `item_set_id`=`t2`.`item_set_id`, `position`=`t2`.`position`;
+            ON DUPLICATE KEY UPDATE `site_id`=:target_id2, `item_set_id`=`t2`.`item_set_id`, `position`=`t2`.`position`
             SQL;
-        $this->connection->executeStatement($sql);
+        $this->connection->executeStatement($sql, [
+            'source_id' => $sourceId,
+            'target_id' => $targetId,
+            'target_id2' => $targetId,
+        ], [
+            'source_id' => ParameterType::INTEGER,
+            'target_id' => ParameterType::INTEGER,
+            'target_id2' => ParameterType::INTEGER,
+        ]);
         $this->entityManager->refresh($target);
     }
 
@@ -503,13 +523,6 @@ class DuplicateSite extends AbstractJob
             $target->setHomepage(null);
         }
 
-        $homepage = $source->getHomepage();
-        if ($homepage && isset($this->mapPages[$homepage->getId()])) {
-            $target->setHomepage($this->mapPages[$homepage->getId()]);
-        } else {
-            $target->setHomepage(null);
-        }
-
         $navigation = $source->getNavigation();
         $iterate = null;
         $iterate = function (&$navigation) use (&$iterate): void {
@@ -530,14 +543,22 @@ class DuplicateSite extends AbstractJob
 
     protected function copyCollecting(Site $source, Site $target): void
     {
-        $sql = <<<SQL
+        $sourceId = $source->getId();
+        $targetId = $target->getId();
+        $sql = <<<'SQL'
             INSERT INTO `collecting_form` (`item_set_id`, `site_id`, `owner_id`, `label`, `anon_type`, `success_text`, `email_text`)
-            SELECT  `t2`.`item_set_id`, {$target->getId()} AS 'site_id', `t2`.`owner_id`, `t2`.`label`, `t2`.`anon_type`, `t2`.`success_text`, `t2`.`email_text` FROM (
-                SELECT `t`.`item_set_id`, `t`.`site_id`, `t`.`owner_id`, `t`.`label`, `t`.`anon_type`, `t`.`success_text`, `t`.`email_text` FROM `collecting_form` AS `t` WHERE `site_id` = {$source->getId()}
-            ) AS `t2`;
+            SELECT  `t2`.`item_set_id`, :target_id AS 'site_id', `t2`.`owner_id`, `t2`.`label`, `t2`.`anon_type`, `t2`.`success_text`, `t2`.`email_text` FROM (
+                SELECT `t`.`item_set_id`, `t`.`site_id`, `t`.`owner_id`, `t`.`label`, `t`.`anon_type`, `t`.`success_text`, `t`.`email_text` FROM `collecting_form` AS `t` WHERE `site_id` = :source_id
+            ) AS `t2`
             SQL;
         try {
-            $result = $this->connection->executeStatement($sql);
+            $result = $this->connection->executeStatement($sql, [
+                'source_id' => $sourceId,
+                'target_id' => $targetId,
+            ], [
+                'source_id' => ParameterType::INTEGER,
+                'target_id' => ParameterType::INTEGER,
+            ]);
         } catch (\Exception $e) {
             $this->logger->notice(
                 'The module Collecting is a new version and is not copiable for now. Copy forms manually if needed.' // @translate
@@ -559,14 +580,15 @@ class DuplicateSite extends AbstractJob
         } catch (\Exception $e) {
             $multiple = '';
         }
+        // Note: $multiple is safe (empty string or ', `multiple`'), not user input.
         $sql = <<<SQL
             INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple)
             SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple FROM `collecting_prompt`
             JOIN `collecting_form` ON `collecting_form`.`id` = `collecting_prompt`.`form_id`
-            WHERE `collecting_form`.`site_id` = {$source->getId()};
+            WHERE `collecting_form`.`site_id` = :source_id
             SQL;
         try {
-            $result = $this->connection->executeStatement($sql);
+            $result = $this->connection->executeStatement($sql, ['source_id' => $sourceId], ['source_id' => ParameterType::INTEGER]);
         } catch (\Exception $e) {
             $this->logger->notice(
                 'The module Collecting is a new version and is not copiable for now. Copy forms manually if needed.' // @translate

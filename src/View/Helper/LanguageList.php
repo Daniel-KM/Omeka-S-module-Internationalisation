@@ -42,7 +42,7 @@ class LanguageList extends AbstractHelper
      *
      * @return self|array|null
      */
-    public function __invoke(string $type = null)
+    public function __invoke(?string $type = null)
     {
         if ($type === null) {
             return $this;
@@ -112,7 +112,10 @@ class LanguageList extends AbstractHelper
                 // Manage home page.
                 $page = $site->homepage();
             }
-            // Page cannot be empty because controller is for page.
+            // Page may be empty if no homepage is configured.
+            if (!$page) {
+                return [];
+            }
             $relations = $api
                 ->search(
                     'site_page_relations',
@@ -179,7 +182,7 @@ class LanguageList extends AbstractHelper
                 $data[] = [
                     'site' => $siteSlug,
                     'locale' => $localeId,
-                    'locale_label' => $this->localeLabels[$localeId],
+                    'locale_label' => $this->localeLabels[$localeId] ?? $localeId,
                     'url' => $url,
                 ];
             }
@@ -231,8 +234,8 @@ class LanguageList extends AbstractHelper
                     // Else use the main search engine of this related site.
                     elseif (isset($mainSearchPageIdBySite[$relatedSiteId])) {
                         // Module AdvancedSearch uses the slug, and module Search uses id;
-                        $searchPageId = $mainSearchPageIdBySite[$relatedSiteId];
-                        $searchPageSlug = $settings->get('advancedsearch_all_configs', [])[$searchPageId] ?? null;
+                        $relatedSearchPageId = $mainSearchPageIdBySite[$relatedSiteId];
+                        $searchPageSlug = $settings->get('advancedsearch_all_configs', [])[$relatedSearchPageId] ?? null;
                         if ($searchPageSlug) {
                             $url = $urlHelper('search-page-' . $searchPageSlug, ['site-slug' => $siteSlug], ['query' => $query], true);
                         }
@@ -247,7 +250,7 @@ class LanguageList extends AbstractHelper
                 $data[] = [
                     'site' => $siteSlug,
                     'locale' => $localeId,
-                    'locale_label' => $this->localeLabels[$localeId],
+                    'locale_label' => $this->localeLabels[$localeId] ?? $localeId,
                     'url' => $url,
                 ];
             }
@@ -260,7 +263,7 @@ class LanguageList extends AbstractHelper
             $data[] = [
                 'site' => $siteSlug,
                 'locale' => $localeId,
-                'locale_label' => $this->localeLabels[$localeId],
+                'locale_label' => $this->localeLabels[$localeId] ?? $localeId,
                 'url' => $urlHelper(null, ['site-slug' => $siteSlug], ['query' => $params->fromQuery()], true),
             ];
         }
