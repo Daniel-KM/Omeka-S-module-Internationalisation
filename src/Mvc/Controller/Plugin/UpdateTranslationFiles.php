@@ -171,12 +171,11 @@ class UpdateTranslationFiles extends AbstractPlugin
         // Include automatic translations, from generic to specific.
         $tableSlugs = $this->api->search('tables', ['sort_by' => 'slug', 'sort_order' => 'ASC'], ['returnScalar' => 'slug'])->getContent();
         $tableTranslationSlugs = preg_grep('~^(?:translation|translation-([a-zA-Z]{2,3})((-|_)[a-zA-Z0-9]{2,4})?)$~', $tableSlugs);
-        usort($tableTranslationSlugs, fn($a, $b) => strlen($a) <=> strlen($b));
+        usort($tableTranslationSlugs, fn ($a, $b) => strlen($a) <=> strlen($b));
 
         $tableSlugsNoLang = [];
 
-        $prepareFile = function (int $siteId, array $tableSlugs) use ($dir, $tableTranslationSlugs, &$tableSlugsNoLang, &$hasError): bool
-        {
+        $prepareFile = function (int $siteId, array $tableSlugs) use ($dir, $tableTranslationSlugs, &$tableSlugsNoLang, &$hasError): bool {
             $locales = [];
             $tableSlugs = array_unique(array_merge($tableTranslationSlugs, $tableSlugs));
             if (!$tableSlugs) {

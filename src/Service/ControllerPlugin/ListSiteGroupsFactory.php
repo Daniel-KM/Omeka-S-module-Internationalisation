@@ -39,9 +39,7 @@ class ListSiteGroupsFactory implements FactoryInterface
         }, array_intersect_key($siteGroups, $sites)));
 
         // Remove sites that belongs to a group and append them.
-        $remaining = array_map(function ($site) {
-            return [$site];
-        }, $sites);
+        $remaining = array_map(fn ($site) => [$site], $sites);
         $result = $siteGroups;
         foreach ($result as $site => $group) {
             unset($remaining[$site]);

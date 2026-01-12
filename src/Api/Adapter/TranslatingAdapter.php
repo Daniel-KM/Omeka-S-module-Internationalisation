@@ -86,7 +86,7 @@ class TranslatingAdapter extends AbstractEntityAdapter
         }
     }
 
-    public function validateRequest(Request $request, ErrorStore $errorStore)
+    public function validateRequest(Request $request, ErrorStore $errorStore): void
     {
         $language = $request->getValue('o:lang');
         if (!$language || !is_string($language) || strlen($language) > 8) {
@@ -127,7 +127,7 @@ class TranslatingAdapter extends AbstractEntityAdapter
         }
     }
 
-    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
+    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void
     {
         /** @var \Internationalisation\Entity\Translating $entity */
 

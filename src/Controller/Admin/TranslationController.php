@@ -365,7 +365,7 @@ class TranslationController extends AbstractActionController
         } else {
             $this->messenger()->addError('Translations were reindexed, but an issue occurred. Check logs.'); // @translate
         }
-       return $this->redirect()->toRoute('admin/translation');
+        return $this->redirect()->toRoute('admin/translation');
     }
 
     /**

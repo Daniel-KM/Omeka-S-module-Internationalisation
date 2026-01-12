@@ -2,14 +2,14 @@
 
 namespace Internationalisation\Form;
 
-use Laminas\EventManager\EventManagerAwareTrait;
 use Laminas\EventManager\Event;
+use Laminas\EventManager\EventManagerAwareTrait;
 
 class SitePageForm extends \Omeka\Form\SitePageForm
 {
     use EventManagerAwareTrait;
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 

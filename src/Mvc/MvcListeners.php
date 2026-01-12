@@ -34,7 +34,7 @@ class MvcListeners extends AbstractListenerAggregate
         $services = $event->getApplication()->getServiceManager();
         $status = $services->get('Omeka\Status');
         // The delegator from MvcTranslator and TranslatorInterface are the same.
-        $translator = $services ->get(TranslatorInterface::class)->getDelegatedTranslator();
+        $translator = $services->get(TranslatorInterface::class)->getDelegatedTranslator();
         $isSiteRequest = $status->isSiteRequest();
 
         if ($isSiteRequest) {

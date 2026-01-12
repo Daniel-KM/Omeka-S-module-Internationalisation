@@ -50,7 +50,7 @@ class SettingsFieldset extends Fieldset
                     'multiple' => $hasModuleTable,
                     'class' => $hasModuleTable ? 'chosen-select' : '',
                     'placeholder' => 'translation-fr translation-el-gr',
-                    'data-placeholder' => 'Select tables…' // @translate,
+                    'data-placeholder' => 'Select tables…', // @translate,
                 ],
             ])
             ->add([

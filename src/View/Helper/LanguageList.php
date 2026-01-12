@@ -202,13 +202,9 @@ class LanguageList extends AbstractHelper
             $services = $site->getServiceLocator();
             $connection = $services->get('Omeka\Connection');
             $searchPageIdsBySite = $connection->fetchAllKeyValue('SELECT `site_id`, `value` FROM `site_setting` WHERE `id` = "advancedsearch_configs";');
-            $searchPageIdsBySite = array_map(function ($v) {
-                return json_decode($v, true);
-            }, $searchPageIdsBySite);
+            $searchPageIdsBySite = array_map(fn ($v) => json_decode($v, true), $searchPageIdsBySite);
             $mainSearchPageIdBySite = $connection->fetchAllKeyValue('SELECT `site_id`, `value` FROM `site_setting` WHERE `id` = "advancedsearch_main_config";');
-            $mainSearchPageIdBySite = array_map(function ($v) {
-                return json_decode($v, true);
-            }, $mainSearchPageIdBySite);
+            $mainSearchPageIdBySite = array_map(fn ($v) => json_decode($v, true), $mainSearchPageIdBySite);
 
             $query = $params->fromQuery();
 

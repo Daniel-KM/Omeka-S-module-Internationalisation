@@ -846,9 +846,7 @@ class Module extends AbstractModule
             $prepended = array_filter($valueOptions, 'is_scalar');
             $appended = array_diff_key($valueOptions, $prepended);
         }
-        $translateLabels = function ($v) use ($translator) {
-            return is_array($v) ? $translator->translate($v['label']) : $translator->translate($v);
-        };
+        $translateLabels = fn ($v) => is_array($v) ? $translator->translate($v['label']) : $translator->translate($v);
         $appendedTranslated = array_map($translateLabels, $appended);
         $localeSort($appendedTranslated);
         $appended = array_replace($appendedTranslated, $appended);
