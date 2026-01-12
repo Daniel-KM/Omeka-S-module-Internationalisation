@@ -1162,7 +1162,7 @@ class Module extends AbstractModule
             case 'all_site_iso':
             case 'site_iso':
                 require_once __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
-                $isoCodes = \Iso639p3::codes($locale);
+                $isoCodes = \Iso639p3\Iso639p3::codes($locale);
                 $siteSettings->set('internationalisation_iso_codes', $isoCodes);
                 $locales = array_merge($locales, $isoCodes);
                 break;
