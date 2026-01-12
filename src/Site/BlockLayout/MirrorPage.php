@@ -44,7 +44,7 @@ class MirrorPage extends AbstractBlockLayout
 
     public function onHydrate(SitePageBlock $block, ErrorStore $errorStore): void
     {
-        $mirrorPage = (int) $block->getData()['page'] ?: $this->defaultSettings['page'];
+        $mirrorPage = (int) ($block->getData()['page'] ?? 0);
 
         if (empty($mirrorPage)) {
             $errorStore->addError('o:block[__blockIndex__][o:data][page]', 'A page should be selected to create a mirror page.'); // @translate
@@ -80,8 +80,14 @@ class MirrorPage extends AbstractBlockLayout
         // Factory is not used to make rendering simpler.
         $services = $site->getServiceLocator();
         $formElementManager = $services->get('FormElementManager');
-        $defaultSettings = $services->get('Config')['blockplus']['block_settings']['mirrorPage'];
-        $blockFieldset = \BlockPlus\Form\MirrorPageFieldset::class;
+        $config = $services->get('Config');
+        $hasBlockPlus = class_exists('BlockPlus\Module', false);
+        $defaultSettings = $hasBlockPlus
+            ? $config['blockplus']['block_settings']['mirrorPage']
+            : $config['internationalisation']['block_settings']['mirrorPage'];
+        $blockFieldset = $hasBlockPlus
+            ? \BlockPlus\Form\MirrorPageFieldset::class
+            : \Internationalisation\Form\MirrorPageFieldset::class;
 
         $data = $block ? ($block->data() ?? []) + $defaultSettings : $defaultSettings;
 
