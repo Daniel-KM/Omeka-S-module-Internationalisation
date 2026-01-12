@@ -317,7 +317,7 @@ Copyright
 This module was built initialy for [Watau]. Next features were added for various
 digital libraries, in particular the [Curiothèque] of the [Musée Curie].
 
-* Copyright Daniel Berthereau, 2019-2025 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2019-2026 (see [Daniel-KM] on GitLab)
 * Copyright BibLibre, 2017 (see [BibLibre] on GitLab), for the switcher
 
 This module provides the same features than the [Omeka Classic] plugins [MultiLanguage]
