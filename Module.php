@@ -760,33 +760,38 @@ class Module extends AbstractModule
             return;
         }
 
-        // Add all pairs.
-        $sql = <<<SQL
-            INSERT INTO site_page_relation (page_id, related_page_id)
-            VALUES
-            SQL;
-
+        // Add all pairs using parameterized query.
         $ids = $selected;
         $ids[] = $pageId;
         sort($ids);
         $relatedIds = $ids;
-        $has = false;
+
+        $values = [];
+        $params = [];
+        $types = [];
+        $i = 0;
         foreach ($ids as $id) {
             foreach ($relatedIds as $relatedId) {
                 if ($relatedId > $id) {
-                    $has = true;
-                    $sql .= "\n($id, $relatedId),";
+                    $values[] = "(:p{$i}, :r{$i})";
+                    $params["p{$i}"] = $id;
+                    $params["r{$i}"] = $relatedId;
+                    $types["p{$i}"] = \Doctrine\DBAL\ParameterType::INTEGER;
+                    $types["r{$i}"] = \Doctrine\DBAL\ParameterType::INTEGER;
+                    ++$i;
                 }
             }
         }
-        $sql = rtrim($sql, ',');
-        if (!$has) {
+
+        if (empty($values)) {
             return;
         }
 
-        $sql .= ' ON DUPLICATE KEY UPDATE `id` = `id`;';
+        $sql = 'INSERT INTO site_page_relation (page_id, related_page_id) VALUES '
+            . implode(', ', $values)
+            . ' ON DUPLICATE KEY UPDATE `id` = `id`';
 
-        $connection->executeStatement($sql);
+        $connection->executeStatement($sql, $params, $types);
     }
 
     public function filterVocabularyMemberSelectQuery(Event $event): void

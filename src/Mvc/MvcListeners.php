@@ -64,11 +64,19 @@ class MvcListeners extends AbstractListenerAggregate
             if (class_exists('Table\Module', false)) {
                 $config = $services->get('Config');
                 $localFilesPath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-                $localFile = $localFilesPath . '/language/table-' . $site->id() . '.php';
-                if (file_exists($localFile) && is_readable($localFile)) {
+                $languageDir = $localFilesPath . '/language';
+                $localFile = $languageDir . '/table-' . $site->id() . '.php';
+                // Security: validate path is within expected directory.
+                $realPath = realpath($localFile);
+                $realLanguageDir = realpath($languageDir);
+                if ($realPath
+                    && $realLanguageDir
+                    && strpos($realPath, $realLanguageDir . DIRECTORY_SEPARATOR) === 0
+                    && is_readable($realPath)
+                ) {
                     // Method addTranslationFile() cannot be used, because the
                     // locale is unknown and may change when creating file.
-                    $locales = include $localFile;
+                    $locales = include $realPath;
                     if (is_array($locales)) {
                         $translator
                             // ->addTranslationFile('tables', $localFile, null, null)
@@ -83,9 +91,17 @@ class MvcListeners extends AbstractListenerAggregate
         } elseif (class_exists('Table\Module', false)) {
             $config = $services->get('Config');
             $localFilesPath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-            $localFile = $localFilesPath . '/language/table-0.php';
-            if (file_exists($localFile) && is_readable($localFile)) {
-                $locales = include $localFile;
+            $languageDir = $localFilesPath . '/language';
+            $localFile = $languageDir . '/table-0.php';
+            // Security: validate path is within expected directory.
+            $realPath = realpath($localFile);
+            $realLanguageDir = realpath($languageDir);
+            if ($realPath
+                && $realLanguageDir
+                && strpos($realPath, $realLanguageDir . DIRECTORY_SEPARATOR) === 0
+                && is_readable($realPath)
+            ) {
+                $locales = include $realPath;
                 if (is_array($locales)) {
                     $translator
                         ->addRemoteTranslations('tables')
