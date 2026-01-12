@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-18 00:00+0000\n"
-"PO-Revision-Date: 2025-08-18 00:00+0000\n"
+"POT-Creation-Date: 2026-01-12 00:00+0000\n"
+"PO-Revision-Date: 2026-01-12 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: French <kde-i18n-doc@kde.org>\n"
 "Language: fr\n"
@@ -15,23 +15,27 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.6\n"
 
-#: data/scripts/upgrade.php:37 Module.php:111
+#: data/scripts/upgrade.php:37 Module.php:110
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
+
+#: Module.php:1023
+msgid "Remove and copy data"
+msgstr "Supprimer et copier des données"
 
 #: src/Api/Adapter/SitePageRelationAdapter.php:220
 #, php-format
 msgid "The \"%s\" field is not available in the %s entity class."
 msgstr "Le champ \"%s\" n'est pas disponible avec la classe %s."
 
-#: src/Site/BlockLayout/MirrorPage.php:97
+#: src/Site/BlockLayout/MirrorPage.php:103
 msgid "Choose any page from any site."
 msgstr "Choisir une page de n’importe quel site."
 
-#: src/Site/BlockLayout/MirrorPage.php:98
+#: src/Site/BlockLayout/MirrorPage.php:104
 msgid ""
 "If a page of a private site is selected, it will be hidden on the public "
 "side."
@@ -39,7 +43,7 @@ msgstr ""
 "Si une page d’un site privé est choisie, elle sera cachée dans la partie "
 "publique."
 
-#: src/Site/BlockLayout/MirrorPage.php:99
+#: src/Site/BlockLayout/MirrorPage.php:105
 msgid "The current page and recursive pages are forbidden."
 msgstr ""
 "La page en cours ou qui se trouve récursivement dans une autre page ne peut "
@@ -151,8 +155,8 @@ msgstr ""
 "Le sélecteur de langue est désormais disponible en tant que bloc de page et "
 "bloc de ressource."
 
-#: data/scripts/upgrade.php:128 Module.php:133
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:277
+#: data/scripts/upgrade.php:128 Module.php:132
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:274
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
@@ -175,14 +179,14 @@ msgstr ""
 "les tables et mettez à jour les paramètres. Les paramètres sont conservés "
 "pour gérer les traductions spécifiques."
 
-#: Module.php:120
+#: Module.php:119
 msgid ""
 "The composer vendor is not ready. See module’s installation documentation."
 msgstr ""
 "Le dossier vendor de composer n’est pas installé. Consulter la documentation "
 "d’installation du module."
 
-#: Module.php:147
+#: Module.php:146
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
@@ -192,8 +196,8 @@ msgstr ""
 "l’installer pour gérer les caractères diacritiques et non-latin et pour "
 "traduire les dates, les nombres et plus."
 
-#: Module.php:921 src/Form/SettingsFieldset.php:60
-#: src/Form/SettingsFieldset.php:62
+#: Module.php:921 src/Form/SettingsFieldset.php:63
+#: src/Form/SettingsFieldset.php:65
 msgid "Remove all groups"
 msgstr "Supprimer tous les groupes"
 
@@ -211,7 +215,7 @@ msgstr ""
 msgid "Select translations of this page…"
 msgstr "Choisir les traductions de cette page…"
 
-#: Module.php:1087 src/Job/DuplicateSite.php:88
+#: Module.php:1087 src/Job/DuplicateSite.php:92
 msgid "The site #{site_id} cannot be copied. Check your rights."
 msgstr "Le site #« {site_id} » ne peut pas être copié. Vérifiez vos droits."
 
@@ -229,18 +233,18 @@ msgstr ""
 "Une tâche a été lancée en arrière-plan pour copier les données du site : "
 "({link_job}tâche #{job_id}{link_end}, {link_log}journaux{link_end})."
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:114
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:223
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:235
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:113
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:220
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:232
 msgid "The file \"{file}\" is not writeable."
 msgstr "Le fichier « {file} » ne peut pas être enregistré."
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:191
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:199
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:188
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:196
 msgid "The tables \"{tables}\" does not exist."
 msgstr "Les tables « {tables} » n’existent pas."
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:258
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:255
 msgid ""
 "The following tables are included for internationalisation in site settings, "
 "but have no defined language: {table_slugs}."
@@ -248,50 +252,50 @@ msgstr ""
 "Les tables suivantes sont inclues pour l’internationalisation dans les "
 "paramètres de site, mais n’ont pas de langue définie : {table_slugs}."
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:288
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:286
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}."
 
-#: src/Job/DuplicateSite.php:73
+#: src/Job/DuplicateSite.php:77
 msgid "The site #{site_id} is not available for copy. Check your rights."
 msgstr ""
 "Le site #« {site_id} » n’est pas disponible pour la copie. Vérifiez vos "
 "droits."
 
-#: src/Job/DuplicateSite.php:189
+#: src/Job/DuplicateSite.php:177
 msgid "Check logs: an error occurred."
 msgstr "Vérifier les journaux : une erreur est survenue."
 
-#: src/Job/DuplicateSite.php:232
+#: src/Job/DuplicateSite.php:210
 msgid "Site settings of \"{site_slug}\" successfully removed."
 msgstr "Les paramètres du site « {site_slug} » ont été supprimés."
 
-#: src/Job/DuplicateSite.php:266
+#: src/Job/DuplicateSite.php:244
 msgid "{total} site permissions removed from \"{site_slug}\"."
 msgstr "{total} permissions supprimées du site « {site_slug} »."
 
-#: src/Job/DuplicateSite.php:305
+#: src/Job/DuplicateSite.php:284
 msgid "{total} site pages removed from \"{site_slug}\"."
 msgstr "{total} pages supprimées du site « {site_slug} »."
 
-#: src/Job/DuplicateSite.php:319
+#: src/Job/DuplicateSite.php:298
 msgid "{total} collecting forms removed from \"{site_slug}\"."
 msgstr ""
 "{total} formulaires de collecte ont été supprimés du site « {site_slug} »."
 
-#: src/Job/DuplicateSite.php:354
+#: src/Job/DuplicateSite.php:331
 msgid ""
 "Site settings of \"{site_slug}\" successfully copied into \"{site_slug_2}\"."
 msgstr ""
 "Les paramètres du site « {site_slug} » ont été copiés dans « {site_slug_2} » "
 "avec succès."
 
-#: src/Job/DuplicateSite.php:417
+#: src/Job/DuplicateSite.php:423
 msgid ""
 "The page slug \"{page_slug}\" from the source has been renamed \"{slug}\"."
 msgstr "Le chemin de la page source « {page_slug} » a été renommé « {slug} »."
 
-#: src/Job/DuplicateSite.php:423
+#: src/Job/DuplicateSite.php:429
 msgid ""
 "Unable to copy page \"{page_slug}\" of site \"{site_slug}\". The page is "
 "skipped."
@@ -299,7 +303,7 @@ msgstr ""
 "Impossible de copier la page« {page_slug} » du site « {site_slug} ». La page "
 "a été ignorée."
 
-#: src/Job/DuplicateSite.php:433
+#: src/Job/DuplicateSite.php:439
 msgid ""
 "{total} site pages of \"{site_slug}\" successfully copied into "
 "\"{site_slug_2}\" (mode \"{mode}\")."
@@ -307,7 +311,7 @@ msgstr ""
 "{total} pages du site « {site_slug} » ont été copiées avec succès dans le "
 "site « {site_slug_2} » (mode « {mode} »)."
 
-#: src/Job/DuplicateSite.php:537 src/Job/DuplicateSite.php:566
+#: src/Job/DuplicateSite.php:564 src/Job/DuplicateSite.php:594
 msgid ""
 "The module Collecting is a new version and is not copiable for now. Copy "
 "forms manually if needed."
@@ -315,7 +319,7 @@ msgstr ""
 "Le module Collecting est une nouvelle version et n’est pas copiable "
 "actuellement. Copiez les formulaires manuellement si besoin."
 
-#: src/Job/DuplicateSite.php:543
+#: src/Job/DuplicateSite.php:570
 msgid ""
 "{total} collecting forms from site \"{site_slug}\" were successfully copied "
 "into \"{site_slug_2}\"."
@@ -323,7 +327,7 @@ msgstr ""
 "{total} formulaires de collecte du site « {site_slug} » ont été copiés avec "
 "succès dans « {site_slug_2} »."
 
-#: src/Job/DuplicateSite.php:588
+#: src/Job/DuplicateSite.php:616
 msgid ""
 "The full text for page {page_slug} was not saved. Run indexation of full "
 "text manually in main settings or in tasks of Easy Admin. Exception: "
@@ -338,43 +342,80 @@ msgstr ""
 msgid "Internationalisation"
 msgstr "Internationalisation"
 
-#: src/Form/SiteSettingsFieldset.php:31 src/Form/SiteSettingsFieldset.php:43
+#: src/Form/SiteSettingsFieldset.php:22 src/Form/SettingsFieldset.php:16
+msgid "Internationalisation: Resources"
+msgstr "Internationalisation: Ressources"
+
+#: src/Form/SiteSettingsFieldset.php:42
 msgid "All values"
 msgstr "Toutes les valeurs"
 
-#: src/Form/SiteSettingsFieldset.php:32
+#: src/Form/SiteSettingsFieldset.php:46
 msgid "All values, with language of the site first"
 msgstr "Toutes les valeurs, avec la langue du site en premier"
 
-#: src/Form/SiteSettingsFieldset.php:33
+#: src/Form/SiteSettingsFieldset.php:50
 msgid "All values, with language of the site or iso fallback first"
 msgstr ""
 "Toutes les valeurs, avec la langue du site ou les langues de repli ISO en "
 "premier"
 
-#: src/Form/SiteSettingsFieldset.php:34
+#: src/Form/SiteSettingsFieldset.php:54
 msgid "All values, with language of the site or custom fallback first"
 msgstr ""
 "Toutes les valeurs, avec la langue du site ou une langue de repli "
 "personnalisée en premier"
 
-#: src/Form/SiteSettingsFieldset.php:35
+#: src/Form/SiteSettingsFieldset.php:58
 msgid "Only values with the language of the site"
 msgstr "Seulement les valeurs correspondant à la langue du site"
 
-#: src/Form/SiteSettingsFieldset.php:36
+#: src/Form/SiteSettingsFieldset.php:62
 msgid "Only values with the language of the site, with iso fallback"
 msgstr ""
 "Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
 "ayant les codes iso correspondant"
 
-#: src/Form/SiteSettingsFieldset.php:37
+#: src/Form/SiteSettingsFieldset.php:66
 msgid "Only values with the language of the site, with custom fallback"
 msgstr ""
 "Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
 "ayant les langues ci-dessous"
 
-#: src/Form/SiteSettingsFieldset.php:40
+#: src/Form/SiteSettingsFieldset.php:78
+msgid "All values (set a locale for more options)"
+msgstr "Toutes les valeurs (indiquer une langue pour plus d’options)"
+
+#: src/Form/SiteSettingsFieldset.php:98
+msgid "Tables to use for special translations"
+msgstr "Tables à utiliser pour les traductions spéciales"
+
+#: src/Form/SiteSettingsFieldset.php:100 src/Form/SettingsFieldset.php:37
+msgid ""
+"The module Table allows to translate strings in admin board. The tables "
+"should have a language."
+msgstr ""
+"Le module Table permet de traduire des chaînes dans l’interface admin. Les "
+"tables doivent avoir une langue."
+
+#: src/Form/SiteSettingsFieldset.php:101 src/Form/SettingsFieldset.php:38
+msgid ""
+"The module Table allows to translate strings in admin board. Separate tables "
+"slugs with a space. The tables should have a language."
+msgstr ""
+"Le module Table permet de traduire des chaînes dans l’interface admin. "
+"Séparer les noms des tables avec une espace. Les tables doivent avoir une "
+"langue."
+
+#: src/Form/SiteSettingsFieldset.php:116 src/Form/SettingsFieldset.php:53
+msgid "Select tables…"
+msgstr "Choisir les tables…"
+
+#: src/Form/SiteSettingsFieldset.php:125
+msgid "Language of values"
+msgstr "Langue des valeurs"
+
+#: src/Form/SiteSettingsFieldset.php:126
 msgid ""
 "Display only the values in the specified language. It applies only for "
 "properties that contains at least one value with a language. The option can "
@@ -384,48 +425,11 @@ msgstr ""
 "seulement aux propriétés qui contiennent au moins une valeur avec une "
 "langue. Cette option peut être contournée par le thème."
 
-#: src/Form/SiteSettingsFieldset.php:45
-msgid ""
-"Display only the values in the specified language. This option is available "
-"only when the site has a language."
-msgstr ""
-"Afficher seulement les valeurs dans la langue choisie. Cette option est "
-"disponible seulement si le site a une langue."
-
-#: src/Form/SiteSettingsFieldset.php:59
-msgid "Tables to use for special translations"
-msgstr "Tables à utiliser pour les traductions spéciales"
-
-#: src/Form/SiteSettingsFieldset.php:61 src/Form/SettingsFieldset.php:35
-msgid ""
-"The module Table allows to translate strings in admin board. The tables "
-"should have a language."
-msgstr ""
-"Le module Table permet de traduire des chaînes dans l’interface admin. Les "
-"tables doivent avoir une langue."
-
-#: src/Form/SiteSettingsFieldset.php:62 src/Form/SettingsFieldset.php:36
-msgid ""
-"The module Table allows to translate strings in admin board. Separate tables "
-"slugs with a space. The tables should have a language."
-msgstr ""
-"Le module Table permet de traduire des chaînes dans l’interface admin. "
-"Séparer les noms des tables avec une espace. Les tables doivent avoir une "
-"langue."
-
-#: src/Form/SiteSettingsFieldset.php:76 src/Form/SettingsFieldset.php:50
-msgid "Select tables…"
-msgstr "Choisir les tables…"
-
-#: src/Form/SiteSettingsFieldset.php:85
-msgid "Language of values"
-msgstr "Langue des valeurs"
-
-#: src/Form/SiteSettingsFieldset.php:100
+#: src/Form/SiteSettingsFieldset.php:140
 msgid "Custom language fallbacks"
 msgstr "Langues de repli"
 
-#: src/Form/SiteSettingsFieldset.php:101
+#: src/Form/SiteSettingsFieldset.php:141
 msgid ""
 "Specify values to display when a property has no value with the language of "
 "the site. Set one language code by line."
@@ -433,11 +437,11 @@ msgstr ""
 "Indique les valeurs à afficher quand une propriété n’a pas de valeur dans la "
 "langue du site. Indiquer une langue par ligne."
 
-#: src/Form/SiteSettingsFieldset.php:119
+#: src/Form/SiteSettingsFieldset.php:160
 msgid "Required languages"
 msgstr "Langues obligatoires"
 
-#: src/Form/SiteSettingsFieldset.php:120
+#: src/Form/SiteSettingsFieldset.php:161
 msgid ""
 "Specify values to display in all cases. Values without language are "
 "displayed in all cases. Set one language code by line."
@@ -505,15 +509,15 @@ msgstr "Laisser blanc pour utiliser le paramètre de langue global."
 msgid "List of strings and translations separated by \"=\""
 msgstr "Liste des chaînes et des traductions séparées par « = »"
 
-#: src/Form/SettingsFieldset.php:33
+#: src/Form/SettingsFieldset.php:35
 msgid "Tables to use for translation in admin"
 msgstr "Tables à utiliser pour la traduction en admin"
 
-#: src/Form/SettingsFieldset.php:58
+#: src/Form/SettingsFieldset.php:61
 msgid "Site groups"
 msgstr "Groupes de sites"
 
-#: src/Form/SettingsFieldset.php:59
+#: src/Form/SettingsFieldset.php:62
 msgid ""
 "Group some sites with a different language so they can be managed together "
 "as a whole. Set all site slugs by group, one by line, with or without comma "
@@ -657,7 +661,7 @@ msgstr ""
 "Une page miroir ne peut pas utiliser une page qui l’utilise récursivement "
 "dans un bloc."
 
-#: src/Site/BlockLayout/MirrorPage.php:113
+#: src/Site/BlockLayout/MirrorPage.php:119
 msgid ""
 "Mirror page block #{block_id} in site {site_slug} and page {page_slug} "
 "should be updated: it refers to a removed page."
@@ -665,7 +669,7 @@ msgstr ""
 "Le bloc Page miroir #{block_id} dans le site {site_slug} pour la page "
 "{page_slug} doit être mis à jour : il fait référence à une page supprimée."
 
-#: src/Site/BlockLayout/MirrorPage.php:143
+#: src/Site/BlockLayout/MirrorPage.php:149
 msgid "Cannot render this mirror page for now: {exception}."
 msgstr "Impossible de rendre la page miroir actuellement : {exception}."
 
@@ -674,15 +678,19 @@ msgid "Language Switcher"
 msgstr "Sélecteur de langue"
 
 #~ msgid ""
+#~ "Display only the values in the specified language. This option is "
+#~ "available only when the site has a language."
+#~ msgstr ""
+#~ "Afficher seulement les valeurs dans la langue choisie. Cette option est "
+#~ "disponible seulement si le site a une langue."
+
+#~ msgid ""
 #~ "The module Table allows to translate strings in admin board. Separate "
 #~ "table slugs with a space. The tables should have a language."
 #~ msgstr ""
 #~ "Le module Table permet de traduire des chaînes dans l’interface admin. "
 #~ "Séparer les noms des tables avec une espace. Les tables doivent avoir une "
 #~ "langue."
-
-#~ msgid "Remove and copy data"
-#~ msgstr "Supprimer et copier des données"
 
 #~ msgid "The composer vendor is not ready."
 #~ msgstr "Le dossier /vendor de composer n’est pas prêt."
