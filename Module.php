@@ -748,26 +748,13 @@ class Module extends AbstractModule
         // should remain.
         // TODO Check if this process remove hidden pages in true life (with language switcher, the user should see all localized sites).
 
-        $existing = $api
-            ->search(
-                'site_page_relations',
-                ['relation' => $pageId]
-            )
-            ->getContent();
-        $existingIds = array_map(function ($relation) use ($pageId) {
-            $relatedId = $relation->relatedPage()->id();
-            return $pageId === $relatedId
-                ? $relation->page()->id()
-                : $relatedId;
-        }, $existing);
-
-        if (count($existingIds)) {
-            $sql = <<<SQL
-                DELETE FROM site_page_relation
-                WHERE page_id IN (:page_ids) OR related_page_id IN (:page_ids)
-                SQL;
-            $connection->executeQuery($sql, ['page_ids' => $existingIds], ['page_ids' => $connection::PARAM_INT_ARRAY]);
-        }
+        // Delete only relations involving the current page, not relations
+        // between other related pages.
+        $sql = <<<SQL
+            DELETE FROM site_page_relation
+            WHERE page_id = :page_id OR related_page_id = :page_id
+            SQL;
+        $connection->executeQuery($sql, ['page_id' => $pageId], ['page_id' => \Doctrine\DBAL\ParameterType::INTEGER]);
 
         if (empty($selected)) {
             return;
