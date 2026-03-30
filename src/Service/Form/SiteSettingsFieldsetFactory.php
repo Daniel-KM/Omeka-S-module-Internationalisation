@@ -16,7 +16,7 @@ class SiteSettingsFieldsetFactory implements FactoryInterface
      *
      * @return \Internationalisation\Form\SiteSettingsFieldset
      */
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         $fieldset = new SiteSettingsFieldset(null, $options ?? []);
         return $fieldset

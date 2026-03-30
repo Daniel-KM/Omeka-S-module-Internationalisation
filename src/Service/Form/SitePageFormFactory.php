@@ -13,7 +13,7 @@ class SitePageFormFactory implements FactoryInterface
      * @see \Omeka\Form\SitePageForm
      * @see \Omeka\Service\Form\SitePageFormFactory
      */
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         /** @var \Omeka\Site\Theme\Theme $theme */
         $theme = $services->get('Omeka\Site\ThemeManager')->getCurrentTheme();

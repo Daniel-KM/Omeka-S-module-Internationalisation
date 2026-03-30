@@ -16,7 +16,7 @@ class LanguageSwitcherFactory implements FactoryInterface
      *
      * @return LanguageSwitcher
      */
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         $settings = $services->get('Omeka\Settings');
         $defaultLocale = $settings->get('locale') ?: $services->get('Config')['translator']['locale'] ?: 'en_US';

@@ -15,7 +15,7 @@ class LocaleValueFactory implements FactoryInterface
      *
      * @return LocaleValue
      */
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         $settings = $services->get('Omeka\Settings\Site');
 

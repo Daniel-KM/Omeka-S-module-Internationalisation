@@ -16,7 +16,7 @@ class LanguageListFactory implements FactoryInterface
      *
      * @return LanguageList
      */
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         /** @var \Laminas\Authentication\AuthenticationService $auth */
         $auth = $services->get('Omeka\AuthenticationService');
