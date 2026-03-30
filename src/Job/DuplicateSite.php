@@ -561,7 +561,7 @@ class DuplicateSite extends AbstractJob
                 'source_id' => ParameterType::INTEGER,
                 'target_id' => ParameterType::INTEGER,
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->notice(
                 'The module Collecting is a new version and is not copiable for now. Copy forms manually if needed.' // @translate
             );
@@ -579,7 +579,7 @@ class DuplicateSite extends AbstractJob
             SQL;
         try {
             $multiple = $this->connection->executeStatement($sql) ? ', `multiple`' : '';
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $multiple = '';
         }
         // Note: $multiple is safe (empty string or ', `multiple`'), not user input.
@@ -591,7 +591,7 @@ class DuplicateSite extends AbstractJob
             SQL;
         try {
             $result = $this->connection->executeStatement($sql, ['source_id' => $sourceId], ['source_id' => ParameterType::INTEGER]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->notice(
                 'The module Collecting is a new version and is not copiable for now. Copy forms manually if needed.' // @translate
             );
@@ -611,7 +611,7 @@ class DuplicateSite extends AbstractJob
         foreach ($site->getPages() as $page) {
             try {
                 $fulltext->save($page, $this->pageAdapter);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Some blocks fail without a site, that may not be provided for
                 // background tasks.
                 $this->logger->warn(

@@ -1267,7 +1267,7 @@ class Module extends AbstractModule
             $siteSettings = $services->get('Omeka\Settings\Site');
             try {
                 $locales = $siteSettings->get('internationalisation_locales', []);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Probably a background process.
                 // TODO Is the exception for current site fixed?
                 $site = $services->get('ControllerPluginManager')->get('currentSite')()

@@ -141,7 +141,7 @@ if (version_compare($oldVersion, '3.4.17', '<')) {
     foreach ($sqls as $sql) {
         try {
             $connection->executeStatement($sql);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Skip.
         }
     }

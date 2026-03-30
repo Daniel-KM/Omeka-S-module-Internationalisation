@@ -144,7 +144,7 @@ class MirrorPage extends AbstractBlockLayout
         $contentView->setVariable('pageViewModel', $contentView);
         try {
             return $view->render($contentView);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $view->logger()->err(
                 'Cannot render this mirror page for now: {exception}.', // @translate
                 ['exception' => $e]
@@ -190,7 +190,7 @@ class MirrorPage extends AbstractBlockLayout
         // TODO Many blocks are not indexed. Why indexing them in mirror pages?
         try {
             return strip_tags($this->render($view, $block));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return '';
         }
     }
