@@ -40,7 +40,8 @@ class MvcListeners extends AbstractListenerAggregate
         if ($isSiteRequest) {
             /** @var \Omeka\Api\Representation\SiteRepresentation $site */
             $site = $services->get('ControllerPluginManager')->get('currentSite')();
-            $themeLanguagePath = OMEKA_PATH . '/themes/' . $site->theme() . '/language';
+            $siteTheme = $site->theme();
+            $themeLanguagePath = (is_dir(OMEKA_PATH . '/themes/' . $siteTheme) ? OMEKA_PATH . '/themes/' : OMEKA_PATH . '/composer-addons/themes/') . $siteTheme . '/language';
             if (file_exists($themeLanguagePath) && is_dir($themeLanguagePath)) {
                 // Since version 4.0, the theme language is loaded automatically
                 // when theme.ini has the option "has_translation" set to true.
