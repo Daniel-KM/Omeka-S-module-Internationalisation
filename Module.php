@@ -968,6 +968,8 @@ class Module extends AbstractModule
                     'info' => 'The selected pages will be translations of the current page within a site group, that must be defined. The language switcher displays only one related page by site.', // @translate
                     'site_group' => 'internationalisation_site_groups',
                     'exclude_current_site' => true,
+                    'site_label' => 'title_slug',
+                    'page_label' => 'slug',
                 ],
                 'attributes' => [
                     'id' => 'o-module-internationalisation:related_page',
