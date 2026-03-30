@@ -102,37 +102,39 @@ class Module extends AbstractModule
     {
         $services = $this->getServiceLocator();
         $plugins = $services->get('ControllerPluginManager');
-        $translate = $plugins->get('translate');
         $translator = $services->get('MvcTranslator');
 
         if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.82')) {
             $message = new \Omeka\Stdlib\Message(
-                $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+                $translator->translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
                 'Common', '3.4.82'
             );
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
 
+        $errors = [];
+
         $vendor = __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
         if (!file_exists($vendor)) {
-            $message = new PsrMessage(
+            $errors[] = (string) (new PsrMessage(
                 'The composer vendor is not ready. See module’s installation documentation.' // @translate
-            );
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
+            ))->setTranslator($translator);
         }
 
         $this->checkExtensionIntl();
 
         $config = $services->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-        $translator = $services->get('MvcTranslator');
 
         if (!$this->checkDestinationDir($basePath . '/internationalisation')) {
-            $message = new PsrMessage(
+            $errors[] = (string) new PsrMessage(
                 'The directory "{path}" is not writeable.', // @translate
                 ['path' => $basePath . '/internationalisation']
             );
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
+
+        if ($errors) {
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n", $errors));
         }
     }
 
@@ -1126,9 +1128,7 @@ class Module extends AbstractModule
         $message = new PsrMessage(
             'A job was launched in background to copy site data: ({link_job}job #{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
             [
-                'link_job' => sprintf('<a href="%s">',
-                    htmlspecialchars($urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
-                ),
+                'link_job' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()]))),
                 'job_id' => $job->getId(),
                 'link_end' => '</a>',
                 'link_log' => class_exists('Log\Module', false)
