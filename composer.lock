@@ -4,50 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b5b927d26d8cffe911441899bacebcb6",
+    "content-hash": "230f6e1ab9438949df763964126f25b8",
     "packages": [
-        {
-            "name": "components/flag-icon-css",
-            "version": "3.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/lipis/flag-icon-css.git",
-                "reference": "5141384c57972b0b08fc3bb67bea297321fbd799"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/lipis/flag-icon-css/zipball/5141384c57972b0b08fc3bb67bea297321fbd799",
-                "reference": "5141384c57972b0b08fc3bb67bea297321fbd799",
-                "shasum": ""
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "name": "flag-icon-css",
-                    "files": [
-                        "less/**",
-                        "css/**",
-                        "flags/**"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Panayiotis Lipiridis (Lipis)",
-                    "email": "lipiridis@gmail.com"
-                }
-            ],
-            "description": "CSS for vector based country flags",
-            "support": {
-                "issues": "https://github.com/lipis/flag-icon-css/issues",
-                "source": "https://github.com/lipis/flag-icon-css/tree/3.5.0"
-            },
-            "time": "2020-06-10T11:53:19+00:00"
-        },
         {
             "name": "daniel-km/simple-iso-639-3",
             "version": "0.2.2",
@@ -91,56 +49,62 @@
             "time": "2025-07-07T00:00:00+00:00"
         },
         {
-            "name": "slowprog/composer-copy-file",
-            "version": "0.3.3",
+            "name": "sempia/external-assets",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/slowprog/CopyFile.git",
-                "reference": "b02d55f7587577f29d355f0ce7b697f66dffc0af"
+                "url": "https://gitlab.com/Sempia/composer-plugin-external-assets.git",
+                "reference": "3c101e7edb043daabfcc45871a3b048bf8a38e96"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slowprog/CopyFile/zipball/b02d55f7587577f29d355f0ce7b697f66dffc0af",
-                "reference": "b02d55f7587577f29d355f0ce7b697f66dffc0af",
+                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-external-assets/repository/archive.zip?sha=3c101e7edb043daabfcc45871a3b048bf8a38e96",
+                "reference": "3c101e7edb043daabfcc45871a3b048bf8a38e96",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6"
+                "composer-plugin-api": "^2.0",
+                "php": ">=7.2.5"
             },
             "require-dev": {
-                "composer/composer": "1.0.*@dev",
-                "mikey179/vfsstream": "~1",
-                "php-mock/php-mock-phpunit": "~1",
-                "phpunit/phpunit": "5.7.27",
-                "symfony/filesystem": "~2.7",
-                "symfony/finder": "~2.7"
+                "composer/composer": "^2.0",
+                "phpunit/phpunit": "^8.5 || ^9.6"
             },
-            "type": "library",
+            "bin": [
+                "bin/external-assets"
+            ],
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Sempia\\ExternalAssets\\ExternalAssetsPlugin"
+            },
             "autoload": {
                 "psr-4": {
-                    "SlowProg\\CopyFile\\": ""
+                    "Sempia\\ExternalAssets\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+                "CECILL-2.1"
             ],
             "authors": [
                 {
-                    "name": "Andrey Tyshev",
-                    "email": "slowprog@gmail.com"
+                    "name": "Daniel Berthereau",
+                    "email": "Daniel.fr@Berthereau.net"
                 }
             ],
-            "description": "Composer script copying your files after install",
-            "homepage": "https://github.com/SlowProg/composer-copy-file",
+            "description": "Composer plugin to download external assets (JS, CSS, fonts, images) for any PHP project",
+            "homepage": "https://gitlab.com/sempia/composer-plugin-external-assets",
             "keywords": [
-                "copy file"
+                "assets",
+                "composer-plugin",
+                "download",
+                "external"
             ],
             "support": {
-                "issues": "https://github.com/slowprog/CopyFile/issues",
-                "source": "https://github.com/slowprog/CopyFile/tree/0.3.3"
+                "issues": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/issues",
+                "source": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/tree/1.0.1"
             },
-            "time": "2020-07-02T14:44:41+00:00"
+            "time": "2026-02-09T00:00:00+00:00"
         }
     ],
     "packages-dev": [],

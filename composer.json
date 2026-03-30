@@ -1,21 +1,52 @@
 {
-    "require": {
-        "components/flag-icon-css": "^3.3",
-        "daniel-km/simple-iso-639-3": "^0.2.2",
-        "slowprog/composer-copy-file": "~0.3"
+    "name": "daniel-km/omeka-s-module-internationalisation",
+    "type": "omeka-s-module",
+    "description": "Module for Omeka S: Add and manage translations by site and page and add a language switcher for the front-end.",
+    "keywords": [
+        "Omeka S",
+        "Omeka S module",
+        "translation",
+        "language"
+    ],
+    "license": "CECILL-2.1",
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation",
+    "authors": [
+        {
+            "name": "Daniel Berthereau",
+            "email": "Daniel.packagist@Berthereau.net"
+        }
+    ],
+    "support": {
+        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/issues",
+        "forum": "https://forum.omeka.org/"
     },
-    "scripts": {
-        "post-install-cmd": [
-            "SlowProg\\CopyFile\\ScriptHandler::copy"
-        ],
-        "post-update-cmd": [
-            "SlowProg\\CopyFile\\ScriptHandler::copy"
-        ]
+    "_require (not set until Omeka S merges PR #2412)": {
+        "omeka/omeka-s": "^4.1",
+        "daniel-km/omeka-s-module-common": "*"
+    },
+    "require": {
+        "daniel-km/simple-iso-639-3": "^0.2.2",
+        "sempia/external-assets": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Internationalisation\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "InternationalisationTest\\": "tests/InternationalisationTest/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "sempia/external-assets": true
+        }
     },
     "extra": {
-        "copy-file": {
-            "vendor/components/flag-icon-css": "asset/vendor/flag-icon-css/"
-        },
-        "installer-name": "Internationalisation"
+        "installer-name": "Internationalisation",
+        "external-assets": {
+            "asset/vendor/flag-icon-css/": "https://github.com/lipis/flag-icon-css/archive/refs/tags/3.5.0.tar.gz"
+        }
     }
 }
