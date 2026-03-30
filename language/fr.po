@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-12 00:00+0000\n"
-"PO-Revision-Date: 2026-01-12 00:00+0000\n"
+"POT-Creation-Date: 2026-03-30 00:00+0000\n"
+"PO-Revision-Date: 2026-03-30 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: French <kde-i18n-doc@kde.org>\n"
 "Language: fr\n"
@@ -17,12 +17,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.6\n"
 
-#: data/scripts/upgrade.php:37 Module.php:110
+#: data/scripts/upgrade.php:37 Module.php:109
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
 
-#: Module.php:1023
+#: data/scripts/upgrade.php:41 data/scripts/upgrade.php:133
+msgid "Missing requirement. Unable to upgrade."
+msgstr "Pré-requis absent. Impossible de mettre à jour."
+
+#: Module.php:1028
 msgid "Remove and copy data"
 msgstr "Supprimer et copier des données"
 
@@ -141,13 +145,13 @@ msgstr "Chaîne"
 msgid "Translation"
 msgstr "Traduction"
 
-#: data/scripts/upgrade.php:112
+#: data/scripts/upgrade.php:113
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 "Le module {module} doit être mis à niveau à la version {version} ou "
 "supérieure."
 
-#: data/scripts/upgrade.php:119
+#: data/scripts/upgrade.php:120
 msgid ""
 "The language switcher is now available as a page block and as a resource "
 "block."
@@ -155,12 +159,12 @@ msgstr ""
 "Le sélecteur de langue est désormais disponible en tant que bloc de page et "
 "bloc de ressource."
 
-#: data/scripts/upgrade.php:128 Module.php:132
+#: data/scripts/upgrade.php:129 Module.php:131
 #: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:274
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
-#: data/scripts/upgrade.php:169
+#: data/scripts/upgrade.php:171
 msgid ""
 "It is now possible to translate strings in admin via the {link}page of "
 "translations{link_end}."
@@ -168,7 +172,7 @@ msgstr ""
 "Il est désormais possible de traduire des chaînes via la {link}page des "
 "traductions{link_end}."
 
-#: data/scripts/upgrade.php:177
+#: data/scripts/upgrade.php:179
 msgid ""
 "If you used the module {link}Table{link_end} to manage translations, just "
 "copy them manually in the new form, remove tables and update settings. The "
@@ -179,14 +183,14 @@ msgstr ""
 "les tables et mettez à jour les paramètres. Les paramètres sont conservés "
 "pour gérer les traductions spécifiques."
 
-#: Module.php:119
+#: Module.php:120
 msgid ""
 "The composer vendor is not ready. See module’s installation documentation."
 msgstr ""
 "Le dossier vendor de composer n’est pas installé. Consulter la documentation "
 "d’installation du module."
 
-#: Module.php:146
+#: Module.php:148
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
@@ -196,12 +200,12 @@ msgstr ""
 "l’installer pour gérer les caractères diacritiques et non-latin et pour "
 "traduire les dates, les nombres et plus."
 
-#: Module.php:921 src/Form/SettingsFieldset.php:63
+#: Module.php:924 src/Form/SettingsFieldset.php:63
 #: src/Form/SettingsFieldset.php:65
 msgid "Remove all groups"
 msgstr "Supprimer tous les groupes"
 
-#: Module.php:967
+#: Module.php:970
 msgid ""
 "The selected pages will be translations of the current page within a site "
 "group, that must be defined. The language switcher displays only one related "
@@ -211,21 +215,21 @@ msgstr ""
 "du groupe de sites, qui doit être défini. Le sélecteur de langue affiche "
 "seulement une page liée par site."
 
-#: Module.php:976
+#: Module.php:981
 msgid "Select translations of this page…"
 msgstr "Choisir les traductions de cette page…"
 
-#: Module.php:1087 src/Job/DuplicateSite.php:92
+#: Module.php:1092 src/Job/DuplicateSite.php:91
 msgid "The site #{site_id} cannot be copied. Check your rights."
 msgstr "Le site #« {site_id} » ne peut pas être copié. Vérifiez vos droits."
 
-#: Module.php:1118
+#: Module.php:1123
 msgid "Remove/copy processes have been done for site \"{site_slug}\"."
 msgstr ""
 "Les traitements de suppression/copie ont été réalisés pour le site "
 "« {site_slug} »."
 
-#: Module.php:1124
+#: Module.php:1129
 msgid ""
 "A job was launched in background to copy site data: ({link_job}job #{job_id}"
 "{link_end}, {link_log}logs{link_end})."
@@ -256,46 +260,46 @@ msgstr ""
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}."
 
-#: src/Job/DuplicateSite.php:77
+#: src/Job/DuplicateSite.php:76
 msgid "The site #{site_id} is not available for copy. Check your rights."
 msgstr ""
 "Le site #« {site_id} » n’est pas disponible pour la copie. Vérifiez vos "
 "droits."
 
-#: src/Job/DuplicateSite.php:177
+#: src/Job/DuplicateSite.php:176
 msgid "Check logs: an error occurred."
 msgstr "Vérifier les journaux : une erreur est survenue."
 
-#: src/Job/DuplicateSite.php:210
+#: src/Job/DuplicateSite.php:209
 msgid "Site settings of \"{site_slug}\" successfully removed."
 msgstr "Les paramètres du site « {site_slug} » ont été supprimés."
 
-#: src/Job/DuplicateSite.php:244
+#: src/Job/DuplicateSite.php:243
 msgid "{total} site permissions removed from \"{site_slug}\"."
 msgstr "{total} permissions supprimées du site « {site_slug} »."
 
-#: src/Job/DuplicateSite.php:284
+#: src/Job/DuplicateSite.php:283
 msgid "{total} site pages removed from \"{site_slug}\"."
 msgstr "{total} pages supprimées du site « {site_slug} »."
 
-#: src/Job/DuplicateSite.php:298
+#: src/Job/DuplicateSite.php:297
 msgid "{total} collecting forms removed from \"{site_slug}\"."
 msgstr ""
 "{total} formulaires de collecte ont été supprimés du site « {site_slug} »."
 
-#: src/Job/DuplicateSite.php:331
+#: src/Job/DuplicateSite.php:330
 msgid ""
 "Site settings of \"{site_slug}\" successfully copied into \"{site_slug_2}\"."
 msgstr ""
 "Les paramètres du site « {site_slug} » ont été copiés dans « {site_slug_2} » "
 "avec succès."
 
-#: src/Job/DuplicateSite.php:423
+#: src/Job/DuplicateSite.php:421
 msgid ""
 "The page slug \"{page_slug}\" from the source has been renamed \"{slug}\"."
 msgstr "Le chemin de la page source « {page_slug} » a été renommé « {slug} »."
 
-#: src/Job/DuplicateSite.php:429
+#: src/Job/DuplicateSite.php:427
 msgid ""
 "Unable to copy page \"{page_slug}\" of site \"{site_slug}\". The page is "
 "skipped."
@@ -303,7 +307,7 @@ msgstr ""
 "Impossible de copier la page« {page_slug} » du site « {site_slug} ». La page "
 "a été ignorée."
 
-#: src/Job/DuplicateSite.php:439
+#: src/Job/DuplicateSite.php:441
 msgid ""
 "{total} site pages of \"{site_slug}\" successfully copied into "
 "\"{site_slug_2}\" (mode \"{mode}\")."
@@ -311,7 +315,7 @@ msgstr ""
 "{total} pages du site « {site_slug} » ont été copiées avec succès dans le "
 "site « {site_slug_2} » (mode « {mode} »)."
 
-#: src/Job/DuplicateSite.php:564 src/Job/DuplicateSite.php:594
+#: src/Job/DuplicateSite.php:566 src/Job/DuplicateSite.php:596
 msgid ""
 "The module Collecting is a new version and is not copiable for now. Copy "
 "forms manually if needed."
@@ -319,7 +323,7 @@ msgstr ""
 "Le module Collecting est une nouvelle version et n’est pas copiable "
 "actuellement. Copiez les formulaires manuellement si besoin."
 
-#: src/Job/DuplicateSite.php:570
+#: src/Job/DuplicateSite.php:572
 msgid ""
 "{total} collecting forms from site \"{site_slug}\" were successfully copied "
 "into \"{site_slug_2}\"."
@@ -327,7 +331,7 @@ msgstr ""
 "{total} formulaires de collecte du site « {site_slug} » ont été copiés avec "
 "succès dans « {site_slug_2} »."
 
-#: src/Job/DuplicateSite.php:616
+#: src/Job/DuplicateSite.php:618
 msgid ""
 "The full text for page {page_slug} was not saved. Run indexation of full "
 "text manually in main settings or in tasks of Easy Admin. Exception: "
