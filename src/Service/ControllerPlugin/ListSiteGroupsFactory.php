@@ -3,7 +3,7 @@
 namespace Internationalisation\Service\ControllerPlugin;
 
 use Internationalisation\Mvc\Controller\Plugin\ListSiteGroups;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Omeka\Api\Exception\NotFoundException;
 

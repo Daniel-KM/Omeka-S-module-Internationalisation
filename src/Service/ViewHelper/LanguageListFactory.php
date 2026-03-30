@@ -3,7 +3,7 @@
 namespace Internationalisation\Service\ViewHelper;
 
 use Internationalisation\View\Helper\LanguageList;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**

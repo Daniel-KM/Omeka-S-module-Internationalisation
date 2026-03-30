@@ -3,7 +3,7 @@
 namespace Internationalisation\Service\Controller;
 
 use Internationalisation\Controller\Admin\TranslationController;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class TranslationControllerFactory implements FactoryInterface

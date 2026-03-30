@@ -3,7 +3,7 @@
 namespace Internationalisation\Service\ControllerPlugin;
 
 use Internationalisation\Mvc\Controller\Plugin\UpdateTranslationFiles;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class UpdateTranslationFilesFactory implements FactoryInterface

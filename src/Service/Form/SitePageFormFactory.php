@@ -3,7 +3,7 @@
 namespace Internationalisation\Service\Form;
 
 use Internationalisation\Form\SitePageForm;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SitePageFormFactory implements FactoryInterface
