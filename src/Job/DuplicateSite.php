@@ -3,7 +3,6 @@
 namespace Internationalisation\Job;
 
 use Doctrine\DBAL\ParameterType;
-use Internationalisation\Entity\SitePageRelation;
 use Omeka\Entity\Site;
 use Omeka\Entity\SitePage;
 use Omeka\Job\AbstractJob;
@@ -417,7 +416,6 @@ class DuplicateSite extends AbstractJob
             if ($response) {
                 $targetPage = $response->getContent();
                 $this->mapPages[$sourcePage->getId()] = $targetPage;
-                $this->addRelations($sourcePage, $targetPage);
                 if ($slugExists) {
                     $this->logger->err(
                         'The page slug "{page_slug}" from the source has been renamed "{slug}".', // @translate
@@ -433,7 +431,11 @@ class DuplicateSite extends AbstractJob
             }
         }
 
+        // Flush to get real IDs for all created pages.
         $this->entityManager->flush();
+
+        // Create relations after flush so all pages have IDs.
+        $this->addRelationsForCopiedPages();
 
         $this->logger->notice(
             '{total} site pages of "{site_slug}" successfully copied into "{site_slug_2}" (mode "{mode}").', // @translate
@@ -620,24 +622,84 @@ class DuplicateSite extends AbstractJob
         }
     }
 
-    protected function addRelations(SitePage $sourcePage, SitePage $targetPage): void
+    /**
+     * Create relations for all copied pages in one batch.
+     *
+     * For each source page that was copied, the target page is related to the
+     * source page and to all pages already related to the source (pages in
+     * other sites of the group). This uses SQL directly to enforce the
+     * convention page_id < related_page_id and to handle duplicates.
+     */
+    protected function addRelationsForCopiedPages(): void
     {
-        /** @var \Internationalisation\Entity\SitePageRelation[] $relations */
-        $relations = $this->api->search('site_page_relations', ['relation' => $sourcePage->getId()], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false, 'flushEntityManager' => false])->getContent();
+        if (!$this->mapPages) {
+            return;
+        }
 
-        // As page/related page cannot be known, a list is made first.
-        $list = [$sourcePage->getId() => $sourcePage];
-        foreach ($relations as $relation) {
-            $list[$relation->getPage()->getId()] = $relation->getPage();
-            $list[$relation->getRelatedPage()->getId()] = $relation->getRelatedPage();
+        // Collect all pairs (smaller_id, larger_id) to insert.
+        $pairs = [];
+
+        foreach ($this->mapPages as $sourcePageId => $targetPage) {
+            $targetPageId = $targetPage->getId();
+
+            // 1. Relate source page to target page.
+            $pairs[] = $sourcePageId < $targetPageId
+                ? [$sourcePageId, $targetPageId]
+                : [$targetPageId, $sourcePageId];
+
+            // 2. Find all pages already related to the source page
+            //    (pages in other sites of the group).
+            $sql = <<<'SQL'
+                SELECT `page_id`, `related_page_id`
+                FROM `site_page_relation`
+                WHERE `page_id` = :page_id
+                   OR `related_page_id` = :page_id
+                SQL;
+            $existingRelations = $this->connection->executeQuery(
+                $sql,
+                ['page_id' => $sourcePageId],
+                ['page_id' => ParameterType::INTEGER]
+            )->fetchAllAssociative();
+
+            foreach ($existingRelations as $row) {
+                $otherId = (int) $row['page_id'] === $sourcePageId
+                    ? (int) $row['related_page_id']
+                    : (int) $row['page_id'];
+                $pairs[] = $otherId < $targetPageId
+                    ? [$otherId, $targetPageId]
+                    : [$targetPageId, $otherId];
+            }
         }
-        foreach ($list as $relatedPage) {
-            $newRelatedPage = new SitePageRelation();
-            $newRelatedPage
-                ->setPage($relatedPage)
-                ->setRelatedPage($targetPage);
-            $this->entityManager->persist($newRelatedPage);
+
+        if (!$pairs) {
+            return;
         }
+
+        // Deduplicate pairs.
+        $unique = [];
+        foreach ($pairs as $pair) {
+            $key = $pair[0] . '-' . $pair[1];
+            $unique[$key] = $pair;
+        }
+
+        // Insert all pairs with parameterized query.
+        $values = [];
+        $params = [];
+        $types = [];
+        $i = 0;
+        foreach ($unique as $pair) {
+            $values[] = "(:p{$i}, :r{$i})";
+            $params["p{$i}"] = $pair[0];
+            $params["r{$i}"] = $pair[1];
+            $types["p{$i}"] = ParameterType::INTEGER;
+            $types["r{$i}"] = ParameterType::INTEGER;
+            ++$i;
+        }
+
+        $sql = 'INSERT INTO `site_page_relation` (`page_id`, `related_page_id`) VALUES '
+            . implode(', ', $values)
+            . ' ON DUPLICATE KEY UPDATE `id` = `id`';
+        $this->connection->executeStatement($sql, $params, $types);
     }
 
     /**
