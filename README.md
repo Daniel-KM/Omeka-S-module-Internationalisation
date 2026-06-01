@@ -17,7 +17,7 @@ A quick and simple interface can be used to add new strings and translations, in
 any language. The languages in themes are automatically included too.
 
 This module is designed to translate short strings for sites and admin board
-when the translations are in American English, the default languague or Omeka.
+when the translations are in American English, the default language or Omeka.
 
 To translate the records of the resources automatically, you can use the module
 [Translate].
@@ -35,8 +35,9 @@ See general end user documentation for [installing a module].
 
 This module requires the module [Common], that should be installed first.
 
-The module [Table] can be used for complex cases where translations are
-different between sites.
+To manage the site settings and theme settings of grouped sites more easily, it
+is recommended to install the module [Site Hub], that propagates settings
+between the sites of a group, so they can be edited once for the whole group.
 
 The module uses external libraries, so use the release zip to install it, or use
 and init the source.
@@ -101,18 +102,16 @@ part.
 Note that the specific translations of the modules override the default
 translations of Omeka, for example for vocabularies.
 
-#### Tables of translations
+**Warning**: The translations stored by this module are a single "string => translation"
+pair, so they cannot express plural forms. Strings that use plurals (`translatePlural()` / ngettext)
+must keep their translations in a po/mo file (module or theme), where the plural
+forms are supported. See the TODO below.
 
-For complex cases, in particular when the same string is translated differently
-between sites, it is possible to manage some translations via the module [Table].
-
-The process is the same than with this module: add a table then translations.
-If the slug of the table begins with "translation", for example "translation-fr",
-it will be added automatically in sites with this language. Other tables can be
-added via a main setting and a site setting.
-
-**Warning**: When a table is updated, the translations should be reindexed via
-the button in the main page of translations.
+**Note**: Previous versions could delegate complex cases (a string translated
+differently between sites) to the module [Table]. This support was removed: all
+translations are now managed by this module. On upgrade, existing translation
+tables (slug starting with "translation") are copied automatically into the
+translations page.
 
 #### Translations via the theme
 
@@ -123,6 +122,16 @@ include an array to return, with strings as keys and the translations as values.
 
 Since Omeka S v4, the directory language/ is automatically managed when the file
 config/theme.ini contains "has_translations = true".
+
+**Warning**: Theme translation files are loaded only during a site request (when
+the public site and its theme are prepared). A string translated *only* in the
+theme therefore falls back to the source language (usually English) whenever a
+view is rendered outside that context: AJAX fragments, api endpoints (for
+example the guest dialog), or any non-site request. This produces mixed pages
+where the core and module strings (loaded globally) are translated while the
+theme-only strings are not. For robustness, translate such strings in the
+translation table (loaded globally for every request, see above) rather than
+only in the theme.
 
 ### Translations by site
 
@@ -150,6 +159,17 @@ In the case you didn’t duplicate the site, you have to set the locale setting
 for all sites you want to translate. It allows to set the language of all pages.
 Furthermore, set the options you want for the display of the values of
 internationalised properties of the resources in the section Internationalisation.
+
+**Important**: set the locale for **every** site, including the one with the
+default language of the install, that is English by default. So the locale of
+the English site should be `en`. The source strings in Omeka, modules and themes
+are written in American English, but when a site locale is left empty the
+interface strings fall back to the **global default locale** (main settings).
+So an English site with an empty locale may display strings translated into
+another language (for example "Accueil" instead of "Home"). Setting the locale
+to `en` also ensures that strings whose source is *not* English (some modules or
+themes, or when coded strings are used) are translated to English when an
+`en`/`en_US` translation exists.
 
 3. In main settings
 
@@ -251,6 +271,7 @@ TODO
 - [ ] Manage sites by group instead of sync manually.
 - [ ] Add a view to display all the languages that are used.
 - [ ] Add a bulk edit to normalize all languages, so fallbacks won't be necessary in  most of the cases. For now, use Bulk Edit.
+- [ ] Support plural forms in the translation tables (currently a single "string => translation" pair only; strings with plurals must stay in a po/mo file).
 - [ ] Add a view to manage fallbacks (site settings?).
 - [ ] Sort by the translated value.
 - [ ] Sort by the translated resource class and template labels.
@@ -258,6 +279,7 @@ TODO
 - [ ] Modify the internal urls with the target site one when copying blocks.
 - [ ] Copy of pages: there is no mapping for collecting forms.
 - [ ] Simplify the process to manage fallbacks when there is only one fallback (managed by default).
+- [ ] A cache is probably useless, even simple to implement (via key in module.config.php translator/cache/adapter), because files are cached.
 
 
 Warning
@@ -329,6 +351,7 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [Translate]: https://gitlab.com/Daniel-KM/Omeka-S-module-Translate
 [Table]: https://gitlab.com/Daniel-KM/Omeka-S-module-Table
+[Site Hub]: https://gitlab.com/Daniel-KM/Omeka-S-module-SiteHub
 [Internationalisation.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/releases
 [BCP 47]: https://en.wikipedia.org/wiki/IETF_language_tag
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
