@@ -13,11 +13,8 @@ class UpdateTranslationFilesFactory implements FactoryInterface
         $config = $services->get('Config');
 
         return new UpdateTranslationFiles(
-            $services->get('Omeka\ApiManager'),
             $services->get('Omeka\Connection'),
             $services->get('Omeka\Logger'),
-            $services->get('Omeka\Settings'),
-            $services->get('Omeka\Settings\Site'),
             $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files')
         );
     }

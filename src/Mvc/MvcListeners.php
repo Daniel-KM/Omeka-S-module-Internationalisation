@@ -2,7 +2,6 @@
 
 namespace Internationalisation\Mvc;
 
-use Internationalisation\Translator\Loader\PhpSimpleArray;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\I18n\Translator\TranslatorInterface;
@@ -56,60 +55,10 @@ class MvcListeners extends AbstractListenerAggregate
                     if ($currentTheme && $currentTheme->getIni('has_translations')) {
                         $translator
                             // Already added via MvcListeners.
-                            // ->addTranslationFilePattern('gettext', $themeLanguagePath, '%s.mo', 'default')
+                            // ->addTranslationFilePattern('gettext',
+                            // $themeLanguagePath, '%s.mo', 'default')
                             ->addTranslationFilePattern('phpArray', $themeLanguagePath, '%s.php', 'default');
                     }
-                }
-            }
-
-            if (class_exists('Table\Module', false)) {
-                $config = $services->get('Config');
-                $localFilesPath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-                $languageDir = $localFilesPath . '/language';
-                $localFile = $languageDir . '/table-' . $site->id() . '.php';
-                // Security: validate path is within expected directory.
-                $realPath = realpath($localFile);
-                $realLanguageDir = realpath($languageDir);
-                if ($realPath
-                    && $realLanguageDir
-                    && strpos($realPath, $realLanguageDir . DIRECTORY_SEPARATOR) === 0
-                    && is_readable($realPath)
-                ) {
-                    // Method addTranslationFile() cannot be used, because the
-                    // locale is unknown and may change when creating file.
-                    $locales = include $realPath;
-                    if (is_array($locales)) {
-                        $translator
-                            // ->addTranslationFile('tables', $localFile, null, null)
-                            ->addRemoteTranslations('tables')
-                            ->getPluginManager()->setService(
-                                'tables',
-                                new PhpSimpleArray(['default' => $locales])
-                            );
-                    }
-                }
-            }
-        } elseif (class_exists('Table\Module', false)) {
-            $config = $services->get('Config');
-            $localFilesPath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-            $languageDir = $localFilesPath . '/language';
-            $localFile = $languageDir . '/table-0.php';
-            // Security: validate path is within expected directory.
-            $realPath = realpath($localFile);
-            $realLanguageDir = realpath($languageDir);
-            if ($realPath
-                && $realLanguageDir
-                && strpos($realPath, $realLanguageDir . DIRECTORY_SEPARATOR) === 0
-                && is_readable($realPath)
-            ) {
-                $locales = include $realPath;
-                if (is_array($locales)) {
-                    $translator
-                        ->addRemoteTranslations('tables')
-                        ->getPluginManager()->setService(
-                            'tables',
-                            new PhpSimpleArray(['default' => $locales])
-                        );
                 }
             }
         }
