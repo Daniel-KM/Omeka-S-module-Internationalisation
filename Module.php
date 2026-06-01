@@ -96,6 +96,62 @@ class Module extends AbstractModule
                 ]
             )
         ;
+
+        $this->attachTranslatorFallback();
+    }
+
+    /**
+     * Wire a fallback locale chain on the MvcTranslator missing-translation
+     * event. Reads site setting `internationalisation_fallbacks` (list of
+     * locales). For each $translate() call whose key is absent in the current
+     * locale, the listener retries the lookup against each fallback locale in
+     * order and returns the first hit. Re-entry guard prevents recursion when
+     * the fallback locale itself misses the key.
+     */
+    protected function attachTranslatorFallback(): void
+    {
+        $services = $this->getServiceLocator();
+        $status = $services->get('Omeka\Status');
+        if (!$status->isSiteRequest()) {
+            return;
+        }
+
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        try {
+            $fallbacks = $siteSettings->get('internationalisation_fallbacks', []);
+        } catch (\Throwable $e) {
+            return;
+        }
+        $fallbacks = array_values(array_filter((array) $fallbacks, 'strlen'));
+        if (!$fallbacks) {
+            return;
+        }
+
+        $translator = $services->get('MvcTranslator')->getDelegatedTranslator();
+        $translator->enableEventManager();
+        $translator->getEventManager()->attach(
+            \Laminas\I18n\Translator\Translator::EVENT_MISSING_TRANSLATION,
+            function (\Laminas\EventManager\EventInterface $e) use ($translator, $fallbacks) {
+                static $reentry = false;
+                if ($reentry) {
+                    return null;
+                }
+                $message = (string) $e->getParam('message');
+                $textDomain = $e->getParam('text_domain') ?: 'default';
+                $reentry = true;
+                try {
+                    foreach ($fallbacks as $locale) {
+                        $translated = $translator->translate($message, $textDomain, $locale);
+                        if ($translated !== $message) {
+                            return $translated;
+                        }
+                    }
+                } finally {
+                    $reentry = false;
+                }
+                return null;
+            }
+        );
     }
 
     protected function preInstall(): void
