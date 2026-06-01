@@ -74,6 +74,7 @@ return [
             Form\DuplicateSiteFieldset::class => \Laminas\Form\ElementFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
             Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
+            \Omeka\Form\Element\LocaleSelect::class => Service\Form\Element\LocaleSelectFactory::class,
         ],
         'aliases' => [
             // The site page form does not implement form events, so override it for now.
@@ -211,6 +212,7 @@ return [
         'settings' => [
             'internationalisation_translation_tables' => [],
             'internationalisation_site_groups' => [],
+            'internationalisation_extra_locales' => [],
         ],
         'site_settings' => [
             'internationalisation_translation_tables' => [],

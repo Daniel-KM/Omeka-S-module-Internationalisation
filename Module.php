@@ -996,6 +996,10 @@ class Module extends AbstractModule
                         ],
                     ],
                 ],
+            ])
+            ->add([
+                'name' => 'internationalisation_extra_locales',
+                'required' => false,
             ]);
     }
 

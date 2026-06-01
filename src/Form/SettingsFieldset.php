@@ -73,6 +73,28 @@ class SettingsFieldset extends Fieldset
                         'rows' => 5,
                     ],
             ])
+            ->add([
+                'name' => 'internationalisation_extra_locales',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'element_group' => 'internationalisation',
+                    'label' => 'Extra locales', // @translate
+                    'info' => 'Additional locale codes to make available in the site locale picker, beyond those discovered from .mo files. One entry per line, in the form "code = Label".', // @translate
+                    'as_key_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'internationalisation_extra_locales',
+                    'rows' => 3,
+                    'placeholder' => <<<'TXT'
+                        apy = Apalaí
+                        br = Brezhoneg
+                        guc = Wayuunaiki
+                        kw = Kernewek
+                        oc = Occitan
+                        way = Wayana
+                        TXT,
+                ],
+            ])
         ;
     }
 }
