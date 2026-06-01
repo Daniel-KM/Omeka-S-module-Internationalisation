@@ -15,8 +15,10 @@ class TranslationForm extends Form
                 'name' => 'translations',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
-                    'label' => 'List of strings and translations separated by "="', // @translate
+                    'label' => 'List of strings and translations separated by " = " (space, equal, space)', // @translate
                     'as_key_value' => true,
+                    // Use " = " (not "=") so source strings may contain "=".
+                    'key_value_separator' => ' = ',
                 ],
                 'attributes' => [
                     'id' => 'translations',
