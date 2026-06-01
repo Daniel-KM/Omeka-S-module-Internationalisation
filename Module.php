@@ -194,6 +194,27 @@ class Module extends AbstractModule
         }
     }
 
+    protected function postInstall(): void
+    {
+        $this->recommendSiteHub();
+    }
+
+    /**
+     * Recommend the module Site Hub to manage site and theme settings of a
+     * group of sites more easily. No-op when it is already available.
+     */
+    protected function recommendSiteHub(): void
+    {
+        if (class_exists('SiteHub\Module', false)) {
+            return;
+        }
+        $services = $this->getServiceLocator();
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $messenger->addWarning(new PsrMessage(
+            'To manage the site settings and theme settings of grouped sites more easily, it is recommended to install the module Site Hub, that propagates settings between the sites of a group.' // @translate
+        ));
+    }
+
     protected function checkExtensionIntl(): void
     {
         if (!extension_loaded('intl')) {
