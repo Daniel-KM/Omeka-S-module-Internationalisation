@@ -18,7 +18,7 @@ use Omeka\Entity\AbstractEntity;
  * @Table(
  *      indexes={
  *         @Index(
- *             name="idx_translating_lang_string",
+ *             name="idx_translated_lang_string",
  *             columns={
  *                 "lang",
  *                 "string"
@@ -30,7 +30,7 @@ use Omeka\Entity\AbstractEntity;
  *     }
  * )
  */
-class Translating extends AbstractEntity
+class Translated extends AbstractEntity
 {
     /**
      * @var int

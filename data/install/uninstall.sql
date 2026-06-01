@@ -1,4 +1,4 @@
 SET foreign_key_checks = 0;
 DROP TABLE IF EXISTS `site_page_relation`;
-DROP TABLE IF EXISTS `translating`;
+DROP TABLE IF EXISTS `translated`;
 SET foreign_key_checks = 1;

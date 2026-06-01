@@ -23,7 +23,7 @@ return [
     'api_adapters' => [
         'invokables' => [
             'site_page_relations' => Api\Adapter\SitePageRelationAdapter::class,
-            'translatings' => Api\Adapter\TranslatingAdapter::class,
+            'translateds' => Api\Adapter\TranslatedAdapter::class,
         ],
     ],
     'entity_manager' => [
@@ -179,7 +179,7 @@ return [
      * But it will be slower than using prepared files.
      */
     'translator' => [
-        // Translations are stored in the "translating" table and exported to
+        // Translations are stored in the "translated" table and exported to
         // php array files by language, updated on save. They are loaded via the
         // standard PhpArray loader below.
         'translation_file_patterns' => [

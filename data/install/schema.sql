@@ -8,12 +8,12 @@ CREATE TABLE `site_page_relation` (
     PRIMARY KEY(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
 
-CREATE TABLE `translating` (
+CREATE TABLE `translated` (
     `id` INT AUTO_INCREMENT NOT NULL,
     `lang` VARCHAR(8) NOT NULL,
     `string` LONGTEXT NOT NULL,
     `translation` LONGTEXT NOT NULL,
-    INDEX `idx_translating_lang_string` (`lang`, `string`(190)),
+    INDEX `idx_translated_lang_string` (`lang`, `string`(190)),
     PRIMARY KEY(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
 
