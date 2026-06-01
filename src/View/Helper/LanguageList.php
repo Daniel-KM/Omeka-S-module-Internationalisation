@@ -149,12 +149,12 @@ class LanguageList extends AbstractHelper
             if ($pageSlug) {
                 $siteSlugsToCheck = array_diff(array_keys($locales), array_keys($relatedPages));
                 if ($siteSlugsToCheck) {
-                    // Get all sites by slug in one query.
-                    $sites = $api->search('sites', ['slug' => $siteSlugsToCheck])->getContent();
-                    $siteIdsBySlug = [];
-                    foreach ($sites as $s) {
-                        $siteIdsBySlug[$s->slug()] = $s->id();
-                    }
+                    // The core site adapter does not support an array of slugs
+                    // (it would build "slug = ?, ?"), and sites are few, so
+                    // load the slug => id map once and keep only the needed
+                    // slugs.
+                    $idsBySlug = array_flip($api->search('sites', [], ['returnScalar' => 'slug'])->getContent());
+                    $siteIdsBySlug = array_intersect_key($idsBySlug, array_flip($siteSlugsToCheck));
                     // Get all pages with the same slug across these sites in one query.
                     if ($siteIdsBySlug) {
                         $pages = $api->search('site_pages', [
