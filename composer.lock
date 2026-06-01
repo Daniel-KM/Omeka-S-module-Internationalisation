@@ -50,16 +50,16 @@
         },
         {
             "name": "sempia/external-assets",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/Sempia/composer-plugin-external-assets.git",
-                "reference": "3c101e7edb043daabfcc45871a3b048bf8a38e96"
+                "reference": "72bba6b5a7bfe3402a5df7fcad3d5df01e6ad9d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-external-assets/repository/archive.zip?sha=3c101e7edb043daabfcc45871a3b048bf8a38e96",
-                "reference": "3c101e7edb043daabfcc45871a3b048bf8a38e96",
+                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-external-assets/repository/archive.zip?sha=72bba6b5a7bfe3402a5df7fcad3d5df01e6ad9d4",
+                "reference": "72bba6b5a7bfe3402a5df7fcad3d5df01e6ad9d4",
                 "shasum": ""
             },
             "require": {
@@ -102,9 +102,9 @@
             ],
             "support": {
                 "issues": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/issues",
-                "source": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/tree/1.0.1"
+                "source": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/tree/1.1.0"
             },
-            "time": "2026-02-09T00:00:00+00:00"
+            "time": "2026-05-04T00:00:00+00:00"
         }
     ],
     "packages-dev": [],
