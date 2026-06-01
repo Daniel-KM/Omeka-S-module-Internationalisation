@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-30 00:00+0000\n"
-"PO-Revision-Date: 2026-03-30 00:00+0000\n"
+"POT-Creation-Date: 2026-06-01 00:00+0000\n"
+"PO-Revision-Date: 2026-06-01 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: French <kde-i18n-doc@kde.org>\n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.6\n"
 
-#: data/scripts/upgrade.php:37 Module.php:109
+#: data/scripts/upgrade.php:37 Module.php:165
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
@@ -26,7 +26,7 @@ msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieur
 msgid "Missing requirement. Unable to upgrade."
 msgstr "Pré-requis absent. Impossible de mettre à jour."
 
-#: Module.php:1028
+#: Module.php:1123
 msgid "Remove and copy data"
 msgstr "Supprimer et copier des données"
 
@@ -159,12 +159,12 @@ msgstr ""
 "Le sélecteur de langue est désormais disponible en tant que bloc de page et "
 "bloc de ressource."
 
-#: data/scripts/upgrade.php:129 Module.php:131
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:274
+#: data/scripts/upgrade.php:129 Module.php:187
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:116
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
-#: data/scripts/upgrade.php:171
+#: data/scripts/upgrade.php:175
 msgid ""
 "It is now possible to translate strings in admin via the {link}page of "
 "translations{link_end}."
@@ -172,7 +172,7 @@ msgstr ""
 "Il est désormais possible de traduire des chaînes via la {link}page des "
 "traductions{link_end}."
 
-#: data/scripts/upgrade.php:179
+#: data/scripts/upgrade.php:183
 msgid ""
 "If you used the module {link}Table{link_end} to manage translations, just "
 "copy them manually in the new form, remove tables and update settings. The "
@@ -183,14 +183,68 @@ msgstr ""
 "les tables et mettez à jour les paramètres. Les paramètres sont conservés "
 "pour gérer les traductions spécifiques."
 
-#: Module.php:120
+#: data/scripts/upgrade.php:318
+msgid ""
+"Migrated translations are stored but the language files could not be "
+"regenerated automatically: open and save any language in the translations "
+"page."
+msgstr ""
+"Les traductions migrées sont stockées mais les fichiers de langue n’ont pas "
+"pu être régénérés automatiquement : ouvrez et enregistrez une langue dans la "
+"page des traductions."
+
+#: data/scripts/upgrade.php:332
+msgid ""
+"Module Table support for translations was removed: {count} strings ({langs} "
+"languages) were copied into the translations page."
+msgstr ""
+"Les traductions gérées par le module Table ont été supprimées : {count} "
+"chaînes ({langs} langues) ont été copiées dans la page de traductions."
+
+#: data/scripts/upgrade.php:338
+msgid ""
+"Module Table support for translations was removed. No translation to migrate."
+msgstr ""
+"La prise en charge du module Table pour les traductions a été supprimée. "
+"Aucune traduction à migrer."
+
+#: data/scripts/upgrade.php:344
+msgid ""
+"These translation tables have no language and were not migrated: {tables}. "
+"Set a language and copy them manually in the translations page."
+msgstr ""
+"Ces tables de traduction n’ont pas de langue et n’ont pas été migrées : "
+"{tables}. Définissez une langue et copiez-la manuellement dans la page des "
+"traductions."
+
+#: data/scripts/upgrade.php:352
+msgid ""
+"To manage the site settings and theme settings of grouped sites more easily, "
+"it is recommended to install the module {link}Site Hub{link_end}, that "
+"propagates settings between the sites of a group."
+msgstr ""
+"Pour gérer plus facilement les paramètres des sites et des thèmes dans les "
+"groupes de sites, il est recommandé d’installer le module {link}Site "
+"Hub{link_end}, qui propage les paramètres entre les sites d’un groupe."
+
+#: Module.php:176
 msgid ""
 "The composer vendor is not ready. See module’s installation documentation."
 msgstr ""
 "Le dossier vendor de composer n’est pas installé. Consulter la documentation "
 "d’installation du module."
 
-#: Module.php:148
+#: Module.php:214
+msgid ""
+"To manage the site settings and theme settings of grouped sites more easily, "
+"it is recommended to install the module Site Hub, that propagates settings "
+"between the sites of a group."
+msgstr ""
+"Pour gérer plus facilement les paramètres des sites et des thèmes dans les "
+"groupes de sites, il est recommandé d’installer le module Site Hub, qui "
+"propage les paramètres entre les sites d’un groupe."
+
+#: Module.php:225
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to manage diacritics and non-latin characters and to translate dates, "
@@ -200,12 +254,22 @@ msgstr ""
 "l’installer pour gérer les caractères diacritiques et non-latin et pour "
 "traduire les dates, les nombres et plus."
 
-#: Module.php:924 src/Form/SettingsFieldset.php:63
-#: src/Form/SettingsFieldset.php:65
+#: Module.php:1001 src/Form/SettingsFieldset.php:32
+#: src/Form/SettingsFieldset.php:34
 msgid "Remove all groups"
 msgstr "Supprimer tous les groupes"
 
-#: Module.php:970
+#: Module.php:1042
+msgid ""
+"No locale is set for this site: interface strings fall back to the global "
+"default locale and may appear in another language. Set the locale below (use "
+"\"en\" for an English site)."
+msgstr ""
+"Aucune langue n’est définie pour ce site : la langue principale par défaut "
+"est utilisée et les traductions peuvent apparaître dans une autre langue. "
+"Définissez la langue ci-dessous (utilisez « en » pour un site anglais)."
+
+#: Module.php:1065
 msgid ""
 "The selected pages will be translations of the current page within a site "
 "group, that must be defined. The language switcher displays only one related "
@@ -215,21 +279,21 @@ msgstr ""
 "du groupe de sites, qui doit être défini. Le sélecteur de langue affiche "
 "seulement une page liée par site."
 
-#: Module.php:981
+#: Module.php:1076
 msgid "Select translations of this page…"
 msgstr "Choisir les traductions de cette page…"
 
-#: Module.php:1092 src/Job/DuplicateSite.php:91
+#: Module.php:1187 src/Job/DuplicateSite.php:91
 msgid "The site #{site_id} cannot be copied. Check your rights."
 msgstr "Le site #« {site_id} » ne peut pas être copié. Vérifiez vos droits."
 
-#: Module.php:1123
+#: Module.php:1218
 msgid "Remove/copy processes have been done for site \"{site_slug}\"."
 msgstr ""
 "Les traitements de suppression/copie ont été réalisés pour le site "
 "« {site_slug} »."
 
-#: Module.php:1129
+#: Module.php:1224
 msgid ""
 "A job was launched in background to copy site data: ({link_job}job #{job_id}"
 "{link_end}, {link_log}logs{link_end})."
@@ -237,26 +301,11 @@ msgstr ""
 "Une tâche a été lancée en arrière-plan pour copier les données du site : "
 "({link_job}tâche #{job_id}{link_end}, {link_log}journaux{link_end})."
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:113
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:220
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:232
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:89
 msgid "The file \"{file}\" is not writeable."
 msgstr "Le fichier « {file} » ne peut pas être enregistré."
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:188
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:196
-msgid "The tables \"{tables}\" does not exist."
-msgstr "Les tables « {tables} » n’existent pas."
-
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:255
-msgid ""
-"The following tables are included for internationalisation in site settings, "
-"but have no defined language: {table_slugs}."
-msgstr ""
-"Les tables suivantes sont inclues pour l’internationalisation dans les "
-"paramètres de site, mais n’ont pas de langue définie : {table_slugs}."
-
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:286
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:128
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}."
 
@@ -341,85 +390,60 @@ msgstr ""
 "Lancer l’indexation manuellement dans les paramètres généraux ou dans les "
 "tâches du module Easy Admin. Exception: {exception}"
 
-#: src/Form/SiteSettingsFieldset.php:18 src/Form/SiteSettingsFieldset.php:21
-#: src/Form/SettingsFieldset.php:11 src/Form/SettingsFieldset.php:14
+#: src/Form/SiteSettingsFieldset.php:17 src/Form/SiteSettingsFieldset.php:20
+#: src/Form/SettingsFieldset.php:10 src/Form/SettingsFieldset.php:13
 msgid "Internationalisation"
 msgstr "Internationalisation"
 
-#: src/Form/SiteSettingsFieldset.php:22 src/Form/SettingsFieldset.php:16
+#: src/Form/SiteSettingsFieldset.php:21 src/Form/SettingsFieldset.php:15
 msgid "Internationalisation: Resources"
 msgstr "Internationalisation: Ressources"
 
-#: src/Form/SiteSettingsFieldset.php:42
+#: src/Form/SiteSettingsFieldset.php:39
 msgid "All values"
 msgstr "Toutes les valeurs"
 
-#: src/Form/SiteSettingsFieldset.php:46
+#: src/Form/SiteSettingsFieldset.php:43
 msgid "All values, with language of the site first"
 msgstr "Toutes les valeurs, avec la langue du site en premier"
 
-#: src/Form/SiteSettingsFieldset.php:50
+#: src/Form/SiteSettingsFieldset.php:47
 msgid "All values, with language of the site or iso fallback first"
 msgstr ""
 "Toutes les valeurs, avec la langue du site ou les langues de repli ISO en "
 "premier"
 
-#: src/Form/SiteSettingsFieldset.php:54
+#: src/Form/SiteSettingsFieldset.php:51
 msgid "All values, with language of the site or custom fallback first"
 msgstr ""
 "Toutes les valeurs, avec la langue du site ou une langue de repli "
 "personnalisée en premier"
 
-#: src/Form/SiteSettingsFieldset.php:58
+#: src/Form/SiteSettingsFieldset.php:55
 msgid "Only values with the language of the site"
 msgstr "Seulement les valeurs correspondant à la langue du site"
 
-#: src/Form/SiteSettingsFieldset.php:62
+#: src/Form/SiteSettingsFieldset.php:59
 msgid "Only values with the language of the site, with iso fallback"
 msgstr ""
 "Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
 "ayant les codes iso correspondant"
 
-#: src/Form/SiteSettingsFieldset.php:66
+#: src/Form/SiteSettingsFieldset.php:63
 msgid "Only values with the language of the site, with custom fallback"
 msgstr ""
 "Seulement les valeurs correspondant à la langue du site, ou à défaut celles "
 "ayant les langues ci-dessous"
 
-#: src/Form/SiteSettingsFieldset.php:78
+#: src/Form/SiteSettingsFieldset.php:75
 msgid "All values (set a locale for more options)"
 msgstr "Toutes les valeurs (indiquer une langue pour plus d’options)"
 
-#: src/Form/SiteSettingsFieldset.php:98
-msgid "Tables to use for special translations"
-msgstr "Tables à utiliser pour les traductions spéciales"
-
-#: src/Form/SiteSettingsFieldset.php:100 src/Form/SettingsFieldset.php:37
-msgid ""
-"The module Table allows to translate strings in admin board. The tables "
-"should have a language."
-msgstr ""
-"Le module Table permet de traduire des chaînes dans l’interface admin. Les "
-"tables doivent avoir une langue."
-
-#: src/Form/SiteSettingsFieldset.php:101 src/Form/SettingsFieldset.php:38
-msgid ""
-"The module Table allows to translate strings in admin board. Separate tables "
-"slugs with a space. The tables should have a language."
-msgstr ""
-"Le module Table permet de traduire des chaînes dans l’interface admin. "
-"Séparer les noms des tables avec une espace. Les tables doivent avoir une "
-"langue."
-
-#: src/Form/SiteSettingsFieldset.php:116 src/Form/SettingsFieldset.php:53
-msgid "Select tables…"
-msgstr "Choisir les tables…"
-
-#: src/Form/SiteSettingsFieldset.php:125
+#: src/Form/SiteSettingsFieldset.php:93
 msgid "Language of values"
 msgstr "Langue des valeurs"
 
-#: src/Form/SiteSettingsFieldset.php:126
+#: src/Form/SiteSettingsFieldset.php:94
 msgid ""
 "Display only the values in the specified language. It applies only for "
 "properties that contains at least one value with a language. The option can "
@@ -429,11 +453,11 @@ msgstr ""
 "seulement aux propriétés qui contiennent au moins une valeur avec une "
 "langue. Cette option peut être contournée par le thème."
 
-#: src/Form/SiteSettingsFieldset.php:140
+#: src/Form/SiteSettingsFieldset.php:108
 msgid "Custom language fallbacks"
 msgstr "Langues de repli"
 
-#: src/Form/SiteSettingsFieldset.php:141
+#: src/Form/SiteSettingsFieldset.php:109
 msgid ""
 "Specify values to display when a property has no value with the language of "
 "the site. Set one language code by line."
@@ -441,11 +465,11 @@ msgstr ""
 "Indique les valeurs à afficher quand une propriété n’a pas de valeur dans la "
 "langue du site. Indiquer une langue par ligne."
 
-#: src/Form/SiteSettingsFieldset.php:160
+#: src/Form/SiteSettingsFieldset.php:128
 msgid "Required languages"
 msgstr "Langues obligatoires"
 
-#: src/Form/SiteSettingsFieldset.php:161
+#: src/Form/SiteSettingsFieldset.php:129
 msgid ""
 "Specify values to display in all cases. Values without language are "
 "displayed in all cases. Set one language code by line."
@@ -510,18 +534,17 @@ msgid "Leave blank to use the global locale setting."
 msgstr "Laisser blanc pour utiliser le paramètre de langue global."
 
 #: src/Form/TranslationForm.php:18
-msgid "List of strings and translations separated by \"=\""
-msgstr "Liste des chaînes et des traductions séparées par « = »"
+msgid ""
+"List of strings and translations separated by \" = \" (space, equal, space)"
+msgstr ""
+"Liste des chaînes et des traductions séparées par « = » (espace, égal, "
+"espace)"
 
-#: src/Form/SettingsFieldset.php:35
-msgid "Tables to use for translation in admin"
-msgstr "Tables à utiliser pour la traduction en admin"
-
-#: src/Form/SettingsFieldset.php:61
+#: src/Form/SettingsFieldset.php:30
 msgid "Site groups"
 msgstr "Groupes de sites"
 
-#: src/Form/SettingsFieldset.php:62
+#: src/Form/SettingsFieldset.php:31
 msgid ""
 "Group some sites with a different language so they can be managed together "
 "as a whole. Set all site slugs by group, one by line, with or without comma "
@@ -530,6 +553,20 @@ msgstr ""
 "Permet de grouper plusieurs sites avec une langue différente de façon à les "
 "gérer ensemble. Indiquer tous les chemins des sites, un par ligne avec un "
 "espace ou une virgule pour les séparer."
+
+#: src/Form/SettingsFieldset.php:50
+msgid "Extra locales"
+msgstr "Langues extra"
+
+#: src/Form/SettingsFieldset.php:51
+msgid ""
+"Additional locale codes to make available in the site locale picker, beyond "
+"those discovered from .mo files. One entry per line, in the form \"code = "
+"Label\"."
+msgstr ""
+"Codes de langues supplémentaires pour le sélecteur de paramètres régionaux "
+"du site, outre ceux découverts à partir des fichiers .mo. Une entrée par "
+"ligne sous la forme \"code = Label\"."
 
 #: src/Form/MirrorPageFieldset.php:18
 msgid ""
@@ -567,11 +604,11 @@ msgid ""
 msgstr ""
 "La page et la page liée d’une relation entre pages doivent être différentes."
 
-#: src/Api/Adapter/TranslatingAdapter.php:93
+#: src/Api/Adapter/TranslatedAdapter.php:93
 msgid "The language should be a valid string shorter than 8 characters."
 msgstr "La langue doit être une chaîne valide de 8 caractères maximum."
 
-#: src/Api/Adapter/TranslatingAdapter.php:95
+#: src/Api/Adapter/TranslatedAdapter.php:95
 msgid ""
 "The language should be a valid locale, so a two character code with an "
 "optional localization code separated with a \"-\" or \"_\"."
@@ -580,15 +617,15 @@ msgstr ""
 "caractères avec un code de localisation facultatif séparé avec un « - »- ou "
 "un « _ »."
 
-#: src/Api/Adapter/TranslatingAdapter.php:100
+#: src/Api/Adapter/TranslatedAdapter.php:100
 msgid "The string to translate is not set."
 msgstr "La chaîne à traduire n’est pas définie."
 
-#: src/Api/Adapter/TranslatingAdapter.php:105
+#: src/Api/Adapter/TranslatedAdapter.php:105
 msgid "The translation is not set."
 msgstr "La traduction n’est pas définie."
 
-#: src/Api/Adapter/TranslatingAdapter.php:138
+#: src/Api/Adapter/TranslatedAdapter.php:138
 msgid ""
 "The string \"{string}\" and language \"{language}\" to translate must be "
 "unique."
@@ -638,6 +675,7 @@ msgstr ""
 "journaux."
 
 #: src/Controller/Admin/TranslationController.php:382
+#: src/Service/Form/Element/LocaleSelectFactory.php:108
 #, php-format
 msgid "%1$s [%2$s]"
 msgstr "%1$s [%2$s]"
@@ -680,6 +718,40 @@ msgstr "Impossible de rendre la page miroir actuellement : {exception}."
 #: src/Site/BlockLayout/LanguageSwitcher.php:21
 msgid "Language Switcher"
 msgstr "Sélecteur de langue"
+
+#~ msgid "The tables \"{tables}\" does not exist."
+#~ msgstr "Les tables « {tables} » n’existent pas."
+
+#~ msgid ""
+#~ "The following tables are included for internationalisation in site "
+#~ "settings, but have no defined language: {table_slugs}."
+#~ msgstr ""
+#~ "Les tables suivantes sont inclues pour l’internationalisation dans les "
+#~ "paramètres de site, mais n’ont pas de langue définie : {table_slugs}."
+
+#~ msgid "Tables to use for special translations"
+#~ msgstr "Tables à utiliser pour les traductions spéciales"
+
+#~ msgid ""
+#~ "The module Table allows to translate strings in admin board. The tables "
+#~ "should have a language."
+#~ msgstr ""
+#~ "Le module Table permet de traduire des chaînes dans l’interface admin. "
+#~ "Les tables doivent avoir une langue."
+
+#~ msgid ""
+#~ "The module Table allows to translate strings in admin board. Separate "
+#~ "tables slugs with a space. The tables should have a language."
+#~ msgstr ""
+#~ "Le module Table permet de traduire des chaînes dans l’interface admin. "
+#~ "Séparer les noms des tables avec une espace. Les tables doivent avoir une "
+#~ "langue."
+
+#~ msgid "Select tables…"
+#~ msgstr "Choisir les tables…"
+
+#~ msgid "Tables to use for translation in admin"
+#~ msgstr "Tables à utiliser pour la traduction en admin"
 
 #~ msgid ""
 #~ "Display only the values in the specified language. This option is "
