@@ -30,6 +30,14 @@ class LanguageList extends AbstractHelper
      */
     protected $siteGroups;
 
+    /**
+     * Cache of "site slug => scheme://domain" when module DomainManager is
+     * used. Null until resolved, then an array (possibly empty).
+     *
+     * @var array|null
+     */
+    protected $siteDomains;
+
     public function __construct(array $localeSites, array $localeLabels, array $siteGroups)
     {
         $this->localeSites = $localeSites;
@@ -187,7 +195,7 @@ class LanguageList extends AbstractHelper
                 ];
             }
 
-            return $data;
+            return $this->applyDomains($data);
         }
 
         // Manage module AdvancedSearch (that has only one action, but multiple paths).
@@ -251,7 +259,7 @@ class LanguageList extends AbstractHelper
                 ];
             }
 
-            return $data;
+            return $this->applyDomains($data);
         }
 
         // Manage standard resources pages and other modules pages.
@@ -264,7 +272,7 @@ class LanguageList extends AbstractHelper
             ];
         }
 
-        return $data;
+        return $this->applyDomains($data);
     }
 
     public function localeSites(): array
@@ -301,5 +309,108 @@ class LanguageList extends AbstractHelper
             ->get('Laminas\View\Helper\ViewModel')
             ->getRoot()
             ->getVariable('site');
+    }
+
+    /**
+     * Rewrite each url to the target site domain when module DomainManager maps
+     * the site to a domain. Without it, links built with the current
+     * (domain-based) route point back to the current domain.
+     *
+     * @see https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/issues/6
+     */
+    protected function applyDomains(array $data): array
+    {
+        $domains = $this->siteDomains();
+        if (!$domains) {
+            return $data;
+        }
+        // Slugs that may legitimately appear as a "/s/{slug}" prefix: any site
+        // of the group and the current site. Restricting the strip to these
+        // avoids cutting a clean url path that happens to start with "/s/"
+        // (module CleanUrl).
+        $knownSlugs = array_keys($domains);
+        $current = $this->currentSite();
+        if ($current) {
+            $knownSlugs[] = $current->slug();
+        }
+
+        foreach ($data as &$entry) {
+            $siteSlug = $entry['site'] ?? null;
+            if ($siteSlug !== null
+                && isset($domains[$siteSlug])
+                && !empty($entry['url'])
+            ) {
+                $entry['url'] = $this->rewriteUrlForDomain($entry['url'], $domains[$siteSlug], $knownSlugs);
+            }
+        }
+        unset($entry);
+        return $data;
+    }
+
+    /**
+     * Replace the host and a known "/s/{slug}" prefix of an url by a domain.
+     *
+     * Only a "/s/{slug}" whose slug is a known site slug is removed, so a clean
+     * url path (module CleanUrl) starting with "/s/…" is preserved.
+     *
+     * @param string $domain "scheme://host" without trailing slash.
+     * @param string[] $knownSlugs Site slugs that may prefix the path.
+     */
+    protected function rewriteUrlForDomain(string $url, string $domain, array $knownSlugs): string
+    {
+        $path = preg_replace('#^https?://[^/]+#', '', $url);
+        $path = (string) $path;
+        if ($knownSlugs && preg_match('#^/s/([^/]+)(/.*|$)#', $path, $m) && in_array($m[1], $knownSlugs, true)) {
+            $path = $m[2];
+        }
+        $path = '/' . ltrim($path, '/');
+        return $domain . $path;
+    }
+
+    /**
+     * Build the map "site slug => scheme://domain" from module DomainManager.
+     *
+     * @return array Empty when the module is absent or no domain is mapped.
+     */
+    protected function siteDomains(): array
+    {
+        if ($this->siteDomains !== null) {
+            return $this->siteDomains;
+        }
+        $this->siteDomains = [];
+
+        if (!class_exists('DomainManager\Module', false)) {
+            return $this->siteDomains;
+        }
+
+        $site = $this->currentSite();
+        if (!$site) {
+            return $this->siteDomains;
+        }
+
+        $services = $site->getServiceLocator();
+        $connection = $services->get('Omeka\Connection');
+        try {
+            $rows = $connection->fetchAllKeyValue(
+                'SELECT s.slug, m.domain FROM domain_site_mapping m INNER JOIN site s ON s.id = m.site_id'
+            );
+        } catch (\Throwable $e) {
+            return $this->siteDomains;
+        }
+        if (!$rows) {
+            return $this->siteDomains;
+        }
+
+        $serverUrl = $this->getView()->plugin('serverUrl');
+        $scheme = parse_url((string) $serverUrl(), PHP_URL_SCHEME) ?: 'https';
+        foreach ($rows as $slug => $domain) {
+            $domain = trim((string) $domain);
+            if ($domain === '') {
+                continue;
+            }
+            $this->siteDomains[$slug] = $scheme . '://' . preg_replace('#^https?://#', '', $domain);
+        }
+
+        return $this->siteDomains;
     }
 }
