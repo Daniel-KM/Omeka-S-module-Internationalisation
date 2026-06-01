@@ -165,7 +165,11 @@ if (version_compare($oldVersion, '3.4.17', '<')) {
         UPDATE `setting` SET `id` = "internationalisation_translation_tables" WHERE `id` = "internationaliation_translation_tables";
         UPDATE `site_setting` SET `id` = "internationalisation_translation_tables" WHERE `id` = "internationaliation_translation_tables";
         SQL;
-    $connection->executeStatement($sql);
+    // Use single statements for execution. See core commit #2689ce92f.
+    $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
+    foreach ($sqls as $sql) {
+        $connection->executeStatement($sql);
+    }
 
     $message = new PsrMessage(
         'It is now possible to translate strings in admin via the {link}page of translations{link_end}.', // @translate
