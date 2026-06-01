@@ -187,3 +187,172 @@ if (version_compare($oldVersion, '3.4.17', '<')) {
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.20', '<')) {
+    // Rename the table "translating" to the clearer "translated".
+    $hasOld = (bool) $connection->executeQuery(
+        "SHOW TABLES LIKE 'translating'"
+    )->fetchOne();
+    $hasNew = (bool) $connection->executeQuery(
+        "SHOW TABLES LIKE 'translated'"
+    )->fetchOne();
+    if ($hasOld && !$hasNew) {
+        $connection->executeStatement('RENAME TABLE `translating` TO `translated`');
+        // Rename the index too, when supported.
+        try {
+            $connection->executeStatement(
+                'ALTER TABLE `translated` RENAME INDEX `idx_translating_lang_string` TO `idx_translated_lang_string`'
+            );
+        } catch (\Throwable $e) {
+            // Older MariaDB/MySQL: drop and recreate the index.
+            try {
+                $connection->executeStatement('ALTER TABLE `translated` DROP INDEX `idx_translating_lang_string`');
+            } catch (\Throwable $e) {
+            }
+            try {
+                $connection->executeStatement(
+                    'ALTER TABLE `translated` ADD INDEX `idx_translated_lang_string` (`lang`, `string`(190))'
+                );
+            } catch (\Throwable $e) {
+            }
+        }
+    }
+
+    // Drop the support of module Table for translations: migrate any
+    // translation into the dedicated "translated" table, then remove the
+    // generated table-*.php files and the related settings.
+
+    $localFilesPath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+    $languageDir = $localFilesPath . '/language';
+
+    $migrated = 0;
+    $langsMigrated = [];
+
+    $insertTranslated = function (string $lang, $string, $translation) use ($connection, &$migrated, &$langsMigrated): void {
+        $lang = trim($lang);
+        $string = (string) $string;
+        $translation = (string) $translation;
+        if ($lang === '' || $string === '' || $translation === '') {
+            return;
+        }
+        $connection->executeStatement(
+            'INSERT IGNORE INTO `translated` (`lang`, `string`, `translation`) VALUES (:lang, :string, :translation)',
+            ['lang' => $lang, 'string' => $string, 'translation' => $translation]
+        );
+        $migrated++;
+        $langsMigrated[$lang] = true;
+    };
+
+    // 1. Migrate from the generated table-*.php files, that are the strings
+    // actually loaded at runtime. This works even when module Table was already
+    // uninstalled, and covers every language present in the files, whether or
+    // not it exists in the "translated" table. Each file returns an array [lang
+    // => [string => translation]].
+    $migratedFiles = [];
+    if (is_dir($languageDir)) {
+        $tableFiles = preg_grep('~[/\\\\]table-\d+\.php$~', glob($languageDir . '/table-*.php') ?: []);
+        foreach ($tableFiles as $file) {
+            if (!is_file($file) || !is_readable($file)) {
+                continue;
+            }
+            $locales = include $file;
+            if (!is_array($locales)) {
+                // Keep the unreadable file to avoid any loss.
+                continue;
+            }
+            foreach ($locales as $lang => $strings) {
+                if (!is_array($strings)) {
+                    continue;
+                }
+                foreach ($strings as $string => $translation) {
+                    $insertTranslated((string) $lang, $string, $translation);
+                }
+            }
+            $migratedFiles[] = $file;
+        }
+    }
+
+    // 2. Also migrate directly from module Table when still installed, to cover
+    // tables that were never materialized to a file.
+    $tablesNoLang = [];
+    if (class_exists('Table\Module', false)) {
+        $tableSlugs = $api
+            ->search('tables', ['sort_by' => 'slug', 'sort_order' => 'ASC'], ['returnScalar' => 'slug'])
+            ->getContent();
+        $translationSlugs = preg_grep(
+            '~^(?:translation|translation-([a-zA-Z]{2,3})((-|_)[a-zA-Z0-9]{2,4})?)$~',
+            $tableSlugs
+        );
+        foreach ($translationSlugs as $slug) {
+            /** @var \Table\Api\Representation\TableRepresentation $table */
+            $table = $api->searchOne('tables', ['slug' => $slug])->getContent();
+            if (!$table) {
+                continue;
+            }
+            $lang = $table->lang() ?: null;
+            if (!$lang) {
+                $tablesNoLang[] = $slug;
+                continue;
+            }
+            foreach ($table->codesAssociative() as $string => $translation) {
+                $insertTranslated((string) $lang, $string, $translation);
+            }
+        }
+    }
+
+    // 3. Remove the generated table files now that their content is copied.
+    // Only the files that were successfully read are removed.
+    foreach ($migratedFiles as $file) {
+        if (is_file($file) && is_writeable($file)) {
+            @unlink($file);
+        }
+    }
+
+    // 4. Regenerate the "{lang}.php" files from the "translated" table so the
+    // migrated strings are actually loaded at runtime, without waiting for a
+    // manual save in the translations page.
+    try {
+        $services->get('ControllerPluginManager')->get('updateTranslationFiles')();
+    } catch (\Throwable $e) {
+        $messenger->addWarning(new PsrMessage(
+            'Migrated translations are stored but the language files could not be regenerated automatically: open and save any language in the translations page.' // @translate
+        ));
+    }
+
+    // 5. Remove the now unused settings.
+    $connection->executeStatement(
+        'DELETE FROM `setting` WHERE `id` = "internationalisation_translation_tables"'
+    );
+    $connection->executeStatement(
+        'DELETE FROM `site_setting` WHERE `id` = "internationalisation_translation_tables"'
+    );
+
+    if ($migrated) {
+        $message = new PsrMessage(
+            'Module Table support for translations was removed: {count} strings ({langs} languages) were copied into the translations page.', // @translate
+            ['count' => $migrated, 'langs' => count($langsMigrated)]
+        );
+        $messenger->addSuccess($message);
+    } else {
+        $message = new PsrMessage(
+            'Module Table support for translations was removed. No translation to migrate.' // @translate
+        );
+        $messenger->addSuccess($message);
+    }
+    if ($tablesNoLang) {
+        $message = new PsrMessage(
+            'These translation tables have no language and were not migrated: {tables}. Set a language and copy them manually in the translations page.', // @translate
+            ['tables' => implode(', ', $tablesNoLang)]
+        );
+        $messenger->addWarning($message);
+    }
+
+    if (!class_exists('SiteHub\Module', false)) {
+        $message = new PsrMessage(
+            'To manage the site settings and theme settings of grouped sites more easily, it is recommended to install the module {link}Site Hub{link_end}, that propagates settings between the sites of a group.', // @translate
+            ['link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-SiteHub">', 'link_end' => '</a>']
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addWarning($message);
+    }
+}
