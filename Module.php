@@ -1007,6 +1007,20 @@ class Module extends AbstractModule
     {
         $this->handleAnySettings($event, 'site_settings');
         $this->prepareSiteLocales();
+
+        // Insist that even an English site must set its locale to "en": when
+        // the locale is empty, the interface strings fall back to the global
+        // default locale, so a site meant to be English may display strings
+        // translated into another language.
+        $services = $this->getServiceLocator();
+
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        if (!$siteSettings->get('locale')) {
+            $messenger = $services->get('ControllerPluginManager')->get('messenger');
+            $messenger->addWarning(new PsrMessage(
+                'No locale is set for this site: interface strings fall back to the global default locale and may appear in another language. Set the locale below (use "en" for an English site).' // @translate
+            ));
+        }
     }
 
     public function handleSitePageForm(Event $event): void
