@@ -12,6 +12,9 @@ class LanguageIso extends AbstractHelper
      * one, or language and country, or from an IETF RFC 4646 language tag, or
      * from the English normalized name, raw or inverted.
      *
+     * The two letters code is returned when the language has one, else the
+     * three letters one.
+     *
      * @param string $language
      * @return self|string If language doesn't exist, an empty string is returned.
      */
@@ -23,9 +26,12 @@ class LanguageIso extends AbstractHelper
     }
 
     /**
-     * Get a normalized three letters language code from a two or three letters
+     * Get the shortest normalized language code from a two or three letters
      * one, or language and country, or from an IETF RFC 4646 language tag, or
      * from the English normalized name, raw or inverted.
+     *
+     * The two letters code is returned when the language has one, else the
+     * three letters one. Use code3letters() to always get three letters.
      *
      * @uses Iso639p3::code()
      * @param string $language
@@ -37,11 +43,13 @@ class LanguageIso extends AbstractHelper
     }
 
     /**
-     * Alias of code().
+     * Get a normalized three letters language code from a two or three letters
+     * one, or language and country, or from an IETF RFC 4646 language tag, or
+     * from the English normalized name, raw or inverted.
      *
-     * @uses Iso639p3::code()
+     * @uses Iso639p3::code3letters()
      * @param string $language
-     * @return string
+     * @return string If language doesn't exist, an empty string is returned.
      */
     public function code3letters($language)
     {

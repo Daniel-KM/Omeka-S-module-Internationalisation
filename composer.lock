@@ -4,21 +4,27 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "230f6e1ab9438949df763964126f25b8",
+    "content-hash": "89ef6ea5a04ef71fb6b76e950651a4d3",
     "packages": [
         {
             "name": "daniel-km/simple-iso-639-3",
-            "version": "0.2.2",
+            "version": "0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/Daniel-KM/Simple-ISO-639-3.git",
-                "reference": "fc017f1d4ee0549cd7b2f2c206ef7c47a947de2c"
+                "reference": "a23604ce1086952911232d39b941c7e0c009c85a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/Daniel-KM%2FSimple-ISO-639-3/repository/archive.zip?sha=fc017f1d4ee0549cd7b2f2c206ef7c47a947de2c",
-                "reference": "fc017f1d4ee0549cd7b2f2c206ef7c47a947de2c",
+                "url": "https://gitlab.com/api/v4/projects/Daniel-KM%2FSimple-ISO-639-3/repository/archive.zip?sha=a23604ce1086952911232d39b941c7e0c009c85a",
+                "reference": "a23604ce1086952911232d39b941c7e0c009c85a",
                 "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
             },
             "type": "library",
             "autoload": {
@@ -46,20 +52,20 @@
                 "issues": "https://gitlab.com/Daniel-KM/Simple-ISO-639-3/-/issues",
                 "source": "https://gitlab.com/Daniel-KM/Simple-ISO-639-3"
             },
-            "time": "2025-07-07T00:00:00+00:00"
+            "time": "2026-08-03T00:00:00+00:00"
         },
         {
             "name": "sempia/external-assets",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/Sempia/composer-plugin-external-assets.git",
-                "reference": "72bba6b5a7bfe3402a5df7fcad3d5df01e6ad9d4"
+                "reference": "594669ecb6e48e8422b2296d3d16abdd67e61c4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-external-assets/repository/archive.zip?sha=72bba6b5a7bfe3402a5df7fcad3d5df01e6ad9d4",
-                "reference": "72bba6b5a7bfe3402a5df7fcad3d5df01e6ad9d4",
+                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-external-assets/repository/archive.zip?sha=594669ecb6e48e8422b2296d3d16abdd67e61c4a",
+                "reference": "594669ecb6e48e8422b2296d3d16abdd67e61c4a",
                 "shasum": ""
             },
             "require": {
@@ -102,9 +108,9 @@
             ],
             "support": {
                 "issues": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/issues",
-                "source": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/tree/1.1.0"
+                "source": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/tree/1.1.1"
             },
-            "time": "2026-05-04T00:00:00+00:00"
+            "time": "2026-07-06T00:00:00+00:00"
         }
     ],
     "packages-dev": [],
