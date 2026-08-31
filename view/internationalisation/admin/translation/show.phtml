@@ -39,7 +39,7 @@ if ($canEditInline) {
 
 <div id="page-actions">
     <?php if ($canUpdate): ?>
-    <?= $hyperlink($translate('Edit'), $url('admin/translation/id', ['language' => $language, 'action' => 'edit']), ['class' => 'button']) ?>
+    <?= $hyperlink($translate('Batch edit'), $url('admin/translation/id', ['language' => $language, 'action' => 'edit']), ['class' => 'button']) ?>
     <?php endif; ?>
     <?php if ($canDelete): ?>
     <?= $hyperlink($translate('Delete'), $url('admin/translation/id', ['language' => $language, 'action' => 'delete-confirm']), ['class' => 'button delete']) ?>

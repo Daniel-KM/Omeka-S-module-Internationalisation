@@ -22,6 +22,12 @@ class TranslationForm extends Form
                     'pairs_editor' => [
                         'key_label' => 'String', // @translate
                         'value_label' => 'Translation', // @translate
+                        // The page has a single field, so the column of the
+                        // label is a waste: it becomes a note above the text.
+                        'label_as_note' => true,
+                        // The form mode looks like the page of the language,
+                        // so the batch edition opens as a text.
+                        'default_display' => 'text',
                     ],
                 ],
                 'attributes' => [

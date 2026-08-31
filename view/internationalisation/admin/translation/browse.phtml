@@ -87,7 +87,7 @@ $canBatchDeleteAll = $this->userIsAllowed(\Internationalisation\Api\Adapter\Tran
                         <?php if ($canUpdate): ?>
                         <li><?= $hyperlink('', $url('admin/translation/id', ['action' => 'edit', 'language' => $language]), [
                             'class' => 'o-icon-edit',
-                            'title' => $translate('Edit'),
+                            'title' => $translate('Batch edit'),
                         ]) ?></li>
                         <?php endif; ?>
                         <?php if ($canDelete): ?>
