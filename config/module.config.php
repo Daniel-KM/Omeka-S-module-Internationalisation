@@ -34,6 +34,12 @@ return [
             dirname(__DIR__) . '/data/doctrine-proxies',
         ],
     ],
+    'js_translate_strings' => [
+        'An error occurred.', // @translate
+        'Delete the string and its translation?', // @translate
+        'Translation deleted.', // @translate
+        'Translation saved.', // @translate
+    ],
     'view_manager' => [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',

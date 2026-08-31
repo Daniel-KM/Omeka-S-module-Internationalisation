@@ -52,3 +52,82 @@
         display: inline-block;
     }
 }
+
+/* Inline edition of the strings of a language (page "translation/show"). */
+
+.translated-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* The field takes the width left by the actions, and the height of its text. */
+.translated-list .translated-cell {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.translated-list .translated-cell .actions {
+    flex: 0 0 auto;
+    display: flex;
+    margin: 0;
+    visibility: hidden;
+}
+
+/* The actions are revealed by the mouse and by the keyboard alike. */
+.translated-list tbody tr:hover,
+.translated-list tbody tr:focus-within {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.translated-list tbody tr:hover .actions,
+.translated-list tbody tr:focus-within .actions {
+    visibility: visible;
+}
+
+/*
+ * The core styles any editable element like a textarea: a fixed minimum
+ * height, a resize handle and a scrollbar. Here a row is a single value, so
+ * the field follows its content.
+ */
+.translated-editable .translated-value {
+    flex: 1 1 auto;
+    /* Without it, a long word without space would widen the cell. */
+    min-width: 0;
+    min-height: unset;
+    max-height: none;
+    height: auto;
+    clear: none;
+    resize: none;
+    overflow-y: visible;
+    padding: 2px 4px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background-color: transparent;
+    overflow-wrap: break-word;
+}
+
+.translated-editable .translated-value[contenteditable="true"]:hover {
+    border-color: rgba(0, 0, 0, 0.15);
+    cursor: text;
+}
+
+.translated-editable .translated-value[contenteditable="true"]:focus {
+    border-color: #4a8bad;
+    outline: 2px solid #4a8bad;
+    outline-offset: 0;
+    background-color: #fff;
+}
+
+.translated-list .translated-saving,
+.translated-list tr.translated-saving td {
+    cursor: progress;
+    opacity: 0.5;
+}

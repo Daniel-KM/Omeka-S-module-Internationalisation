@@ -135,6 +135,8 @@ class TranslationController extends AbstractActionController
             'localeName' => $this->getLocaleName($language),
             'translations' => $translations,
             'confirmForm' => $confirmForm,
+            // The rows are edited inline, one by one, via a post.
+            'csrf' => new \Laminas\Form\Element\Csrf('translate_string_csrf'),
         ]);
     }
 
@@ -153,6 +155,92 @@ class TranslationController extends AbstractActionController
         ]);
         return $view
             ->setTerminal(true);
+    }
+
+    /**
+     * Update a string or its translation inline from the page of a language.
+     */
+    public function updateStringAction()
+    {
+        $error = $this->checkInlineRequest('update');
+        if ($error) {
+            return $error;
+        }
+
+        $params = $this->params();
+        try {
+            $data = $this->translatedEditor()->update(
+                strtolower(strtr($this->params('language'), '_', '-')),
+                (string) $params->fromPost('string'),
+                (string) $params->fromPost('field'),
+                trim((string) $params->fromPost('text'))
+            );
+        } catch (\RuntimeException $e) {
+            return $this->jSend()->fail(null, $this->translate($e->getMessage()));
+        }
+
+        $this->updateTranslationFiles();
+
+        return $this->jSend()->success($data);
+    }
+
+    /**
+     * Delete a string and its translation inline from the page of a language.
+     */
+    public function deleteStringAction()
+    {
+        $error = $this->checkInlineRequest('delete');
+        if ($error) {
+            return $error;
+        }
+
+        try {
+            $data = $this->translatedEditor()->delete(
+                strtolower(strtr($this->params('language'), '_', '-')),
+                (string) $this->params()->fromPost('string')
+            );
+        } catch (\RuntimeException $e) {
+            return $this->jSend()->fail(null, $this->translate($e->getMessage()));
+        }
+
+        $this->updateTranslationFiles();
+
+        return $this->jSend()->success($data);
+    }
+
+    protected function translatedEditor(): \Internationalisation\Stdlib\TranslatedEditor
+    {
+        return new \Internationalisation\Stdlib\TranslatedEditor($this->connection);
+    }
+
+    /**
+     * Check the method, the rights and the token of an inline edition.
+     *
+     * @return \Laminas\View\Model\JsonModel|null Null when the request is fine.
+     */
+    protected function checkInlineRequest(string $privilege)
+    {
+        if (!$this->getRequest()->isPost()) {
+            return $this->jSend()->fail(null, (string) new PsrMessage(
+                'The request should be a post.' // @translate
+            ));
+        }
+
+        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatedAdapter::class, $privilege)) {
+            return $this->jSend()->fail(null, (string) new PsrMessage(
+                'You are not allowed to update translations.' // @translate
+            ));
+        }
+
+        // The rows are updated one by one, so protect against a forged request.
+        $csrf = new \Laminas\Form\Element\Csrf('translate_string_csrf');
+        if (!$csrf->getInputSpecification()['validators'][0]->isValid($this->params()->fromPost('translate_string_csrf'))) {
+            return $this->jSend()->fail(null, (string) new PsrMessage(
+                'Invalid or expired form. Please reload the page.' // @translate
+            ));
+        }
+
+        return null;
     }
 
     public function addAction()
