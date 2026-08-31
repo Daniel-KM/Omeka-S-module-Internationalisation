@@ -193,6 +193,16 @@ class Module extends AbstractModule
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
 
+        // The module Mapper embeds the same library "simple-iso-639-3" and its
+        // autoloader may win, so an older version breaks the languages here.
+        if ($this->isModuleActive('Mapper') && !$this->isModuleVersionAtLeast('Mapper', '3.4.9')) {
+            $message = new \Omeka\Stdlib\Message(
+                $translator->translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+                'Mapper', '3.4.9'
+            );
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
+
         $errors = [];
 
         $vendor = __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';

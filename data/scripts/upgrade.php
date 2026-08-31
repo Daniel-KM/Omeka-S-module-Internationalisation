@@ -12,6 +12,7 @@ use Common\Stdlib\PsrMessage;
  *
  * @var \Omeka\Api\Manager $api
  * @var \Omeka\View\Helper\Url $url
+ * @var \Laminas\Log\Logger $logger
  * @var \Omeka\Settings\Settings $settings
  * @var \Doctrine\DBAL\Connection $connection
  * @var \Doctrine\ORM\EntityManager $entityManager
@@ -20,6 +21,7 @@ use Common\Stdlib\PsrMessage;
 $plugins = $services->get('ControllerPluginManager');
 $url = $services->get('ViewHelperManager')->get('url');
 $api = $plugins->get('api');
+$logger = $services->get('Omeka\Logger');
 $config = $services->get('Config');
 $settings = $services->get('Omeka\Settings');
 $translate = $plugins->get('translate');
@@ -32,10 +34,21 @@ $localConfig = require dirname(__DIR__, 2) . '/config/module.config.php';
 
 $this->checkExtensionIntl();
 
-if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.86')) {
+if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.91')) {
     $message = new \Omeka\Stdlib\Message(
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
-        'Common', '3.4.86'
+        'Common', '3.4.91'
+    );
+    $messenger->addError($message);
+    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
+}
+
+// The module Mapper embeds the same library "simple-iso-639-3" and its
+// autoloader may win, so an older version breaks the languages here.
+if ($this->isModuleActive('Mapper') && !$this->isModuleVersionAtLeast('Mapper', '3.4.9')) {
+    $message = new \Omeka\Stdlib\Message(
+        $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+        'Mapper', '3.4.9'
     );
     $messenger->addError($message);
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
@@ -311,9 +324,24 @@ if (version_compare($oldVersion, '3.4.20', '<')) {
     // 4. Regenerate the "{lang}.php" files from the "translated" table so the
     // migrated strings are actually loaded at runtime, without waiting for a
     // manual save in the translations page.
+    // The module is not loaded during its own upgrade, so its controller
+    // plugins are not registered: build the plugin with its factory.
+    // The classes of "src/" are not autoloadable either, so require them.
+    $modulePath = dirname(__DIR__, 2);
+    require_once $modulePath . '/src/Mvc/Controller/Plugin/UpdateTranslationFiles.php';
+    require_once $modulePath . '/src/Service/ControllerPlugin/UpdateTranslationFilesFactory.php';
     try {
-        $services->get('ControllerPluginManager')->get('updateTranslationFiles')();
+        $updateTranslationFiles = (new Service\ControllerPlugin\UpdateTranslationFilesFactory())($services, 'updateTranslationFiles');
+        $result = $updateTranslationFiles();
     } catch (\Throwable $e) {
+        $result = false;
+        $message = new PsrMessage(
+            'The language files could not be regenerated: {message}', // @translate
+            ['message' => $e->getMessage()]
+        );
+        $logger->err((string) $message);
+    }
+    if (!$result) {
         $messenger->addWarning(new PsrMessage(
             'Migrated translations are stored but the language files could not be regenerated automatically: open and save any language in the translations page.' // @translate
         ));
@@ -355,4 +383,11 @@ if (version_compare($oldVersion, '3.4.20', '<')) {
         $message->setEscapeHtml(false);
         $messenger->addWarning($message);
     }
+}
+
+if (version_compare($oldVersion, '3.4.21', '<')) {
+    $message = new PsrMessage(
+        'It is now possible to copy and translate site pages individually.' // @translate
+    );
+    $messenger->addSuccess($message);
 }
