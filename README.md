@@ -102,10 +102,37 @@ part.
 Note that the specific translations of the modules override the default
 translations of Omeka, for example for vocabularies.
 
-**Warning**: The translations stored by this module are a single "string => translation"
-pair, so they cannot express plural forms. Strings that use plurals (`translatePlural()` / ngettext)
-must keep their translations in a po/mo file (module or theme), where the plural
-forms are supported. See the TODO below.
+**Warning**: The translations stored by this module are a single
+"string => translation" pair, so they cannot express plural forms nor contexts.
+For these strings, add a gettext file in the directory "files/language/", named
+with the locale, for example "fr.mo" (see below).
+
+#### Translations via a gettext file
+
+The table above cannot store the plural forms (`translatePlural()` / ngettext)
+nor the contexts (`msgctxt`), that are the strings translated differently
+according to where they are displayed. So the files "*.mo" of the directory
+"files/language/" are loaded too. They are named with the locale, like "fr.mo"
+or "fr_FR.mo", and they are prepared with a tool like poedit.
+
+Unlike the files "*.php" of the same directory, that are automatically generated
+from the table and replaced on each save, the files "*.mo" are never modified by
+the module.
+
+A string translated in the table wins over the same string translated in a file,
+so a translation managed in the admin interface is always the one displayed.
+
+The contexts are loaded, but laminas has no api for them, so use the view helper
+of the module (see the conventions for the gender and the cases in the chapter
+Development below):
+
+```php
+// Displays the translation of "Home" for the context "menu".
+echo $this->translateContext('Home', 'menu');
+```
+
+When the pair message/context has no translation, the message alone is
+translated, and when it has none either, the message is returned as is.
 
 **Note**: Previous versions could delegate complex cases (a string translated
 differently between sites) to the module [Table]. This support was removed: all
@@ -192,6 +219,29 @@ Make the relations between translated pages in each group of sites. For that
 purpose, there is a new field to fill in the site page: the pages that are a
 translation of the current page. So select the related pages and translate them.
 
+When the page does not exist yet in the other sites, it can be created from the
+list of the pages of the site: the action `Copy` opens a sidebar with a selector
+of the site groups and of the sites. The page is then copied into the selected
+sites with all its blocks and related to the original page as a translation.
+
+The current site is the first choice of the selector, apart from the groups: the
+page is then simply duplicated inside it, with a number appended to its slug. A
+duplicate is not a translation, so it is not related to the original page.
+
+For the other sites, a site that has already a translation of this page is
+skipped, and the slug is suffixed too when it is used already in the target
+site. Selecting a group copies the page into all the sites of the group at once,
+and any site can be selected individually, so a single page can be translated
+without preparing a group first.
+
+It is the equivalent of the duplication of a site, but for a single page, so a
+new page can be added to a group of sites that is already translated. When the
+module [Translator] is installed and configured, the copies can be translated in
+the background, following the pairs of languages set in its settings.
+
+Note: the copy is not added to the navigation of the target sites, that stays
+managed manually.
+
 It’s important to set relations for all pages, else the language switcher will
 display a "page doesn’t exist" error if the user browse to it. Furthemore, it is
 recommended to use all the same settings, item pools, themes, rights, etc. for
@@ -204,6 +254,26 @@ same content than the specified page. It is useful for pages that are common in
 all the sites too (about, terms and conditions…).
 
 Then, in public front-end, the visitor can switch between sites via a flag.
+
+5. Translation of the pages
+
+With the module [Translator], a second action `Translate` is available in the
+list of the pages. It opens a sidebar with one checkbox by site, all checked:
+
+- the site of the page itself translates it in place, into the locale of that
+  site. It is used for a page that was never translated, or that is written in
+  another language than the one of its site. The language of the page can be
+  selected, or detected by the translation service.
+- each other site updates the page it has related to this one, following the
+  pairs of languages set in the settings of the module Translator.
+
+A block is translated again only when the original text changed, so the
+corrections made by a user are kept. A page written in the language of its own
+site is not modified.
+
+The copies are translated automatically when a page is created or saved, so
+this action is mainly used to translate them again, or to translate a page that
+is not a copy.
 
 #### Integration of the language switcher
 
@@ -258,6 +328,61 @@ queries. In such way, the api will response for example French "Auteur" for the
 property "dcterms:creator" on a template "Book").
 
 
+Development
+-----------
+
+### Contexts for gender, case and other criteria
+
+A gettext file has only two axes: the number, through the plural rule, and the
+context, that is a free string. There is no native support of the gender, of the
+grammatical cases, nor of the ordinals. In particular, the plural rule takes a
+single integer, so it cannot select a form according to anything else: it fits
+the complex systems, like the three forms of Polish or the six ones of Arabic,
+but only as a function of the count.
+
+So the other criteria are managed by convention, with the context. The
+recommended convention is a criterion and a value, separated by ":", so the
+contexts stay readable and easy to grep:
+
+```po
+msgctxt "gender:female"
+msgid "%s left"
+msgstr "%s est partie"
+
+msgctxt "gender:male"
+msgid "%s left"
+msgstr "%s est parti"
+
+msgctxt "case:genitive"
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] "%d pliku"
+msgstr[1] "%d plików"
+msgstr[2] "%d plików"
+```
+
+The caller builds the context itself:
+
+```php
+echo $this->translateContext('%s left', 'gender:' . $gender);
+```
+
+Three points to keep in mind:
+
+- Nothing is automatic: unlike the plural forms, gettext never selects a
+  context. It is the code that decides which one to ask.
+- Use the same criteria and the same values across all the strings of a module
+  or of a theme, else the translators cannot guess them.
+- A missing context is not an error: `translateContext()` falls back to the
+  message translated without context, then to the message itself, so a partial
+  set of contexts still displays something.
+
+The format that supports these criteria natively is ICU MessageFormat, available
+in php through the extension `intl`, with its keywords `select` and
+`selectordinal`. Neither Omeka nor laminas use it to translate the interface, so
+it is not an option here.
+
+
 TODO
 ----
 
@@ -271,7 +396,7 @@ TODO
 - [ ] Manage sites by group instead of sync manually.
 - [ ] Add a view to display all the languages that are used.
 - [ ] Add a bulk edit to normalize all languages, so fallbacks won't be necessary in  most of the cases. For now, use Bulk Edit.
-- [ ] Support plural forms in the translation tables (currently a single "string => translation" pair only; strings with plurals must stay in a po/mo file).
+- [ ] Support plural forms and contexts in the translation table (currently a single "string => translation" pair only; they are supported via a gettext file in "files/language/"). No loader has to be changed: the php array files support them already, with the key "" for the plural rule, an array of forms as a value, and the context prefixed to the string and separated by "\x04". So the work is to add a column for the context and a storage for the forms in the table, to manage them in the form, and to output them in the generated files.
 - [ ] Add a view to manage fallbacks (site settings?).
 - [ ] Sort by the translated value.
 - [ ] Sort by the translated resource class and template labels.
@@ -348,6 +473,7 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 
 [Internationalisation]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation
 [Omeka S]: https://omeka.org/s
+[Translator]: https://gitlab.com/Daniel-KM/Omeka-S-module-Translator
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [Translate]: https://gitlab.com/Daniel-KM/Omeka-S-module-Translate
 [Table]: https://gitlab.com/Daniel-KM/Omeka-S-module-Table
