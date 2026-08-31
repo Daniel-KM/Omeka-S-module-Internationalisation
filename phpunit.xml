@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE phpunit>
-<phpunit
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/9.5/phpunit.xsd"
-    colors="true"
-    backupGlobals="false"
-    bootstrap="test/bootstrap.php"
-    >
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         bootstrap="./tests/bootstrap.php"
+         colors="true"
+         backupGlobals="false"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+    <coverage>
+        <include>
+            <directory suffix=".php">./src</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">./src/Service</directory>
+        </exclude>
+    </coverage>
     <testsuites>
-        <testsuite name="LanguageSwitcher">
-            <directory suffix="Test.php">test/LanguageSwitcherTest</directory>
+        <testsuite name="Internationalisation">
+            <directory suffix="Test.php">./tests/InternationalisationTest</directory>
         </testsuite>
     </testsuites>
-    <php>
-        <env name="APPLICATION_ENV" value="testing"/>
-        <includePath>./tests</includePath>
-    </php>
 </phpunit>
