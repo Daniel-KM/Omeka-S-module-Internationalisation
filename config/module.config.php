@@ -48,6 +48,7 @@ return [
             'languageList' => Service\ViewHelper\LanguageListFactory::class,
             'languageSwitcher' => Service\ViewHelper\LanguageSwitcherFactory::class,
             'localeValue' => Service\ViewHelper\LocaleValueFactory::class,
+            'translateContext' => Service\ViewHelper\TranslateContextFactory::class,
         ],
     ],
     'block_layouts' => [
@@ -187,6 +188,17 @@ return [
             [
                 'type' => \Laminas\I18n\Translator\Loader\Gettext::class,
                 'base_dir' => dirname(__DIR__) . '/language',
+                'pattern' => '%s.mo',
+                'text_domain' => null,
+            ],
+            // Translations added by the user as gettext files. Unlike the
+            // table, they support the plural forms and the contexts. They are
+            // loaded before the files below, so a translation managed in the
+            // admin interface wins, and the file is not overwritten: only the
+            // files "*.php" are replaced.
+            [
+                'type' => \Laminas\I18n\Translator\Loader\Gettext::class,
+                'base_dir' => $localPath . '/language',
                 'pattern' => '%s.mo',
                 'text_domain' => null,
             ],

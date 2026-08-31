@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Test string of the module Internationalisation"
+msgstr "Chaine de test du module Internationalisation"
+
+msgid "One tested item"
+msgid_plural "%d tested items"
+msgstr[0] "Un contenu teste"
+msgstr[1] "%d contenus testes"
+
+msgctxt "menu"
+msgid "Tested home"
+msgstr "Accueil du menu teste"
+
+msgctxt "button"
+msgid "Tested home"
+msgstr "Bouton accueil teste"
