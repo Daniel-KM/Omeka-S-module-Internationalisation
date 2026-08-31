@@ -289,8 +289,12 @@ class TranslationController extends AbstractActionController
         // The route of this action has no site slug, so it is set explicitly.
         $browseUrl = $this->url()->fromRoute('admin/site/slug/page', ['site-slug' => $page->site()->slug()]);
 
+        // The form creates pages, so it is protected against a forged request.
+        $csrf = new \Laminas\Form\Element\Csrf('copy_page_csrf');
+
         if (!$this->getRequest()->isPost()) {
             $view = new ViewModel([
+                'csrf' => $csrf,
                 'page' => $page,
                 'siteGroups' => $this->listSiteGroupsToCopy($page),
                 // The own site of the page is displayed apart and first, so a
@@ -302,6 +306,11 @@ class TranslationController extends AbstractActionController
             return $view
                 ->setTemplate('internationalisation/admin/translation/copy-page')
                 ->setTerminal(true);
+        }
+
+        if (!$csrf->getInputSpecification()['validators'][0]->isValid($this->params()->fromPost('copy_page_csrf'))) {
+            $this->messenger()->addError('Invalid or expired form. Please retry.'); // @translate
+            return $this->redirect()->toUrl($browseUrl);
         }
 
         $siteIds = $this->siteIdsFromPost((array) $this->params()->fromPost('sites', []));
@@ -318,6 +327,13 @@ class TranslationController extends AbstractActionController
                 ['count' => count($result['created'])]
             ));
         }
+        if ($result['duplicated']) {
+            // The page can be duplicated only once by request, so there is no
+            // count and no plural to manage here.
+            $this->messenger()->addSuccess(new PsrMessage(
+                'The page was duplicated in this site.' // @translate
+            ));
+        }
         if ($result['skipped']) {
             $this->messenger()->addNotice(new PsrMessage(
                 '{count} sites have already a translation of this page, so they were skipped.', // @translate
@@ -327,6 +343,8 @@ class TranslationController extends AbstractActionController
         // The copies are translated in the background by the module Translator.
         // The job is dispatched explicitly: the source page is not saved here,
         // so the listener of the module on the api is not triggered.
+        // A duplicate in the same site is never translated, so the job is not
+        // dispatched when there is no copy in another site.
         if ($result['created']
             && $this->hasTranslator
             && $this->params()->fromPost('translate')

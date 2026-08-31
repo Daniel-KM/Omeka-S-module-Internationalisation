@@ -51,13 +51,15 @@ class CopyPageToSites extends AbstractPlugin
      * @param int $pageId The page to copy.
      * @param int[] $siteIds The sites to copy the page into, including the site
      * of the page itself.
-     * @return array Result with the keys "created" (ids of the new pages),
-     * "skipped" (ids of the sites that have already a translation) and "errors"
-     * (ids of the sites where the copy failed).
+     * @return array Result with the keys "created" (ids of the new pages in the
+     * other sites, that are translations), "duplicated" (ids of the new pages
+     * in the site of the page itself), "skipped" (ids of the sites that have
+     * already a translation) and "errors" (ids of the sites where the copy
+     * failed).
      */
     public function __invoke(int $pageId, array $siteIds): array
     {
-        $result = ['created' => [], 'skipped' => [], 'errors' => []];
+        $result = ['created' => [], 'duplicated' => [], 'skipped' => [], 'errors' => []];
 
         try {
             /** @var \Omeka\Api\Representation\SitePageRepresentation $page */
@@ -102,10 +104,12 @@ class CopyPageToSites extends AbstractPlugin
 
             try {
                 $newPageId = $this->api->create('site_pages', $copy)->getContent()->id();
-                $result['created'][] = $newPageId;
                 // A duplicate in the same site is not a translation: the
                 // language switcher displays one related page by site.
-                if ($siteId !== $ownSiteId) {
+                if ($siteId === $ownSiteId) {
+                    $result['duplicated'][] = $newPageId;
+                } else {
+                    $result['created'][] = $newPageId;
                     $toRelate[] = $newPageId;
                 }
             } catch (\Throwable $e) {

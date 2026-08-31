@@ -3,6 +3,7 @@
  * Sidebar to copy a page into other sites, from the browse of the site pages.
  *
  * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Laminas\Form\Element\Csrf $csrf
  * @var \Omeka\Api\Representation\SitePageRepresentation $page
  * @var \Omeka\Api\Representation\SiteRepresentation $ownSite
  * @var array $siteGroups Slugs of the sites by group.
@@ -20,11 +21,12 @@ $action = $this->url('admin/translation/copy-page', ['page-id' => $page->id()]);
 <p class="copy-page-title"><?= $escape($page->title()) ?></p>
 
 <form method="post" action="<?= $escape($action) ?>" class="copy-page-form">
+    <?= $this->formElement($csrf) ?>
     <div class="field">
         <div class="field-meta">
             <label for="copy-page-sites"><?= $translate('Sites') ?></label>
             <div class="field-description">
-                <?= $translate('The page is copied with all its blocks, then related to this page as a translation. A site that has already a translation is skipped. A copy in the current site is a simple duplicate, so it is not a translation and a number is appended to its slug.') ?>
+                <?= $translate('The page is copied with all its blocks, then related to this page as a translation. A site that has already a translation is skipped.') ?>
             </div>
         </div>
         <div class="inputs">
@@ -57,11 +59,12 @@ $action = $this->url('admin/translation/copy-page', ['page-id' => $page->id()]);
         <div class="field-meta">
             <label for="copy-page-translate"><?= $translate('Translate the page') ?></label>
             <div class="field-description">
-                <?= $translate('The copies are translated in the background, following the pairs of languages set in the settings of the module Translator. A duplicate in the current site is not translated.') ?>
+                <?= $translate('The copies are translated in the background according to the pairs of languages set by module Translator.') ?>
             </div>
         </div>
         <div class="inputs">
             <input type="checkbox" id="copy-page-translate" name="translate" value="1" checked="checked"/>
+            <?= $translate('Translate new pages in sites') ?>
         </div>
     </div>
     <?php endif; ?>
