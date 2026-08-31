@@ -117,4 +117,37 @@ class LanguageIso extends AbstractHelper
     {
         return Iso639p3::englishInvertedName($language);
     }
+
+    /**
+     * Get the language name in French from a language string.
+     *
+     * Most of the languages have no French name in the standard sources, so an
+     * empty string is returned for them.
+     *
+     * @uses Iso639p3::frenchName()
+     * @param string $language
+     * @return string If language doesn't exist, an empty string is returned.
+     */
+    public function frenchName($language)
+    {
+        return Iso639p3::frenchName($language);
+    }
+
+    /**
+     * Get the language inverted name in French from a language string.
+     *
+     * The inverted language is used to simplify listing (ordered by root
+     * language).
+     *
+     * Most of the languages have no French name in the standard sources, so an
+     * empty string is returned for them.
+     *
+     * @uses Iso639p3::frenchInvertedName()
+     * @param string $language
+     * @return string If language doesn't exist, an empty string is returned.
+     */
+    public function frenchInvertedName($language)
+    {
+        return Iso639p3::frenchInvertedName($language);
+    }
 }
