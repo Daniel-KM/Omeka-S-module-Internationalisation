@@ -2,8 +2,8 @@
 
 namespace Internationalisation\Form;
 
+use Common\Form\Element as CommonElement;
 use Laminas\Form\Form;
-use Omeka\Form\Element as OmekaElement;
 
 class TranslationForm extends Form
 {
@@ -13,12 +13,16 @@ class TranslationForm extends Form
             ->setAttribute('id', 'table-form')
             ->add([
                 'name' => 'translations',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'List of strings and translations separated by " = " (space, equal, space)', // @translate
                     'as_key_value' => true,
                     // Use " = " (not "=") so source strings may contain "=".
                     'key_value_separator' => ' = ',
+                    'pairs_editor' => [
+                        'key_label' => 'String', // @translate
+                        'value_label' => 'Translation', // @translate
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'translations',

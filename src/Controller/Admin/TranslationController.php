@@ -195,8 +195,6 @@ class TranslationController extends AbstractActionController
                         );
                     // $removedLanguages = [$language];
                 } else {
-                    asort($translations);
-
                     // Do not update translations that are not updated.
                     $kept = array_intersect_assoc($existingTranslations, $translations);
                     $translations = array_diff_key($translations, $kept);
@@ -797,7 +795,7 @@ class TranslationController extends AbstractActionController
         // Use a direct query to avoid to load representations for a simple
         // two-column table.
         return $this->connection
-            ->executeQuery('SELECT `string`, `translation` FROM `translated` WHERE `lang` = :lang', ['lang' => $language])
+            ->executeQuery('SELECT `string`, `translation` FROM `translated` WHERE `lang` = :lang ORDER BY `string` ASC', ['lang' => $language])
             ->fetchAllKeyValue();
     }
 }
