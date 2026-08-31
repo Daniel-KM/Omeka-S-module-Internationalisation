@@ -1,0 +1,66 @@
+<?php
+/**
+ * Sidebar to translate a page, from the browse of the site pages.
+ *
+ * One checkbox by site, all checked: the site of the page translates it in
+ * place, into the locale of its own site, and the other ones update the page
+ * they have related to it.
+ *
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Laminas\Form\Element\Csrf $csrf
+ * @var \Omeka\Api\Representation\SitePageRepresentation $page
+ * @var array $sites Arrays with the keys "label" and "own", by site id.
+ * @var array $siteLanguages Labels of the languages of the sites, by code.
+ */
+
+$escape = $this->plugin('escapeHtml');
+$translate = $this->plugin('translate');
+
+$action = $this->url('admin/translation/translate-page', ['page-id' => $page->id()]);
+?>
+<h3><?= $translate('Translate the page') ?></h3>
+
+<p class="translate-page-title"><?= $escape($page->title()) ?></p>
+
+<form method="post" action="<?= $escape($action) ?>" class="translate-page-form">
+    <?= $this->formElement($csrf) ?>
+    <div class="field">
+        <div class="field-meta">
+            <label><?= $translate('Sites') ?></label>
+            <div class="field-description">
+                <?= $translate('A block is translated again only when the text changed, so the corrections are kept.') ?>
+            </div>
+        </div>
+        <div class="inputs">
+            <?php foreach ($sites as $siteId => $site): ?>
+            <label class="translate-page-site">
+                <input type="checkbox" name="sites[]" value="<?= (int) $siteId ?>" checked="checked"/>
+                <?= $escape($site['label']) ?>
+            </label>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="field-meta">
+            <label><?= $translate('Language of this page') ?></label>
+            <div class="field-description">
+                <?= $translate('Used only to translate this page in place: the detection of the language is not reliable with short strings.') ?>
+            </div>
+        </div>
+        <div class="inputs">
+            <label class="translate-page-lang">
+                <input type="radio" name="lang_source" value="auto" checked="checked"/>
+                <?= $translate('Detect the language automatically') ?>
+            </label>
+            <?php foreach ($siteLanguages as $lang => $label): ?>
+            <label class="translate-page-lang">
+                <input type="radio" name="lang_source" value="<?= $escape($lang) ?>"/>
+                <?= $escape($label) ?>
+            </label>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <button type="submit" class="button"><?= $translate('Translate') ?></button>
+</form>

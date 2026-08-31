@@ -122,6 +122,18 @@ return [
                                     ],
                                 ],
                             ],
+                            'translate-page' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/translate-page/:page-id',
+                                    'constraints' => [
+                                        'page-id' => '\d+',
+                                    ],
+                                    'defaults' => [
+                                        'action' => 'translate-page',
+                                    ],
+                                ],
+                            ],
                             'default' => [
                                 'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [

@@ -271,6 +271,175 @@ class TranslationController extends AbstractActionController
      *
      * The get displays the selector of the sites, the post does the copy.
      */
+    /**
+     * Translate the copies of a page, from the sidebar of the page browse.
+     *
+     * Unlike the copy, the action does not modify the page itself: it updates
+     * the pages of the other sites that are related to it, so the sidebar lists
+     * them before the confirmation.
+     */
+    public function translatePageAction()
+    {
+        if (!$this->hasTranslator) {
+            return $this->notFoundAction();
+        }
+
+        $pageId = (int) $this->params('page-id');
+
+        try {
+            /** @var \Omeka\Api\Representation\SitePageRepresentation $page */
+            $page = $this->api()->read('site_pages', $pageId)->getContent();
+        } catch (\Omeka\Api\Exception\NotFoundException $e) {
+            return $this->notFoundAction();
+        }
+
+        if (!$page->userIsAllowed('update')) {
+            throw new \Omeka\Mvc\Exception\PermissionDeniedException();
+        }
+
+        $csrf = new \Laminas\Form\Element\Csrf('translate_page_csrf');
+        $browseUrl = $this->url()->fromRoute('admin/site/slug/page', ['site-slug' => $page->site()->slug()]);
+
+        if (!$this->getRequest()->isPost()) {
+            $view = new ViewModel([
+                'csrf' => $csrf,
+                'page' => $page,
+                'sites' => $this->listSitesToTranslate($page),
+                'siteLanguages' => $this->listSiteLanguages($page),
+            ]);
+            return $view
+                ->setTemplate('internationalisation/admin/translation/translate-page')
+                ->setTerminal(true);
+        }
+
+        if (!$csrf->getInputSpecification()['validators'][0]->isValid($this->params()->fromPost('translate_page_csrf'))) {
+            $this->messenger()->addError('Invalid or expired form. Please retry.'); // @translate
+            return $this->redirect()->toUrl($browseUrl);
+        }
+
+        // One checkbox by site: the site of the page translates it in place,
+        // the other ones update the page they have related to it.
+        $ownSiteId = (int) $page->site()->id();
+        $siteIds = array_map('intval', (array) $this->params()->fromPost('sites', []));
+        $siteIds = array_values(array_unique(array_filter($siteIds)));
+        if (!$siteIds) {
+            $this->messenger()->addWarning('No site was selected, so nothing was translated.'); // @translate
+            return $this->redirect()->toUrl($browseUrl);
+        }
+
+        // A single job manages the selected sites: the site of the page is
+        // translated in place, the other ones update their related page.
+        $this->dispatchTranslation(
+            $pageId,
+            \Translator\Job\TranslatePages::MODE_RELATED,
+            in_array($ownSiteId, $siteIds, true)
+                ? (string) $this->params()->fromPost('lang_source', 'auto')
+                : null,
+            $siteIds
+        );
+
+        return $this->redirect()->toUrl($browseUrl);
+    }
+
+    /**
+     * List the sites where the page may be translated, with a label.
+     *
+     * The site of the page itself comes first: it translates the page in place.
+     * The other ones are the sites that have a page related to it.
+     *
+     * @return array Arrays with the keys "label" and "own", by site id.
+     */
+    protected function listSitesToTranslate($page): array
+    {
+        $ownSiteId = (int) $page->site()->id();
+
+        $result = [
+            $ownSiteId => [
+                'label' => sprintf(
+                    $this->translate('This page, in %s'), // @translate
+                    $page->site()->title()
+                ),
+                'own' => true,
+            ],
+        ];
+
+        foreach ($this->listRelatedPages((int) $page->id()) as $related) {
+            $result[(int) $related->site()->id()] = [
+                'label' => sprintf('%s — %s', $related->site()->title(), $related->title()),
+                'own' => false,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * List the languages of all the sites, to select the source of a page.
+     *
+     * The locale of the site of the page is excluded: a page is not translated
+     * into the language it is written in.
+     *
+     * @return array Labels of the languages by code.
+     */
+    protected function listSiteLanguages($page): array
+    {
+        $siteSettings = $this->siteSettings();
+        $ownLang = null;
+
+        $result = [];
+        foreach ($this->api()->search('sites', [], ['returnScalar' => 'id'])->getContent() as $siteId) {
+            $locale = (string) $siteSettings->get('locale', '', $siteId);
+            if ($locale === '') {
+                continue;
+            }
+            $lang = \Iso639p3\Iso639p3::code(strtok(strtr($locale, '_', '-'), '-'));
+            if (!$lang) {
+                continue;
+            }
+            if ((int) $siteId === $page->site()->id()) {
+                $ownLang = $lang;
+            }
+            $name = \Iso639p3\Iso639p3::englishName($lang);
+            $result[$lang] = $name ? sprintf('%s (%s)', $name, $lang) : $lang;
+        }
+
+        unset($result[$ownLang]);
+        natcasesort($result);
+
+        return $result;
+    }
+
+    /**
+     * Get the pages related to a page, with their site, to display them.
+     */
+    protected function listRelatedPages(int $pageId): array
+    {
+        $sql = <<<'SQL'
+            SELECT p.id
+            FROM site_page_relation r
+            INNER JOIN site_page p
+                ON p.id = IF(r.page_id = :page_id, r.related_page_id, r.page_id)
+            WHERE r.page_id = :page_id OR r.related_page_id = :page_id
+            SQL;
+
+        $ids = $this->connection->executeQuery(
+            $sql,
+            ['page_id' => $pageId],
+            ['page_id' => \Doctrine\DBAL\ParameterType::INTEGER]
+        )->fetchFirstColumn();
+
+        $result = [];
+        foreach ($ids as $id) {
+            try {
+                $result[] = $this->api()->read('site_pages', (int) $id)->getContent();
+            } catch (\Throwable $e) {
+                // The related page may have been removed.
+            }
+        }
+
+        return $result;
+    }
+
     public function copyPageAction()
     {
         $pageId = (int) $this->params('page-id');
@@ -370,12 +539,24 @@ class TranslationController extends AbstractActionController
      *
      * @see \Translator\Job\TranslatePages
      */
-    protected function dispatchTranslation(int $pageId): void
-    {
+    protected function dispatchTranslation(
+        int $pageId,
+        string $mode = 'related',
+        ?string $langSource = null,
+        array $siteIds = []
+    ): void {
+        $args = ['page_ids' => $pageId, 'mode' => $mode];
+        if ($langSource !== null) {
+            $args['lang_source'] = $langSource;
+        }
+        if ($siteIds) {
+            $args['site_ids'] = $siteIds;
+        }
+
         try {
             $job = $this->jobDispatcher->dispatch(
                 \Translator\Job\TranslatePages::class,
-                ['page_ids' => $pageId]
+                $args
             );
         } catch (\Throwable $e) {
             $this->messenger()->addError(new PsrMessage(
@@ -386,7 +567,7 @@ class TranslationController extends AbstractActionController
         }
 
         $message = new PsrMessage(
-            'Translating the copies of the page in background (job {link_job}#{job_id}{link_end}).', // @translate
+            'Translating the page in background (job {link_job}#{job_id}{link_end}).', // @translate
             [
                 'link_job' => sprintf(
                     '<a href="%s">',

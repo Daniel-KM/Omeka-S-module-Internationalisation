@@ -822,15 +822,39 @@ class Module extends AbstractModule
             return;
         }
 
-        $label = $view->translate('Copy the page into this site or another one'); // @translate
-        $url = $view->url('admin/translation/copy-page', ['page-id' => $page->id()]);
-
-        echo sprintf(
-            '<li><a href="#" class="o-icon- far fa-copy sidebar-content" data-sidebar-content-url="%s" aria-label="%s" title="%s"></a></li>',
-            $view->escapeHtml($url),
-            $view->escapeHtml($label),
-            $view->escapeHtml($label)
+        // The stylesheet of the module is not loaded on the pages of the core,
+        // and it lightens the icons of the regular variant of Font Awesome. The
+        // head is rendered after the content, and headLink skips the
+        // duplicates, so it can be appended for each row.
+        $view->headLink()->appendStylesheet(
+            $view->assetUrl('css/internationalisation.css', 'Internationalisation')
         );
+
+        $actions = [];
+
+        // The translation of the copies is managed by the module Translator.
+        if ($this->isModuleActive('Translator')) {
+            $actions['translate-page'] = [
+                'class' => 'o-icon- fa-language',
+                'label' => $view->translate('Translate the copies of the page'), // @translate
+            ];
+        }
+
+        $actions['copy-page'] = [
+            'class' => 'o-icon- far fa-copy',
+            'label' => $view->translate('Copy the page into this site or another one'), // @translate
+        ];
+
+        foreach ($actions as $route => $action) {
+            $url = $view->url('admin/translation/' . $route, ['page-id' => $page->id()]);
+            echo sprintf(
+                '<li><a href="#" class="%s sidebar-content" data-sidebar-content-url="%s" aria-label="%s" title="%s"></a></li>',
+                $action['class'],
+                $view->escapeHtml($url),
+                $view->escapeHtml($action['label']),
+                $view->escapeHtml($action['label'])
+            );
+        }
     }
 
     public function handleApiUpdatePostPage(Event $event): void

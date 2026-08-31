@@ -1,4 +1,9 @@
 @media all {
+    /* Display the regular variant of a Font Awesome icon lighter against omeka core. */
+    [class*="o-icon-"].far::before {
+        font-weight: 400;
+    }
+
     header nav .translation::before,
     .translation .subhead::before,
     .translations .subhead::before,
