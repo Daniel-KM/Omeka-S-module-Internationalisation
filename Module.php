@@ -339,8 +339,18 @@ class Module extends AbstractModule
         );
 
         // Add an action to copy a page into the other sites from the browse.
+        // The helper "trigger" uses the param "controller" of the route as
+        // identifier. Unlike the admin routes, that set the full name of the
+        // controller, the site admin routes set a short name ("Page") and the
+        // namespace apart, so the two identifiers are used.
+        // @see \Omeka\View\Helper\Trigger
         $sharedEventManager->attach(
             'Omeka\Controller\SiteAdmin\Page',
+            'view.browse.actions',
+            [$this, 'handleViewBrowseActionsPage']
+        );
+        $sharedEventManager->attach(
+            'Page',
             'view.browse.actions',
             [$this, 'handleViewBrowseActionsPage']
         );
