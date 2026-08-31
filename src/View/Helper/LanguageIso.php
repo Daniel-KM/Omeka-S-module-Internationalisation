@@ -2,9 +2,7 @@
 
 namespace Internationalisation\View\Helper;
 
-require_once dirname(__DIR__, 3) . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
-
-use Iso639p3;
+use Iso639p3\Iso639p3;
 use Laminas\View\Helper\AbstractHelper;
 
 class LanguageIso extends AbstractHelper
