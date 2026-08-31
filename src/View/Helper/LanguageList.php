@@ -88,9 +88,10 @@ class LanguageList extends AbstractHelper
         // This is automatically managed since siteGroups list only them.
         // TODO Update the setting for site groups when a site is renamed.
         // $locales = array_intersect_key($this->localeSites, array_flip($siteGroup));
-        // First each lang keys to allow intersect keys.
+        // The core site adapter does not support an array of slugs,
+        // so check via a full sites id/slug load.
         if (!is_array(reset($siteGroup))) {
-            $siteGroupKeys = array_flip($siteGroup);
+            $siteGroupKeys = array_fill_keys(array_filter($siteGroup, 'is_scalar'), true);
         } else {
             $siteGroupKeys = array_fill_keys(array_keys($siteGroup), true);
         }
@@ -149,12 +150,15 @@ class LanguageList extends AbstractHelper
             if ($pageSlug) {
                 $siteSlugsToCheck = array_diff(array_keys($locales), array_keys($relatedPages));
                 if ($siteSlugsToCheck) {
-                    // The core site adapter does not support an array of slugs
-                    // (it would build "slug = ?, ?"), and sites are few, so
-                    // load the slug => id map once and keep only the needed
-                    // slugs.
-                    $idsBySlug = array_flip($api->search('sites', [], ['returnScalar' => 'slug'])->getContent());
-                    $siteIdsBySlug = array_intersect_key($idsBySlug, array_flip($siteSlugsToCheck));
+                    // The core site adapter does not support an array of slugs,
+                    // so check via a full sites id/slug load.
+                    $neededSlugs = array_fill_keys($siteSlugsToCheck, true);
+                    $siteIdsBySlug = [];
+                    foreach ($api->search('sites', [], ['returnScalar' => 'slug'])->getContent() as $siteId => $siteSlug) {
+                        if (isset($neededSlugs[$siteSlug])) {
+                            $siteIdsBySlug[$siteSlug] = $siteId;
+                        }
+                    }
                     // Get all pages with the same slug across these sites in one query.
                     if ($siteIdsBySlug) {
                         $pages = $api->search('site_pages', [
