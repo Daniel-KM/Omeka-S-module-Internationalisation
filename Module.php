@@ -338,6 +338,13 @@ class Module extends AbstractModule
             [$this, 'handleApiUpdatePostPage']
         );
 
+        // Add an action to copy a page into the other sites from the browse.
+        $sharedEventManager->attach(
+            'Omeka\Controller\SiteAdmin\Page',
+            'view.browse.actions',
+            [$this, 'handleViewBrowseActionsPage']
+        );
+
         // Order the form element for properties and resource classes.
         $sharedEventManager->attach(
             \Omeka\Form\Element\AbstractVocabularyMemberSelect::class,
@@ -792,6 +799,40 @@ class Module extends AbstractModule
         $event->setParam('jsonLd', $jsonLd);
     }
 
+    /**
+     * Append an action to copy a page into other sites in the browse of pages.
+     *
+     * The sidebar of the core displays the selector of the sites: it is loaded
+     * from the url set in the attribute "data-sidebar-content-url".
+     *
+     * @see \Internationalisation\Controller\Admin\TranslationController::copyPageAction()
+     */
+    public function handleViewBrowseActionsPage(Event $event): void
+    {
+        /**
+         * @var \Laminas\View\Renderer\PhpRenderer $view
+         * @var \Omeka\Api\Representation\SitePageRepresentation $page
+         */
+        $view = $event->getTarget();
+        $page = $event->getParam('resource');
+
+        if (!$page instanceof \Omeka\Api\Representation\SitePageRepresentation
+            || !$page->userIsAllowed('update')
+        ) {
+            return;
+        }
+
+        $label = $view->translate('Copy the page into this site or another one'); // @translate
+        $url = $view->url('admin/translation/copy-page', ['page-id' => $page->id()]);
+
+        echo sprintf(
+            '<li><a href="#" class="o-icon- far fa-copy sidebar-content" data-sidebar-content-url="%s" aria-label="%s" title="%s"></a></li>',
+            $view->escapeHtml($url),
+            $view->escapeHtml($label),
+            $view->escapeHtml($label)
+        );
+    }
+
     public function handleApiUpdatePostPage(Event $event): void
     {
         $services = $this->getServiceLocator();
@@ -806,14 +847,29 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $pageId = $response->getContent()->getId();
 
+        // The form posts a list of ids, but the json-ld of a page exposes the
+        // related pages as references, so an update done through the api sends
+        // a list of arrays: intval() would turn each of them into "1".
+        // @see \Internationalisation\Module::filterJsonLdSitePage()
         $selected = $request->getValue('o-module-internationalisation:related_page', []);
-        $selected = array_map('intval', $selected);
+        $selected = array_filter(array_map(function ($related) {
+            if (is_array($related)) {
+                return (int) ($related['o:id'] ?? 0);
+            }
+            return $related instanceof \Omeka\Api\Representation\AbstractRepresentation
+                || $related instanceof \Omeka\Api\Representation\ResourceReference
+                ? (int) $related->id()
+                : (int) $related;
+        }, (array) $selected));
+        $selected = array_values($selected);
 
         // The page cannot be related to itself.
         $key = array_search($pageId, $selected);
         if ($key !== false) {
             unset($selected[$key]);
         }
+
+        $selected = array_values(array_unique(array_filter($selected)));
 
         // To simplify process, all existing pairs are deleted before saving.
 

@@ -1,0 +1,86 @@
+<?php
+/**
+ * Sidebar to copy a page into other sites, from the browse of the site pages.
+ *
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageRepresentation $page
+ * @var \Omeka\Api\Representation\SiteRepresentation $ownSite
+ * @var array $siteGroups Slugs of the sites by group.
+ * @var array $sites Slug and title of the other sites, by id.
+ * @var bool $hasTranslator Whether the module Translator is active.
+ */
+
+$escape = $this->plugin('escapeHtml');
+$translate = $this->plugin('translate');
+
+$action = $this->url('admin/translation/copy-page', ['page-id' => $page->id()]);
+?>
+<h3><?= $translate('Copy the page') ?></h3>
+
+<p class="copy-page-title"><?= $escape($page->title()) ?></p>
+
+<form method="post" action="<?= $escape($action) ?>" class="copy-page-form">
+    <div class="field">
+        <div class="field-meta">
+            <label for="copy-page-sites"><?= $translate('Sites') ?></label>
+            <div class="field-description">
+                <?= $translate('The page is copied with all its blocks, then related to this page as a translation. A site that has already a translation is skipped. A copy in the current site is a simple duplicate, so it is not a translation and a number is appended to its slug.') ?>
+            </div>
+        </div>
+        <div class="inputs">
+            <select id="copy-page-sites" name="sites[]" multiple="multiple" class="chosen-select"
+                data-placeholder="<?= $escape($translate('Select sites or a group…')) ?>">
+                <option value="<?= (int) $ownSite->id() ?>">
+                    <?= $escape(sprintf($translate('Duplicate in this site (%s)'), $ownSite->slug())) ?>
+                </option>
+                <?php if ($siteGroups): ?>
+                <optgroup label="<?= $escape($translate('Site groups')) ?>">
+                    <?php foreach ($siteGroups as $groupSlug => $groupSites): ?>
+                    <option value="group:<?= $escape($groupSlug) ?>">
+                        <?= $escape(sprintf($translate('All the sites of the group (%s)'), implode(', ', $groupSites))) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </optgroup>
+                <?php endif; ?>
+                <?php if ($sites): ?>
+                <optgroup label="<?= $escape($translate('Sites')) ?>">
+                    <?php foreach ($sites as $siteId => $site): ?>
+                    <option value="<?= (int) $siteId ?>"><?= $escape(sprintf('%s (%s)', $site['title'], $site['slug'])) ?></option>
+                    <?php endforeach; ?>
+                </optgroup>
+                <?php endif; ?>
+            </select>
+        </div>
+    </div>
+    <?php if ($hasTranslator): ?>
+    <div class="field checkbox">
+        <div class="field-meta">
+            <label for="copy-page-translate"><?= $translate('Translate the page') ?></label>
+            <div class="field-description">
+                <?= $translate('The copies are translated in the background, following the pairs of languages set in the settings of the module Translator. A duplicate in the current site is not translated.') ?>
+            </div>
+        </div>
+        <div class="inputs">
+            <input type="checkbox" id="copy-page-translate" name="translate" value="1" checked="checked"/>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <button type="submit" class="button"><?= $translate('Copy') ?></button>
+</form>
+
+<script>
+// The admin initializes chosen on page load only, but this content is loaded
+// in the sidebar with ajax, so the select is initialized here. jQuery runs the
+// scripts of an injected html.
+(function () {
+    var select = jQuery('#copy-page-sites');
+    if (select.length && jQuery.fn.chosen) {
+        select.chosen({
+            allow_single_deselect: true,
+            disable_search_threshold: 10,
+            width: '100%',
+        });
+    }
+})();
+</script>

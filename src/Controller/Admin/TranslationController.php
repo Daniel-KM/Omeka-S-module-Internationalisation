@@ -17,9 +17,24 @@ class TranslationController extends AbstractActionController
      */
     protected $connection;
 
-    public function __construct(Connection $connection)
-    {
+    /**
+     * @var \Omeka\Job\Dispatcher
+     */
+    protected $jobDispatcher;
+
+    /**
+     * @var bool
+     */
+    protected $hasTranslator;
+
+    public function __construct(
+        Connection $connection,
+        \Omeka\Job\Dispatcher $jobDispatcher,
+        bool $hasTranslator
+    ) {
         $this->connection = $connection;
+        $this->jobDispatcher = $jobDispatcher;
+        $this->hasTranslator = $hasTranslator;
     }
 
     public function indexAction()
@@ -249,6 +264,200 @@ class TranslationController extends AbstractActionController
             'form' => $form,
             'confirmForm' => $confirmForm,
         ]);
+    }
+
+    /**
+     * Copy a site page into other sites, from the sidebar of the page browse.
+     *
+     * The get displays the selector of the sites, the post does the copy.
+     */
+    public function copyPageAction()
+    {
+        $pageId = (int) $this->params('page-id');
+
+        try {
+            /** @var \Omeka\Api\Representation\SitePageRepresentation $page */
+            $page = $this->api()->read('site_pages', $pageId)->getContent();
+        } catch (\Omeka\Api\Exception\NotFoundException $e) {
+            return $this->notFoundAction();
+        }
+
+        if (!$page->userIsAllowed('update')) {
+            throw new \Omeka\Mvc\Exception\PermissionDeniedException();
+        }
+
+        // The route of this action has no site slug, so it is set explicitly.
+        $browseUrl = $this->url()->fromRoute('admin/site/slug/page', ['site-slug' => $page->site()->slug()]);
+
+        if (!$this->getRequest()->isPost()) {
+            $view = new ViewModel([
+                'page' => $page,
+                'siteGroups' => $this->listSiteGroupsToCopy($page),
+                // The own site of the page is displayed apart and first, so a
+                // duplicate is not confused with a translation.
+                'ownSite' => $page->site(),
+                'sites' => $this->listSitesToCopy($page),
+                'hasTranslator' => $this->hasTranslator,
+            ]);
+            return $view
+                ->setTemplate('internationalisation/admin/translation/copy-page')
+                ->setTerminal(true);
+        }
+
+        $siteIds = $this->siteIdsFromPost((array) $this->params()->fromPost('sites', []));
+        if (!$siteIds) {
+            $this->messenger()->addWarning('No site was selected, so the page was not copied.'); // @translate
+            return $this->redirect()->toUrl($browseUrl);
+        }
+
+        $result = $this->copyPageToSites($pageId, $siteIds);
+
+        if ($result['created']) {
+            $this->messenger()->addSuccess(new PsrMessage(
+                'The page was copied into {count} sites and set as a translation.', // @translate
+                ['count' => count($result['created'])]
+            ));
+        }
+        if ($result['skipped']) {
+            $this->messenger()->addNotice(new PsrMessage(
+                '{count} sites have already a translation of this page, so they were skipped.', // @translate
+                ['count' => count($result['skipped'])]
+            ));
+        }
+        // The copies are translated in the background by the module Translator.
+        // The job is dispatched explicitly: the source page is not saved here,
+        // so the listener of the module on the api is not triggered.
+        if ($result['created']
+            && $this->hasTranslator
+            && $this->params()->fromPost('translate')
+        ) {
+            $this->dispatchTranslation($pageId);
+        }
+
+        if ($result['errors']) {
+            $this->messenger()->addError(new PsrMessage(
+                'The page could not be copied into {count} sites. See the logs.', // @translate
+                ['count' => count($result['errors'])]
+            ));
+        }
+
+        return $this->redirect()->toUrl($browseUrl);
+    }
+
+    /**
+     * Translate the copies of a page with the module Translator.
+     *
+     * The job translates the copies related to the page, following the pairs of
+     * languages set in the settings of the module.
+     *
+     * @see \Translator\Job\TranslatePages
+     */
+    protected function dispatchTranslation(int $pageId): void
+    {
+        try {
+            $job = $this->jobDispatcher->dispatch(
+                \Translator\Job\TranslatePages::class,
+                ['page_ids' => $pageId]
+            );
+        } catch (\Throwable $e) {
+            $this->messenger()->addError(new PsrMessage(
+                'The translation could not be launched: {message}', // @translate
+                ['message' => $e->getMessage()]
+            ));
+            return;
+        }
+
+        $message = new PsrMessage(
+            'Translating the copies of the page in background (job {link_job}#{job_id}{link_end}).', // @translate
+            [
+                'link_job' => sprintf(
+                    '<a href="%s">',
+                    htmlspecialchars($this->url()->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
+                ),
+                'job_id' => $job->getId(),
+                'link_end' => '</a>',
+            ]
+        );
+        $this->messenger()->addSuccess($message->setEscapeHtml(false));
+    }
+
+    /**
+     * Get the site groups where the page may be copied, without the sites that
+     * have already a translation.
+     */
+    protected function listSiteGroupsToCopy($page): array
+    {
+        $siteGroups = $this->settings()->get('internationalisation_site_groups') ?: [];
+        $slug = $page->site()->slug();
+        if (empty($siteGroups[$slug])) {
+            return [];
+        }
+
+        $group = array_values(array_diff($siteGroups[$slug], [$slug]));
+
+        return $group
+            ? [$slug => $group]
+            : [];
+    }
+
+    /**
+     * Get the other sites where the page may be copied.
+     *
+     * The own site of the page is excluded here: a copy inside it is a
+     * duplicate and not a translation, so it is displayed apart.
+     */
+    protected function listSitesToCopy($page): array
+    {
+        $currentSiteId = $page->site()->id();
+
+        $slugs = $this->api()->search('sites', [], ['returnScalar' => 'slug'])->getContent();
+        $titles = $this->api()->search('sites', [], ['returnScalar' => 'title'])->getContent();
+
+        $result = [];
+        foreach ($slugs as $siteId => $slug) {
+            if ($siteId != $currentSiteId) {
+                $result[$siteId] = [
+                    'slug' => $slug,
+                    'title' => $titles[$siteId] ?? $slug,
+                ];
+            }
+        }
+        uasort($result, fn ($a, $b) => strnatcasecmp($a['title'], $b['title']));
+
+        return $result;
+    }
+
+    /**
+     * Convert the posted values into a list of site ids.
+     *
+     * A value may be a site id, or a group of sites prefixed with "group:".
+     */
+    protected function siteIdsFromPost(array $values): array
+    {
+        $siteGroups = $this->settings()->get('internationalisation_site_groups') ?: [];
+
+        $slugs = [];
+        $siteIds = [];
+        foreach ($values as $value) {
+            if (strpos((string) $value, 'group:') === 0) {
+                $groupSlug = substr((string) $value, 6);
+                $slugs = array_merge($slugs, $siteGroups[$groupSlug] ?? []);
+            } else {
+                $siteIds[] = (int) $value;
+            }
+        }
+
+        if ($slugs) {
+            $allSlugs = $this->api()->search('sites', [], ['returnScalar' => 'slug'])->getContent();
+            $slugs = array_flip($slugs);
+            foreach ($allSlugs as $siteId => $slug) {
+                if (isset($slugs[$slug])) {
+                    $siteIds[] = (int) $siteId;
+                }
+            }
+        }
+
+        return array_values(array_unique(array_filter($siteIds)));
     }
 
     public function deleteConfirmAction()

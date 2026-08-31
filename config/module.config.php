@@ -89,6 +89,7 @@ return [
     ],
     'controller_plugins' => [
         'factories' => [
+            'copyPageToSites' => Service\ControllerPlugin\CopyPageToSitesFactory::class,
             'listSiteGroups' => Service\ControllerPlugin\ListSiteGroupsFactory::class,
             'updateTranslationFiles' => Service\ControllerPlugin\UpdateTranslationFilesFactory::class,
         ],
@@ -109,6 +110,18 @@ return [
                         ],
                         'may_terminate' => true,
                         'child_routes' => [
+                            'copy-page' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/copy-page/:page-id',
+                                    'constraints' => [
+                                        'page-id' => '\d+',
+                                    ],
+                                    'defaults' => [
+                                        'action' => 'copy-page',
+                                    ],
+                                ],
+                            ],
                             'default' => [
                                 'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
