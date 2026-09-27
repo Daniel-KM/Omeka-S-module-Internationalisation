@@ -487,7 +487,7 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 [omeka/omeka-s#1493]: https://github.com/omeka/omeka-s/pull/1493
 [Api Info]: https://gitlab.com/Daniel-KM/Omeka-S-module-ApiInfo
 [Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/work_items
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
