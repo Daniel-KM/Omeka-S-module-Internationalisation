@@ -39,6 +39,10 @@ class MvcListeners extends AbstractListenerAggregate
         if ($isSiteRequest) {
             /** @var \Omeka\Api\Representation\SiteRepresentation $site */
             $site = $services->get('ControllerPluginManager')->get('currentSite')();
+            // The site may be missing (unknown slug), so there is no theme.
+            if (!$site) {
+                return;
+            }
             $siteTheme = $site->theme();
             $themeLanguagePath = (is_dir(OMEKA_PATH . '/themes/' . $siteTheme) ? OMEKA_PATH . '/themes/' : OMEKA_PATH . '/composer-addons/themes/') . $siteTheme . '/language';
             if (file_exists($themeLanguagePath) && is_dir($themeLanguagePath)) {
