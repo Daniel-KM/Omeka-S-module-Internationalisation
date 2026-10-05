@@ -76,7 +76,6 @@ class TranslationController extends AbstractActionController
         $formLanguage = new Form();
         $formLanguage
             ->setAttribute('id', 'add-language')
-            // ->setAttribute('action', $this->url()->fromRoute('admin/translation/default', ['action' => 'add']))
             ->add([
                 'name' => 'o:lang',
                 'type' => \Laminas\Form\Element\Text::class,
@@ -300,11 +299,6 @@ class TranslationController extends AbstractActionController
         return null;
     }
 
-    public function addAction()
-    {
-        return $this->addEdit();
-    }
-
     /**
      * The batch edition is now a part of the page of the language.
      */
@@ -317,65 +311,6 @@ class TranslationController extends AbstractActionController
         );
     }
 
-    protected function addEdit()
-    {
-        // The batch edition writes the table directly, so the controller rule
-        // is not enough.
-        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatedAdapter::class, 'create')) {
-            $this->messenger()->addError('You are not allowed to update translations.'); // @translate
-            return $this->redirect()->toRoute('admin/translation');
-        }
-
-        $language = strtolower(strtr($this->params('language'), '_', '-'));
-
-        $existingTranslations = $this->getTranslations($language);
-
-        /** @var \Internationalisation\Form\TranslationForm $form */
-        $form = $this->getForm(TranslationForm::class);
-        $form
-            ->setAttribute('action', $this->url()->fromRoute(null, [], true))
-            ->setAttribute('enctype', 'multipart/form-data')
-            ->setAttribute('id', 'edit-translation');
-
-        $form->get('translations')->setValue($existingTranslations);
-
-        if ($this->getRequest()->isPost()) {
-            $post = $this->params()->fromPost();
-            $form->setData($post);
-            if ($form->isValid()) {
-                $this->translatedEditor()->replace($language, $form->getData()['translations'] ?: []);
-                $this->messenger()->addSuccess(new PsrMessage(
-                    'Translations successfully updated.' // @translate
-                ));
-                $result = $this->updateTranslationFiles();
-                if (!$result) {
-                    $this->messenger()->addError(new PsrMessage(
-                        'An error occurred when saving translations as file.' // @translate
-                    ));
-                }
-                return $this->redirect()->toRoute('admin/translation/id', ['language' => $language]);
-            } else {
-                $this->messenger()->addFormErrors($form);
-            }
-        }
-
-        $confirmForm = $this->getForm(ConfirmForm::class);
-        $confirmForm->setAttribute('action', $this->url()->fromRoute('admin/translation/id', ['language' => $language, 'action' => 'delete']));
-
-        return new ViewModel([
-            'language' => $language,
-            'localeName' => $this->getLocaleName($language),
-            'translations' => $existingTranslations,
-            'form' => $form,
-            'confirmForm' => $confirmForm,
-        ]);
-    }
-
-    /**
-     * Copy a site page into other sites, from the sidebar of the page browse.
-     *
-     * The get displays the selector of the sites, the post does the copy.
-     */
     /**
      * Translate the copies of a page, from the sidebar of the page browse.
      *
@@ -545,6 +480,11 @@ class TranslationController extends AbstractActionController
         return $result;
     }
 
+    /**
+     * Copy a site page into other sites, from the sidebar of the page browse.
+     *
+     * The get displays the selector of the sites, the post does the copy.
+     */
     public function copyPageAction()
     {
         $pageId = (int) $this->params('page-id');
