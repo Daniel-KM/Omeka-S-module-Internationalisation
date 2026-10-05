@@ -83,9 +83,23 @@ To add specific strings to the translator, you need to go to the main menu
 
 To add a new language, set its normalized name according to [BCP 47] and many
 subsequents standards, for example "fr" for international French or "el-gr"
-greek as spoken in Greece. Then fill the text area with translations from
-American English, that is the default in Omeka S, to the locale, for example for
-a site in international British English:
+greek as spoken in Greece. Then the page of the language opens.
+
+The page of a language lists its strings, in American English, that is the
+default in Omeka S, and their translation in the language. Each of them can be
+edited directly in the list:
+
+- click on a string or a translation, type the new text, then press Enter or
+  click elsewhere to save it, or press Escape to cancel;
+- the button "Add a translation" adds a row at the top of the list: type the
+  string, press Enter to go to the translation, and the row is saved as soon as
+  the two are filled;
+- the icon of the trash deletes a string and its translation, after a
+  confirmation.
+
+The button "Batch edit" switches the list into a text area, with one translation
+by line, the string and the translation being separated by " = " (space, equal,
+space), for example for a site in international British English:
 
 ```ini
 Color = Colour
@@ -93,6 +107,13 @@ Internationalization = Internationalisation
 License = Licence
 Movie = Film
 ```
+
+Saving the text area replaces all the translations of the language, so a line
+that is removed from the text is deleted.
+
+The translations are global: they apply to all the sites that use the language.
+So only the global administrators, the site administrators and the editors can
+add, update or delete them. The other roles can only browse them.
 
 Of course, only strings passed to the function `$translate()` will be translated,
 so you need to check all hard coded strings in themes and to translate them to
@@ -481,9 +502,6 @@ and [Locale Switcher], adapted for the multi-sites capabilities of Omeka S.
 [Internationalisation.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/releases
 [BCP 47]: https://en.wikipedia.org/wiki/IETF_language_tag
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
-[`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
-[`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L489
-[#1506]: https://github.com/omeka/omeka-s/pull/1506/files
 [omeka/omeka-s#1493]: https://github.com/omeka/omeka-s/pull/1493
 [Api Info]: https://gitlab.com/Daniel-KM/Omeka-S-module-ApiInfo
 [Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
