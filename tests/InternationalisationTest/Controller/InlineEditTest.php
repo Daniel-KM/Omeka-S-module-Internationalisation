@@ -90,7 +90,7 @@ class InlineEditTest extends AbstractTestCase
      * The module allows the adapter to all the default roles, so a role is not
      * enough to check that the view really follows the rights.
      */
-    protected function renderShowWithRights(bool $canUpdate, bool $canDelete): string
+    protected function renderShowWithRights(bool $canUpdate, bool $canDelete, bool $canCreate = false): string
     {
         $services = $this->getServiceManager();
         $viewHelpers = $services->get('ViewHelperManager');
@@ -103,7 +103,7 @@ class InlineEditTest extends AbstractTestCase
                 return !empty($this->rights[$privilege]);
             }
         };
-        $helper->rights = ['update' => $canUpdate, 'delete' => $canDelete];
+        $helper->rights = ['update' => $canUpdate, 'delete' => $canDelete, 'create' => $canCreate];
         $viewHelpers->setService('userIsAllowed', $helper);
 
         return $services->get('ViewRenderer')->render('internationalisation/admin/translation/show', [
@@ -112,6 +112,8 @@ class InlineEditTest extends AbstractTestCase
             'translations' => ['Browse' => 'Parcourir'],
             'confirmForm' => $services->get('FormElementManager')->get(\Omeka\Form\ConfirmForm::class),
             'csrf' => new \Laminas\Form\Element\Csrf('translate_string_csrf'),
+            'form' => $services->get('FormElementManager')->get(\Internationalisation\Form\TranslationForm::class),
+            'batchOpen' => false,
         ]);
     }
 
@@ -145,6 +147,78 @@ class InlineEditTest extends AbstractTestCase
         $this->assertStringContainsString('data-update-url', $html);
         $this->assertStringNotContainsString('delete-string', $html);
         $this->assertStringNotContainsString('translated-delete', $html);
+    }
+
+    public function testAStringCanBeAddedWithTheRightToCreate(): void
+    {
+        $html = $this->renderShowWithRights(false, false, true);
+        $this->assertStringContainsString('translated-add', $html);
+        $this->assertStringContainsString('data-add-url', $html);
+        $this->assertStringContainsString('<template id="translated-new-row">', $html);
+        // The new row is editable to be filled, but not the existing ones.
+        $this->assertSame(2, substr_count($html, 'contenteditable="true"'));
+        $this->assertStringContainsString('translated-inline-hint', $html);
+    }
+
+    public function testNoStringCanBeAddedWithoutTheRightToCreate(): void
+    {
+        $html = $this->renderShowWithRights(true, true, false);
+        $this->assertStringNotContainsString('translated-add', $html);
+        $this->assertStringNotContainsString('data-add-url', $html);
+        $this->assertStringNotContainsString('translated-new-row', $html);
+    }
+
+    public function testTheBatchEditionIsToggledWithTheRightToUpdate(): void
+    {
+        $html = $this->renderShowWithRights(true, false);
+        $this->assertStringContainsString('translated-batch-toggle', $html);
+        $this->assertStringContainsString('aria-pressed="false"', $html);
+        $this->assertStringContainsString('id="translated-batch"', $html);
+        $this->assertStringContainsString('<textarea', $html);
+    }
+
+    public function testTheBatchEditionIsMissingWithoutTheRightToUpdate(): void
+    {
+        $html = $this->renderShowWithRights(false, true, true);
+        $this->assertStringNotContainsString('translated-batch', $html);
+        $this->assertStringNotContainsString('<textarea', $html);
+    }
+
+    public function testTheOldPageOfBatchEditionOpensThePage(): void
+    {
+        $this->dispatch('/admin/translation/' . $this->language . '/edit');
+        $this->assertRedirectRegex('~/admin/translation/' . $this->language . '\?batch=1$~');
+    }
+
+    public function testTheBatchEditionIsOpenedByTheQuery(): void
+    {
+        $this->dispatch('/admin/translation/' . $this->language . '?batch=1');
+        $this->assertResponseStatusCode(200);
+        $content = (string) $this->getResponse()->getContent();
+        $this->assertStringContainsString('aria-pressed="true"', $content);
+        $this->assertStringContainsString('<div id="item-metadata" hidden>', $content);
+        $this->assertStringContainsString('Parcourir', $content);
+    }
+
+    public function testTheTranslationsAreReplaced(): void
+    {
+        $this->editor->replace($this->language, [
+            // Updated.
+            'Browse' => 'Naviguer',
+            // Added.
+            'Home' => 'Accueil',
+            // "Search" is removed.
+        ]);
+        $this->assertSame('Naviguer', $this->translationOf('Browse'));
+        $this->assertSame('Accueil', $this->translationOf('Home'));
+        $this->assertNull($this->translationOf('Search'));
+    }
+
+    public function testAnEmptyBatchRemovesAllTheTranslations(): void
+    {
+        $this->editor->replace($this->language, []);
+        $this->assertNull($this->translationOf('Browse'));
+        $this->assertNull($this->translationOf('Search'));
     }
 
     public function testAForgedRequestIsRefused(): void
@@ -211,6 +285,30 @@ class InlineEditTest extends AbstractTestCase
     {
         $this->expectException(\RuntimeException::class);
         $this->editor->update($this->language, 'Missing', 'translation', 'Absent');
+    }
+
+    public function testAStringIsAdded(): void
+    {
+        $data = $this->editor->create($this->language, 'Home', 'Accueil');
+        $this->assertSame(['string' => 'Home', 'translation' => 'Accueil'], $data);
+        $this->assertSame('Accueil', $this->translationOf('Home'));
+    }
+
+    public function testAnExistingStringIsNotAdded(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('This string is already translated in this language.');
+        try {
+            $this->editor->create($this->language, 'Browse', 'Naviguer');
+        } finally {
+            $this->assertSame('Parcourir', $this->translationOf('Browse'));
+        }
+    }
+
+    public function testAnIncompleteStringIsNotAdded(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->editor->create($this->language, 'Home', '');
     }
 
     public function testAStringIsDeleted(): void
