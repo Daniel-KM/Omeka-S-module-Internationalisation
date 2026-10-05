@@ -111,9 +111,28 @@ class Module extends AbstractModule
                 ]
             )
 
-            // Admin part.
+            // Admin part. The translations are global and change the public
+            // interface of all sites, so only some roles can write them. The
+            // copy and the translation of a page check the rights on the page.
             ->allow(
                 $defaultRoles,
+                [\Internationalisation\Controller\Admin\TranslationController::class],
+                ['index', 'browse', 'show', 'show-details', 'translate-page', 'copy-page']
+            )
+            ->allow(
+                $defaultRoles,
+                [
+                    \Internationalisation\Api\Adapter\TranslatedAdapter::class,
+                    \Internationalisation\Entity\Translated::class,
+                ],
+                ['search', 'read']
+            )
+            ->allow(
+                [
+                    \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
+                    \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
+                    \Omeka\Permissions\Acl::ROLE_EDITOR,
+                ],
                 [
                     \Internationalisation\Controller\Admin\TranslationController::class,
                     \Internationalisation\Api\Adapter\TranslatedAdapter::class,

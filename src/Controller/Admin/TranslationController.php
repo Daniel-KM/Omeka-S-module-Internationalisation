@@ -281,11 +281,18 @@ class TranslationController extends AbstractActionController
 
     protected function addEdit(bool $add)
     {
+        // The batch edition writes the table directly, so the controller rule
+        // is not enough.
+        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatedAdapter::class, $add ? 'create' : 'update')) {
+            $this->messenger()->addError('You are not allowed to update translations.'); // @translate
+            return $this->redirect()->toRoute('admin/translation');
+        }
+
         $language = strtolower(strtr($this->params('language'), '_', '-'));
 
         $existingTranslations = $this->getTranslations($language);
 
-        /** @var \Internationalisation\\Form\TranslationForm $form */
+        /** @var \Internationalisation\Form\TranslationForm $form */
         $form = $this->getForm(TranslationForm::class);
         $form
             ->setAttribute('action', $this->url()->fromRoute(null, [], true))
