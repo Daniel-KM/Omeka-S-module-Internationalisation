@@ -320,7 +320,7 @@ class LanguageList extends AbstractHelper
      * the site to a domain. Without it, links built with the current
      * (domain-based) route point back to the current domain.
      *
-     * @see https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/issues/6
+     * @see https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/work_items/6
      */
     protected function applyDomains(array $data): array
     {
