@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "655d63690c663d7d0a2cd6cef3bab90b",
+    "content-hash": "713662535fcca3932727839844c58680",
     "packages": [
         {
             "name": "daniel-km/simple-iso-639-3",
@@ -56,16 +56,16 @@
         },
         {
             "name": "sempia/external-assets",
-            "version": "1.2.0",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/Sempia/composer-plugin-external-assets.git",
-                "reference": "3cc732e8a84ca227efae21ab14e8ce187d0a6fd7"
+                "reference": "518363a07733d28dbac4dc340b1e7ad379ec0fda"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-external-assets/repository/archive.zip?sha=3cc732e8a84ca227efae21ab14e8ce187d0a6fd7",
-                "reference": "3cc732e8a84ca227efae21ab14e8ce187d0a6fd7",
+                "url": "https://gitlab.com/api/v4/projects/Sempia%2Fcomposer-plugin-external-assets/repository/archive.zip?sha=518363a07733d28dbac4dc340b1e7ad379ec0fda",
+                "reference": "518363a07733d28dbac4dc340b1e7ad379ec0fda",
                 "shasum": ""
             },
             "require": {
@@ -108,9 +108,9 @@
             ],
             "support": {
                 "issues": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/issues",
-                "source": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/tree/1.2.0"
+                "source": "https://gitlab.com/Sempia/composer-plugin-external-assets/-/tree/1.3.0"
             },
-            "time": "2026-08-31T00:00:00+00:00"
+            "time": "2026-10-05T00:00:00+00:00"
         }
     ],
     "packages-dev": [],
@@ -121,5 +121,5 @@
     "prefer-lowest": false,
     "platform": {},
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
