@@ -6,6 +6,8 @@
  * @var array $translations
  * @var \Omeka\Form\ConfirmForm $confirmForm
  * @var \Laminas\Form\Element\Csrf $csrf
+ * @var \Internationalisation\Form\TranslationForm $form
+ * @var bool $batchOpen
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -31,7 +33,7 @@ $updateUrl = $url('admin/translation/id', ['language' => $language, 'action' => 
 $deleteUrl = $url('admin/translation/id', ['language' => $language, 'action' => 'delete-string']);
 
 // A new row is editable to be filled, whatever the right to update.
-$renderRow = function (string $string, string $translated, bool $isNew = false) use ($canUpdate, $canDelete, $escape, $escapeAttr, $translate): string {
+$renderRow = function (string $string, string $translated, bool $isNew = false) use ($canUpdate, $canDelete, $deleteUrl, $escape, $escapeAttr, $translate): string {
     $editable = $canUpdate || $isNew;
     $cell = function (string $field, string $value, string $label) use ($editable, $escape, $escapeAttr): string {
         return '<span class="translated-value translated-' . $field . '"'
@@ -43,7 +45,12 @@ $renderRow = function (string $string, string $translated, bool $isNew = false) 
     $pencil = fn (string $title): string => '<li><a href="#" class="o-icon-edit translated-edit" tabindex="-1" aria-hidden="true" title="' . $escapeAttr($title) . '"></a></li>';
     $actionsString = $editable ? '<ul class="actions">' . $pencil($translate('Edit the string')) . '</ul>' : '';
     $actionsTranslation = ($editable ? $pencil($translate('Edit the translation')) : '')
-        . ($canDelete ? '<li><a href="#" role="button" class="o-icon-delete translated-delete" data-label="' . $escapeAttr($translate('Delete the string "%s"')) . '" aria-label="' . $escapeAttr(sprintf($translate('Delete the string "%s"'), $string)) . '" title="' . $escapeAttr($translate('Delete')) . '"></a></li>' : '');
+        // The confirmation and the request use the standard dialog of Common.
+        . ($canDelete ? '<li><a href="#" role="button" class="o-icon-delete translated-delete"'
+            . ' data-url="' . $escapeAttr($deleteUrl) . '" data-spinner="true"'
+            . ' data-dialog-message="' . $escapeAttr($translate('Delete the string and its translation?')) . '"'
+            . ' data-dialog-text-ok="' . $escapeAttr($translate('Delete')) . '"'
+            . ' data-label="' . $escapeAttr($translate('Delete the string "%s"')) . '" aria-label="' . $escapeAttr(sprintf($translate('Delete the string "%s"'), $string)) . '" title="' . $escapeAttr($translate('Delete')) . '"></a></li>' : '');
     return '<tr' . ($isNew ? ' class="translated-new"' : ' data-string="' . $escapeAttr($string) . '"') . '>'
         . '<td><div class="translated-cell">' . $cell('string', $string, $translate('String')) . $actionsString . '</div></td>'
         . '<td><div class="translated-cell">' . $cell('translation', $translated, $translate('Translation'))
@@ -52,6 +59,8 @@ $renderRow = function (string $string, string $translated, bool $isNew = false) 
 };
 
 if ($canEditInline) {
+    $this->headLink()
+        ->appendStylesheet($assetUrl('css/common-dialog-admin.css', 'Common'));
     $this->headScript()
         ->appendFile($assetUrl('js/common-dialog.js', 'Common'), 'text/javascript', ['defer' => 'defer'])
         ->appendFile($assetUrl('js/internationalisation-inline.js', 'Internationalisation'), 'text/javascript', ['defer' => 'defer']);
@@ -65,7 +74,7 @@ if ($canEditInline) {
     <button type="button" class="button translated-add"><?= $escape($translate('Add a translation')) ?></button>
     <?php endif; ?>
     <?php if ($canUpdate): ?>
-    <?= $hyperlink($translate('Batch edit'), $url('admin/translation/id', ['language' => $language, 'action' => 'edit']), ['class' => 'button']) ?>
+    <button type="button" class="button translated-batch-toggle" aria-pressed="<?= $batchOpen ? 'true' : 'false' ?>" aria-controls="translated-batch"><?= $escape($translate('Batch edit')) ?></button>
     <?php endif; ?>
     <?php if ($canDelete): ?>
     <?= $hyperlink($translate('Delete'), $url('admin/translation/id', ['language' => $language, 'action' => 'delete-confirm']), ['class' => 'button delete']) ?>
@@ -80,7 +89,7 @@ if ($canEditInline) {
 <p id="translated-inline-status" class="translated-hidden" role="status" aria-live="polite"></p>
 <?php endif; ?>
 
-<div id="item-metadata">
+<div id="item-metadata"<?= $batchOpen && $canUpdate ? ' hidden' : '' ?>>
     <?php if (count($translations) || $canCreate): ?>
     <?php if ($canUpdate || $canCreate): ?>
     <?php // The hint is referenced by each editable cell, so it is stated once. ?>
@@ -93,7 +102,7 @@ if ($canEditInline) {
         . ($canEditInline ? ' translated-inline' : '')
         . ($canUpdate ? ' translated-editable' : '');
     ?>
-    <table class="<?= $tableClass ?>" data-tablesaw-mode="stack"<?= $canCreate ? ' data-add-url="' . $escapeAttr($addUrl) . '"' : '' ?><?= $canUpdate ? ' data-update-url="' . $escapeAttr($updateUrl) . '"' : '' ?><?= $canDelete ? ' data-delete-url="' . $escapeAttr($deleteUrl) . '"' : '' ?>>
+    <table class="<?= $tableClass ?>" data-tablesaw-mode="stack"<?= $canCreate ? ' data-add-url="' . $escapeAttr($addUrl) . '"' : '' ?><?= $canUpdate ? ' data-update-url="' . $escapeAttr($updateUrl) . '"' : '' ?>>
         <thead>
             <tr>
                 <th><?= $translate('String') ?></th>
@@ -113,6 +122,26 @@ if ($canEditInline) {
     <p><?= $translate('No translated strings.') ?></p>
     <?php endif; ?>
 </div>
+
+<?php if ($canUpdate):
+    $form->prepare();
+    $textarea = $form->get('translations');
+    $textarea->setAttribute('aria-labelledby', 'translated-batch-note');
+    ?>
+<div id="translated-batch" class="translated-batch"<?= $batchOpen ? '' : ' hidden' ?>>
+    <?= $this->form()->openTag($form) ?>
+    <p id="translated-batch-note" class="translated-batch-note"><?= $escape($translate($textarea->getLabel())) ?></p>
+    <?php foreach ($form->getElements() as $element): ?>
+    <?= $this->formElement($element) ?>
+    <?php endforeach; ?>
+    <?= $this->formElementErrors($textarea) ?>
+    <div class="translated-batch-actions">
+        <button type="button" class="button translated-batch-cancel"><?= $escape($translate('Cancel')) ?></button>
+        <button type="submit" class="button"><?= $escape($translate('Save')) ?></button>
+    </div>
+    <?= $this->form()->closeTag() ?>
+</div>
+<?php endif; ?>
 
 <?php if ($canDelete): ?>
 <?= $this->partial('internationalisation/admin/translation/delete-confirm', [

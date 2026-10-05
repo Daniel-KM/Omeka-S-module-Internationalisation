@@ -108,6 +108,50 @@ class TranslatedEditor
     }
 
     /**
+     * Replace all the translations of a language, writing only the changes.
+     *
+     * @param array $translations Translations by string.
+     */
+    public function replace(string $language, array $translations): void
+    {
+        $existing = $this->connection
+            ->executeQuery(
+                'SELECT `string`, `translation` FROM `translated` WHERE `lang` = :lang',
+                ['lang' => $language]
+            )
+            ->fetchAllKeyValue();
+
+        // Do not update translations that are not updated.
+        $kept = array_intersect_assoc($existing, $translations);
+        $translations = array_diff_key($translations, $kept);
+        $existing = array_diff_key($existing, $kept);
+
+        $updated = array_intersect_key($translations, $existing);
+        foreach ($updated as $string => $translation) {
+            $this->connection->executeStatement(
+                'UPDATE `translated` SET `translation` = :translation WHERE `lang` = :lang AND `string` = :string',
+                ['lang' => $language, 'string' => (string) $string, 'translation' => $translation]
+            );
+        }
+
+        $deleted = array_diff_key($existing, $translations);
+        if ($deleted) {
+            $this->connection->executeStatement(
+                'DELETE FROM `translated` WHERE `lang` = :lang AND `string` IN (:strings)',
+                ['lang' => $language, 'strings' => array_map('strval', array_keys($deleted))],
+                ['lang' => \Doctrine\DBAL\ParameterType::STRING, 'strings' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
+            );
+        }
+
+        foreach (array_diff_key($translations, $updated) as $string => $translation) {
+            $this->connection->executeStatement(
+                'INSERT INTO `translated` (`lang`, `string`, `translation`) VALUES (:lang, :string, :translation)',
+                ['lang' => $language, 'string' => (string) $string, 'translation' => $translation]
+            );
+        }
+    }
+
+    /**
      * Get the translation of a string, or null when the row does not exist.
      */
     public function translationOf(string $language, string $string): ?string

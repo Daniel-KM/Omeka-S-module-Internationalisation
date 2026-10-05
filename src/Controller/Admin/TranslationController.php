@@ -110,7 +110,7 @@ class TranslationController extends AbstractActionController
                 $data = $formLanguage->getData();
                 $language = $data['o:lang'];
                 $language = strtolower(strtr($language, '_', '-'));
-                return $this->redirect()->toRoute('admin/translation/id', ['action' => 'edit', 'language' => $language]);
+                return $this->redirect()->toRoute('admin/translation/id', ['language' => $language], ['query' => ['batch' => 1]]);
             }
         }
 
@@ -125,7 +125,36 @@ class TranslationController extends AbstractActionController
     public function showAction()
     {
         $language = strtolower(strtr($this->params('language'), '_', '-'));
+
+        // The batch edition is a form of this page, toggled with the table.
+        /** @var \Internationalisation\Form\TranslationForm $form */
+        $form = $this->getForm(TranslationForm::class);
+        $form->setAttribute('action', $this->url()->fromRoute('admin/translation/id', ['language' => $language]));
+        $batchOpen = (bool) $this->params()->fromQuery('batch');
+
+        if ($this->getRequest()->isPost()) {
+            // The page is readable by all the roles, so check the right here.
+            if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatedAdapter::class, 'update')) {
+                $this->messenger()->addError('You are not allowed to update translations.'); // @translate
+                return $this->redirect()->toRoute('admin/translation/id', ['language' => $language]);
+            }
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $this->translatedEditor()->replace($language, $form->getData()['translations'] ?: []);
+                $this->messenger()->addSuccess('Translations successfully updated.'); // @translate
+                if (!$this->updateTranslationFiles()) {
+                    $this->messenger()->addError('An error occurred when saving translations as file.'); // @translate
+                }
+                return $this->redirect()->toRoute('admin/translation/id', ['language' => $language]);
+            }
+            $this->messenger()->addFormErrors($form);
+            $batchOpen = true;
+        }
+
         $translations = $this->getTranslations($language);
+        if (!$this->getRequest()->isPost()) {
+            $form->get('translations')->setValue($translations);
+        }
 
         $confirmForm = $this->getForm(ConfirmForm::class);
         $confirmForm->setAttribute('action', $this->url()->fromRoute('admin/translation/id', ['language' => $language, 'action' => 'delete']));
@@ -134,6 +163,8 @@ class TranslationController extends AbstractActionController
             'language' => $language,
             'localeName' => $this->getLocaleName($language),
             'translations' => $translations,
+            'form' => $form,
+            'batchOpen' => $batchOpen,
             'confirmForm' => $confirmForm,
             // The rows are edited inline, one by one, via a post.
             'csrf' => new \Laminas\Form\Element\Csrf('translate_string_csrf'),
@@ -271,19 +302,26 @@ class TranslationController extends AbstractActionController
 
     public function addAction()
     {
-        return $this->addEdit(true);
+        return $this->addEdit();
     }
 
+    /**
+     * The batch edition is now a part of the page of the language.
+     */
     public function editAction()
     {
-        return $this->addEdit(false);
+        return $this->redirect()->toRoute(
+            'admin/translation/id',
+            ['language' => strtolower(strtr($this->params('language'), '_', '-'))],
+            ['query' => ['batch' => 1]]
+        );
     }
 
-    protected function addEdit(bool $add)
+    protected function addEdit()
     {
         // The batch edition writes the table directly, so the controller rule
         // is not enough.
-        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatedAdapter::class, $add ? 'create' : 'update')) {
+        if (!$this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatedAdapter::class, 'create')) {
             $this->messenger()->addError('You are not allowed to update translations.'); // @translate
             return $this->redirect()->toRoute('admin/translation');
         }
@@ -305,59 +343,7 @@ class TranslationController extends AbstractActionController
             $post = $this->params()->fromPost();
             $form->setData($post);
             if ($form->isValid()) {
-                // $removedLanguages = [];
-                $data = $form->getData();
-                $translations = $data['translations'];
-                if (!$translations) {
-                    $this->connection
-                        ->executeStatement(
-                            'DELETE FROM `translated` WHERE `lang` = :lang',
-                            ['lang' => $language]
-                        );
-                    // $removedLanguages = [$language];
-                } else {
-                    // Do not update translations that are not updated.
-                    $kept = array_intersect_assoc($existingTranslations, $translations);
-                    $translations = array_diff_key($translations, $kept);
-                    $existingTranslations = array_diff_key($existingTranslations, $kept);
-
-                    if ($translations || $existingTranslations) {
-                        // Update translations that are updated.
-                        $updatedTranslations = array_intersect_key($translations, $existingTranslations);
-                        if ($updatedTranslations) {
-                            $sql = 'UPDATE `translated` SET `translation` = :translation WHERE `lang` = :lang AND `string` = :string';
-                            foreach ($updatedTranslations as $string => $translation) {
-                                $bind = ['lang' => $language, 'string' => $string, 'translation' => $translation];
-                                $this->connection->executeStatement($sql, $bind);
-                            }
-                            $translations = array_diff_key($translations, $updatedTranslations);
-                            $existingTranslations = array_diff_key($existingTranslations, $updatedTranslations);
-                        }
-
-                        // Delete translations that are deleted.
-                        $deletedTranslations = array_diff_key($existingTranslations, $translations);
-                        if ($deletedTranslations) {
-                            $this->connection
-                                ->executeStatement(
-                                    'DELETE FROM `translated` WHERE `lang` = :lang AND `string` IN (:strings)',
-                                    ['lang' => $language, 'strings' => array_values(array_map('strval', array_keys($deletedTranslations)))],
-                                    ['lang' => \Doctrine\DBAL\ParameterType::STRING, 'strings' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
-                                );
-                            $existingTranslations = array_diff_key($existingTranslations, $deletedTranslations);
-                            // Normally, there is no existing translations here.
-                            // $removedLanguages = $deletedTranslations;
-                        }
-
-                        // Create new translations.
-                        if ($translations) {
-                            $sql = 'INSERT INTO `translated` (`lang`, `string`, `translation`) VALUES(:lang, :string, :translation)';
-                            foreach ($translations as $string => $translation) {
-                                $bind = ['lang' => $language, 'string' => $string, 'translation' => $translation];
-                                $this->connection->executeStatement($sql, $bind);
-                            }
-                        }
-                    }
-                }
+                $this->translatedEditor()->replace($language, $form->getData()['translations'] ?: []);
                 $this->messenger()->addSuccess(new PsrMessage(
                     'Translations successfully updated.' // @translate
                 ));

@@ -9,6 +9,56 @@
  */
 $(document).ready(function() {
 
+    // The batch edition is a textarea toggled with the table. The rows may have
+    // been edited inline since the page was loaded, so the text is rebuilt
+    // from them each time it is opened.
+
+    const batch = $('#translated-batch');
+    const batchToggle = $('.translated-batch-toggle');
+    if (batch.length && batchToggle.length) {
+        const batchForm = batch.find('form');
+        const textarea = batch.find('textarea');
+        let openedText = textarea.val();
+
+        const setBatch = function(open) {
+            batchToggle.attr('aria-pressed', open ? 'true' : 'false');
+            batch.prop('hidden', !open);
+            $('#item-metadata').prop('hidden', open);
+            $('.translated-add').prop('hidden', open);
+        };
+
+        batchToggle.on('click', function() {
+            if (batchToggle.attr('aria-pressed') === 'true') {
+                textarea.val(openedText);
+                setBatch(false);
+                return;
+            }
+            const lines = [];
+            $('.translated-list tbody tr[data-string]').not('.translated-new').each(function() {
+                const row = $(this);
+                lines.push(row.attr('data-string') + ' = ' + row.find('.translated-translation').text());
+            });
+            openedText = lines.length ? lines.join('\n') + '\n' : '';
+            textarea.val(openedText);
+            // The core warns of unsaved changes from the data of the form on
+            // load, so the rebuilt text is the new reference.
+            batchForm.data('omekaFormOriginalData', batchForm.serialize());
+            setBatch(true);
+            textarea.trigger('focus');
+        });
+
+        batch.find('.translated-batch-cancel').on('click', function() {
+            textarea.val(openedText);
+            setBatch(false);
+            batchToggle.trigger('focus');
+        });
+
+        // Opened by the server (old url or invalid text): keep the posted text.
+        if (!batch.prop('hidden')) {
+            $('.translated-add').prop('hidden', true);
+        }
+    }
+
     const table = $('.translated-inline');
     if (!table.length) {
         return;
@@ -47,7 +97,7 @@ $(document).ready(function() {
     const refreshDeleteLabel = function(row) {
         const link = row.find('.translated-delete');
         if (link.length && link.data('label')) {
-            link.attr('aria-label', link.data('label').replace('%s', row.data('string')));
+            link.attr('aria-label', link.data('label').replace('%s', row.attr('data-string')));
         }
     };
 
@@ -74,8 +124,7 @@ $(document).ready(function() {
         post(url, {string: string, translation: translation})
             .done(function(response) {
                 row.removeClass('translated-new')
-                    .attr('data-string', response.data.string)
-                    .data('string', response.data.string);
+                    .attr('data-string', response.data.string);
                 row.find('.translated-string').text(response.data.string);
                 refreshDeleteLabel(row);
                 // Without the right to update, the saved row becomes static.
@@ -157,7 +206,7 @@ $(document).ready(function() {
 
             field.addClass('translated-saving');
             post(url, {
-                string: row.data('string'),
+                string: row.attr('data-string'),
                 field: field.data('field'),
                 text: newText,
             })
@@ -166,7 +215,7 @@ $(document).ready(function() {
                         ? response.data.string
                         : newText);
                     // The string is the key of the row: keep it in step.
-                    row.data('string', response.data.string);
+                    row.attr('data-string', response.data.string);
                     refreshDeleteLabel(row);
                     announce(Omeka.jsTranslate('Translation saved.'));
                 })
@@ -180,43 +229,40 @@ $(document).ready(function() {
                 });
         });
 
-    // Delete a string and its translation.
+    // Delete a string and its translation with the standard dialog of Common:
+    // the trigger holds the message, the url and the spinner, and the failures
+    // are displayed by Common.
 
     table.on('click', '.translated-delete', function(e) {
         e.preventDefault();
-        const link = $(this);
-        const row = link.closest('tr');
+        const link = this;
+        const row = $(link).closest('tr');
         // A row not saved yet is only removed from the page.
         if (row.hasClass('translated-new')) {
             row.remove();
             $('.translated-add').trigger('focus');
             return;
         }
-        const url = table.data('delete-url');
-        if (!url) {
-            return;
-        }
-        const string = row.data('string');
 
-        CommonDialog.dialogConfirm({
-            message: Omeka.jsTranslate('Delete the string and its translation?'),
-        }).then(function(confirmed) {
+        CommonDialog.dialogConfirm({trigger: link}).then(function(confirmed) {
             if (!confirmed) {
                 return;
             }
-            row.addClass('translated-saving');
-            post(url, {string: string})
-                .done(function() {
+            // The string may have been renamed since the page was loaded.
+            link.dataset.payload = JSON.stringify({
+                string: row.attr('data-string'),
+                translate_string_csrf: token,
+            });
+            CommonDialog.jSend({target: link, preventDefault: function() {}})
+                .then(function(data) {
+                    if (!data || data.status !== 'success') {
+                        return;
+                    }
                     // Move the focus out of the row before removing it.
                     const next = row.next('tr').find('.translated-delete').first();
-                    (next.length ? next : $('#page-actions').find('a').first()).trigger('focus');
+                    (next.length ? next : $('#page-actions').find('a, button').first()).trigger('focus');
                     row.remove();
                     announce(Omeka.jsTranslate('Translation deleted.'));
-                })
-                .fail(function(jqXHR) {
-                    row.removeClass('translated-saving');
-                    announce(failMessage(jqXHR));
-                    CommonDialog.jSendFail(jqXHR);
                 });
         });
     });

@@ -123,7 +123,7 @@ class InlineEditTest extends AbstractTestCase
         $this->assertStringNotContainsString('data-update-url', $html);
         $this->assertStringNotContainsString('translated-editable', $html);
         // The deletion remains available on its own.
-        $this->assertStringContainsString('data-delete-url', $html);
+        $this->assertStringContainsString('delete-string', $html);
         $this->assertStringContainsString('translated-delete', $html);
     }
 
@@ -132,7 +132,7 @@ class InlineEditTest extends AbstractTestCase
         $html = $this->renderShowWithRights(false, false);
         $this->assertStringNotContainsString('contenteditable', $html);
         $this->assertStringNotContainsString('data-update-url', $html);
-        $this->assertStringNotContainsString('data-delete-url', $html);
+        $this->assertStringNotContainsString('delete-string', $html);
         $this->assertStringNotContainsString('translated-inline', $html);
         // No empty list of actions is left in the cells.
         $this->assertDoesNotMatchRegularExpression('~<ul class="actions">\s*</ul>~', $html);
@@ -143,7 +143,7 @@ class InlineEditTest extends AbstractTestCase
         $html = $this->renderShowWithRights(true, false);
         $this->assertStringContainsString('contenteditable="true"', $html);
         $this->assertStringContainsString('data-update-url', $html);
-        $this->assertStringNotContainsString('data-delete-url', $html);
+        $this->assertStringNotContainsString('delete-string', $html);
         $this->assertStringNotContainsString('translated-delete', $html);
     }
 
