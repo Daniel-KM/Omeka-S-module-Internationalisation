@@ -109,7 +109,7 @@ class TranslationController extends AbstractActionController
                 $data = $formLanguage->getData();
                 $language = $data['o:lang'];
                 $language = strtolower(strtr($language, '_', '-'));
-                return $this->redirect()->toRoute('admin/translation/id', ['language' => $language], ['query' => ['batch' => 1]]);
+                return $this->redirect()->toRoute('admin/translation/id', ['language' => $language]);
             }
         }
 
