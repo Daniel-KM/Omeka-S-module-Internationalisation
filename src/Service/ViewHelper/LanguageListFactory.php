@@ -22,7 +22,7 @@ class LanguageListFactory implements FactoryInterface
         $auth = $services->get('Omeka\AuthenticationService');
         if ($auth->hasIdentity()) {
             $role = $auth->getIdentity()->getRole();
-            $isPublic = $role === 'guest';
+            $isPublic = in_array($role, ['guest', 'guest_private', 'guest_private_site']);
         } else {
             $isPublic = true;
         }
