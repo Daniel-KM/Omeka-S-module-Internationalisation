@@ -63,6 +63,29 @@ class TranslatedEditor
     }
 
     /**
+     * Add a string and its translation.
+     *
+     * @throws \RuntimeException With a message ready to be displayed.
+     */
+    public function create(string $language, string $string, string $translation): array
+    {
+        if ($string === '' || $translation === '') {
+            throw new \RuntimeException('The string and the translation cannot be empty.'); // @translate
+        }
+
+        if ($this->translationOf($language, $string) !== null) {
+            throw new \RuntimeException('This string is already translated in this language.'); // @translate
+        }
+
+        $this->connection->executeStatement(
+            'INSERT INTO `translated` (`lang`, `string`, `translation`) VALUES (:lang, :string, :translation)',
+            ['lang' => $language, 'string' => $string, 'translation' => $translation]
+        );
+
+        return ['string' => $string, 'translation' => $translation];
+    }
+
+    /**
      * Delete a string and its translation.
      *
      * @throws \RuntimeException With a message ready to be displayed.

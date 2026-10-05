@@ -158,6 +158,32 @@ class TranslationController extends AbstractActionController
     }
 
     /**
+     * Add a string and its translation inline from the page of a language.
+     */
+    public function addStringAction()
+    {
+        $error = $this->checkInlineRequest('create');
+        if ($error) {
+            return $error;
+        }
+
+        $params = $this->params();
+        try {
+            $data = $this->translatedEditor()->create(
+                strtolower(strtr($this->params('language'), '_', '-')),
+                trim((string) $params->fromPost('string')),
+                trim((string) $params->fromPost('translation'))
+            );
+        } catch (\RuntimeException $e) {
+            return $this->jSend()->fail(null, $this->translate($e->getMessage()));
+        }
+
+        $this->updateTranslationFiles();
+
+        return $this->jSend()->success($data);
+    }
+
+    /**
      * Update a string or its translation inline from the page of a language.
      */
     public function updateStringAction()

@@ -67,7 +67,6 @@
     border: 0;
 }
 
-/* The field takes the width left by the actions, and the height of its text. */
 .translated-list .translated-cell {
     display: flex;
     align-items: flex-start;
@@ -94,8 +93,8 @@
 
 /*
  * The core styles any editable element like a textarea: a fixed minimum
- * height, a resize handle and a scrollbar. Here a row is a single value, so
- * the field follows its content.
+ * height, a resize handle and a scrollbar.
+ * Here a row is a single value, so the field follows its content.
  */
 .translated-editable .translated-value {
     flex: 1 1 auto;
@@ -130,4 +129,14 @@
 .translated-list tr.translated-saving td {
     cursor: progress;
     opacity: 0.5;
+}
+
+.translated-list tr.translated-new .translated-value {
+    border-color: rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+}
+
+.translated-list tr.translated-new .translated-value:empty::before {
+    content: attr(aria-label);
+    color: #999;
 }

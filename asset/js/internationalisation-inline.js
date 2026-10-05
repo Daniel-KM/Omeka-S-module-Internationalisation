@@ -37,6 +37,76 @@ $(document).ready(function() {
             : Omeka.jsTranslate('An error occurred.');
     };
 
+    const cleanText = function(field) {
+        return field.text().replace(/\s+/g, ' ').trim();
+    };
+
+    /**
+     * Name the button to delete a row with its string, that may change.
+     */
+    const refreshDeleteLabel = function(row) {
+        const link = row.find('.translated-delete');
+        if (link.length && link.data('label')) {
+            link.attr('aria-label', link.data('label').replace('%s', row.data('string')));
+        }
+    };
+
+    /**
+     * Save a new row once the string and the translation are filled.
+     */
+    const saveNewRow = function(row) {
+        const string = cleanText(row.find('.translated-string'));
+        const translation = cleanText(row.find('.translated-translation'));
+        if (!string && !translation) {
+            // An empty row is removed once the focus left it.
+            window.setTimeout(function() {
+                if (!row[0].contains(document.activeElement)) {
+                    row.remove();
+                }
+            }, 0);
+            return;
+        }
+        const url = table.data('add-url');
+        if (!string || !translation || !url || row.data('saving')) {
+            return;
+        }
+        row.data('saving', true).addClass('translated-saving');
+        post(url, {string: string, translation: translation})
+            .done(function(response) {
+                row.removeClass('translated-new')
+                    .attr('data-string', response.data.string)
+                    .data('string', response.data.string);
+                row.find('.translated-string').text(response.data.string);
+                refreshDeleteLabel(row);
+                // Without the right to update, the saved row becomes static.
+                if (!table.data('update-url')) {
+                    row.find('.translated-value')
+                        .removeAttr('contenteditable role aria-multiline aria-label aria-describedby');
+                    row.find('.translated-edit').closest('li').remove();
+                }
+                announce(Omeka.jsTranslate('Translation added.'));
+            })
+            .fail(function(jqXHR) {
+                announce(failMessage(jqXHR));
+                CommonDialog.jSendFail(jqXHR);
+            })
+            .always(function() {
+                row.removeData('saving').removeClass('translated-saving');
+            });
+    };
+
+    // Add a row, filled in place, saved when the two cells are filled.
+
+    $('.translated-add').on('click', function() {
+        const template = document.getElementById('translated-new-row');
+        if (!template) {
+            return;
+        }
+        const row = $(template.content.firstElementChild.cloneNode(true));
+        table.find('tbody').prepend(row);
+        row.find('.translated-string').trigger('focus');
+    });
+
     // Save a string or a translation.
 
     table
@@ -48,6 +118,12 @@ $(document).ready(function() {
             // A single line: the new line validates instead of splitting.
             if (e.key === 'Enter') {
                 e.preventDefault();
+                const field = $(this);
+                const row = field.closest('tr');
+                if (row.hasClass('translated-new') && field.data('field') === 'string') {
+                    row.find('.translated-translation').trigger('focus');
+                    return;
+                }
                 this.blur();
             } else if (e.key === 'Escape') {
                 const field = $(this);
@@ -59,8 +135,14 @@ $(document).ready(function() {
             const field = $(this);
             const row = field.closest('tr');
             const oldText = field.data('original-text');
-            const newText = field.text().replace(/\s+/g, ' ').trim();
+            const newText = cleanText(field);
             field.removeData('original-text');
+
+            if (row.hasClass('translated-new')) {
+                field.text(newText);
+                saveNewRow(row);
+                return;
+            }
 
             if (newText === '' || newText === oldText) {
                 field.text(oldText);
@@ -85,6 +167,7 @@ $(document).ready(function() {
                         : newText);
                     // The string is the key of the row: keep it in step.
                     row.data('string', response.data.string);
+                    refreshDeleteLabel(row);
                     announce(Omeka.jsTranslate('Translation saved.'));
                 })
                 .fail(function(jqXHR) {
@@ -101,12 +184,18 @@ $(document).ready(function() {
 
     table.on('click', '.translated-delete', function(e) {
         e.preventDefault();
+        const link = $(this);
+        const row = link.closest('tr');
+        // A row not saved yet is only removed from the page.
+        if (row.hasClass('translated-new')) {
+            row.remove();
+            $('.translated-add').trigger('focus');
+            return;
+        }
         const url = table.data('delete-url');
         if (!url) {
             return;
         }
-        const link = $(this);
-        const row = link.closest('tr');
         const string = row.data('string');
 
         CommonDialog.dialogConfirm({

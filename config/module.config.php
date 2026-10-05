@@ -37,6 +37,7 @@ return [
     'js_translate_strings' => [
         'An error occurred.', // @translate
         'Delete the string and its translation?', // @translate
+        'Translation added.', // @translate
         'Translation deleted.', // @translate
         'Translation saved.', // @translate
     ],

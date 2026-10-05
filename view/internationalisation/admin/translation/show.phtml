@@ -23,10 +23,33 @@ $this->headLink()
 
 $canUpdate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatedAdapter::class, 'update');
 $canDelete = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatedAdapter::class, 'delete');
-$canEditInline = $canUpdate || $canDelete;
+$canCreate = $this->userIsAllowed(\Internationalisation\Api\Adapter\TranslatedAdapter::class, 'create');
+$canEditInline = $canUpdate || $canDelete || $canCreate;
 
+$addUrl = $url('admin/translation/id', ['language' => $language, 'action' => 'add-string']);
 $updateUrl = $url('admin/translation/id', ['language' => $language, 'action' => 'update-string']);
 $deleteUrl = $url('admin/translation/id', ['language' => $language, 'action' => 'delete-string']);
+
+// A new row is editable to be filled, whatever the right to update.
+$renderRow = function (string $string, string $translated, bool $isNew = false) use ($canUpdate, $canDelete, $escape, $escapeAttr, $translate): string {
+    $editable = $canUpdate || $isNew;
+    $cell = function (string $field, string $value, string $label) use ($editable, $escape, $escapeAttr): string {
+        return '<span class="translated-value translated-' . $field . '"'
+            . ($editable ? ' contenteditable="true" role="textbox" aria-multiline="false" aria-label="' . $escapeAttr($label) . '" aria-describedby="translated-inline-hint" data-field="' . $field . '"' : '')
+            . '>' . $escape($value) . '</span>';
+    };
+    // The pencil only duplicates the editable cell for the mouse, so it is
+    // hidden from the assistive technologies.
+    $pencil = fn (string $title): string => '<li><a href="#" class="o-icon-edit translated-edit" tabindex="-1" aria-hidden="true" title="' . $escapeAttr($title) . '"></a></li>';
+    $actionsString = $editable ? '<ul class="actions">' . $pencil($translate('Edit the string')) . '</ul>' : '';
+    $actionsTranslation = ($editable ? $pencil($translate('Edit the translation')) : '')
+        . ($canDelete ? '<li><a href="#" role="button" class="o-icon-delete translated-delete" data-label="' . $escapeAttr($translate('Delete the string "%s"')) . '" aria-label="' . $escapeAttr(sprintf($translate('Delete the string "%s"'), $string)) . '" title="' . $escapeAttr($translate('Delete')) . '"></a></li>' : '');
+    return '<tr' . ($isNew ? ' class="translated-new"' : ' data-string="' . $escapeAttr($string) . '"') . '>'
+        . '<td><div class="translated-cell">' . $cell('string', $string, $translate('String')) . $actionsString . '</div></td>'
+        . '<td><div class="translated-cell">' . $cell('translation', $translated, $translate('Translation'))
+        . ($actionsTranslation ? '<ul class="actions">' . $actionsTranslation . '</ul>' : '') . '</div></td>'
+        . '</tr>';
+};
 
 if ($canEditInline) {
     $this->headScript()
@@ -38,6 +61,9 @@ if ($canEditInline) {
 <?= $this->pageTitle($localeName, 1, $translate('Translations')) ?>
 
 <div id="page-actions">
+    <?php if ($canCreate): ?>
+    <button type="button" class="button translated-add"><?= $escape($translate('Add a translation')) ?></button>
+    <?php endif; ?>
     <?php if ($canUpdate): ?>
     <?= $hyperlink($translate('Batch edit'), $url('admin/translation/id', ['language' => $language, 'action' => 'edit']), ['class' => 'button']) ?>
     <?php endif; ?>
@@ -55,8 +81,8 @@ if ($canEditInline) {
 <?php endif; ?>
 
 <div id="item-metadata">
-    <?php if (count($translations)): ?>
-    <?php if ($canUpdate): ?>
+    <?php if (count($translations) || $canCreate): ?>
+    <?php if ($canUpdate || $canCreate): ?>
     <?php // The hint is referenced by each editable cell, so it is stated once. ?>
     <p id="translated-inline-hint" class="translated-hidden"><?= $translate('Editable field: type the text, then press Enter to save or Escape to cancel.') ?></p>
     <?php endif; ?>
@@ -67,7 +93,7 @@ if ($canEditInline) {
         . ($canEditInline ? ' translated-inline' : '')
         . ($canUpdate ? ' translated-editable' : '');
     ?>
-    <table class="<?= $tableClass ?>" data-tablesaw-mode="stack"<?= $canUpdate ? ' data-update-url="' . $escapeAttr($updateUrl) . '"' : '' ?><?= $canDelete ? ' data-delete-url="' . $escapeAttr($deleteUrl) . '"' : '' ?>>
+    <table class="<?= $tableClass ?>" data-tablesaw-mode="stack"<?= $canCreate ? ' data-add-url="' . $escapeAttr($addUrl) . '"' : '' ?><?= $canUpdate ? ' data-update-url="' . $escapeAttr($updateUrl) . '"' : '' ?><?= $canDelete ? ' data-delete-url="' . $escapeAttr($deleteUrl) . '"' : '' ?>>
         <thead>
             <tr>
                 <th><?= $translate('String') ?></th>
@@ -76,37 +102,13 @@ if ($canEditInline) {
         </thead>
         <tbody>
             <?php foreach ($translations as $string => $translated): ?>
-            <tr data-string="<?= $escapeAttr($string) ?>">
-                <td>
-                    <div class="translated-cell">
-                    <span class="translated-value translated-string"<?php if ($canUpdate): ?> contenteditable="true" role="textbox" aria-multiline="false" aria-label="<?= $escapeAttr($translate('String')) ?>" aria-describedby="translated-inline-hint" data-field="string"<?php endif; ?>><?= $escape($string) ?></span>
-                    <?php if ($canUpdate): ?>
-                    <?php // The pencil only duplicates the editable cell for the mouse, so it is hidden from the assistive technologies. ?>
-                    <ul class="actions">
-                        <li><a href="#" class="o-icon-edit translated-edit" tabindex="-1" aria-hidden="true" title="<?= $escapeAttr($translate('Edit the string')) ?>"></a></li>
-                    </ul>
-                    <?php endif; ?>
-                    </div>
-                </td>
-                <td>
-                    <div class="translated-cell">
-                    <span class="translated-value translated-translation"<?php if ($canUpdate): ?> contenteditable="true" role="textbox" aria-multiline="false" aria-label="<?= $escapeAttr($translate('Translation')) ?>" aria-describedby="translated-inline-hint" data-field="translation"<?php endif; ?>><?= $escape($translated) ?></span>
-                    <?php if ($canEditInline): ?>
-                    <ul class="actions">
-                        <?php if ($canUpdate): ?>
-                        <li><a href="#" class="o-icon-edit translated-edit" tabindex="-1" aria-hidden="true" title="<?= $escapeAttr($translate('Edit the translation')) ?>"></a></li>
-                        <?php endif; ?>
-                        <?php if ($canDelete): ?>
-                        <li><a href="#" role="button" class="o-icon-delete translated-delete" aria-label="<?= $escapeAttr(sprintf($translate('Delete the string "%s"'), $string)) ?>" title="<?= $escapeAttr($translate('Delete')) ?>"></a></li>
-                        <?php endif; ?>
-                    </ul>
-                    <?php endif; ?>
-                    </div>
-                </td>
-            </tr>
+            <?= $renderRow((string) $string, (string) $translated) ?>
             <?php endforeach; ?>
         </tbody>
     </table>
+    <?php if ($canCreate): ?>
+    <template id="translated-new-row"><?= $renderRow('', '', true) ?></template>
+    <?php endif; ?>
     <?php else: ?>
     <p><?= $translate('No translated strings.') ?></p>
     <?php endif; ?>
