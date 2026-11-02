@@ -111,10 +111,11 @@ class LanguageList extends AbstractHelper
             $api = $view->api();
             $pageSlug = $params->fromRoute('page-slug');
             if ($pageSlug) {
+                // The page may be private or missing (error page).
                 $page = $api
-                    ->read(
+                    ->searchOne(
                         'site_pages',
-                        ['site' => $site->id(), 'slug' => $pageSlug]
+                        ['site_id' => $site->id(), 'slug' => $pageSlug]
                     )
                     ->getContent();
             } else {
@@ -244,8 +245,10 @@ class LanguageList extends AbstractHelper
                         // Module AdvancedSearch uses the slug, and module Search uses id;
                         $relatedSearchPageId = $mainSearchPageIdBySite[$relatedSiteId];
                         $searchPageSlug = $settings->get('advancedsearch_all_configs', [])[$relatedSearchPageId] ?? null;
+                        // The search routes of other sites are not registered.
                         if ($searchPageSlug) {
-                            $url = $urlHelper('search-page-' . $searchPageSlug, ['site-slug' => $siteSlug], ['query' => $query], true);
+                            $url = $urlHelper('site', ['site-slug' => $siteSlug]) . '/' . rawurlencode($searchPageSlug)
+                                . ($query ? '?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986) : '');
                         }
                     }
                 }
