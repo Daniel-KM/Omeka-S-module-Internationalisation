@@ -92,10 +92,7 @@
 }
 
 /*
- * The core styles any editable element like a textarea: a fixed minimum
- * height, a resize handle and a scrollbar.
- * Here a row is a single value, so the field follows its content.
- */
+ * Bypass core styles set on any editable element. */
 .translated-editable .translated-value {
     flex: 1 1 auto;
     /* Without it, a long word without space would widen the cell. */
@@ -150,6 +147,8 @@
 
 .translated-batch textarea {
     width: 100%;
+    height: calc(100vh - 15rem);
+    min-height: 15rem;
 }
 
 .translated-batch-note {
