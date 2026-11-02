@@ -46,10 +46,10 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
 
 // The module Mapper embeds the same library "simple-iso-639-3" and its
 // autoloader may win, so an older version breaks the languages here.
-if ($this->isModuleActive('Mapper') && !$this->isModuleVersionAtLeast('Mapper', '3.4.9')) {
+if (!$this->checkModuleAvailability('Mapper', '3.4.10')) {
     $message = new \Omeka\Stdlib\Message(
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
-        'Mapper', '3.4.9'
+        'Mapper', '3.4.10'
     );
     $messenger->addError($message);
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
@@ -120,9 +120,7 @@ if (version_compare($oldVersion, '3.3.10', '<')) {
 }
 
 if (version_compare($oldVersion, '3.4.14', '<')) {
-    if ($this->isModuleActive('BlockPlus')
-        && !$this->isModuleVersionAtLeast('BlockPlus', '3.4.29')
-    ) {
+    if (!$this->checkModuleAvailability('BlockPlus', '3.4.29')) {
         $message = new PsrMessage(
             'The module {module} should be upgraded to version {version} or later.', // @translate
             ['module' => 'BlockPlus', 'version' => '3.4.29']
