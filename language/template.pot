@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 00:00+0000\n"
+"POT-Creation-Date: 2026-11-02 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -264,7 +264,7 @@ msgid ""
 msgstr ""
 
 #: data/scripts/upgrade.php:143 Module.php:241
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:116
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:120
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
@@ -376,11 +376,11 @@ msgid ""
 "{link_end}, {link_log}logs{link_end})."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:89
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:86
 msgid "The file \"{file}\" is not writeable."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:128
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:132
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
@@ -750,7 +750,7 @@ msgid "Translations were reindexed, but an issue occurred. Check logs."
 msgstr ""
 
 #: src/Controller/Admin/TranslationController.php:835
-#: src/Service/Form/Element/LocaleSelectFactory.php:108
+#: src/Service/Form/Element/LocaleSelectFactory.php:109
 #, php-format
 msgid "%1$s [%2$s]"
 msgstr ""
@@ -814,14 +814,14 @@ msgstr ""
 msgid "An error occurred."
 msgstr ""
 
-#: config/module.config.php:40
+#: config/module.config.php:39
 msgid "Translation added."
 msgstr ""
 
-#: config/module.config.php:41
+#: config/module.config.php:40
 msgid "Translation deleted."
 msgstr ""
 
-#: config/module.config.php:42
+#: config/module.config.php:41
 msgid "Translation saved."
 msgstr ""

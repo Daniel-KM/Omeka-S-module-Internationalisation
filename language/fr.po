@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 00:00+0000\n"
-"PO-Revision-Date: 2026-10-05 00:00+0000\n"
+"POT-Creation-Date: 2026-11-02 00:00+0000\n"
+"PO-Revision-Date: 2026-11-02 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: French <kde-i18n-doc@kde.org>\n"
 "Language: fr\n"
@@ -284,7 +284,7 @@ msgstr ""
 "bloc de ressource."
 
 #: data/scripts/upgrade.php:143 Module.php:241
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:116
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:120
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
@@ -435,11 +435,11 @@ msgstr ""
 "Une tâche a été lancée en arrière-plan pour copier les données du site : "
 "({link_job}tâche #{job_id}{link_end}, {link_log}journaux{link_end})."
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:89
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:86
 msgid "The file \"{file}\" is not writeable."
 msgstr "Le fichier « {file} » ne peut pas être enregistré."
 
-#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:128
+#: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:132
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier « {path} » n’est pas inscriptible : {error}."
 
@@ -867,7 +867,7 @@ msgstr ""
 "journaux."
 
 #: src/Controller/Admin/TranslationController.php:835
-#: src/Service/Form/Element/LocaleSelectFactory.php:108
+#: src/Service/Form/Element/LocaleSelectFactory.php:109
 #, php-format
 msgid "%1$s [%2$s]"
 msgstr "%1$s [%2$s]"
@@ -935,15 +935,15 @@ msgstr "La chaîne ne peut pas être vide."
 msgid "An error occurred."
 msgstr "Une erreur s’est produite."
 
-#: config/module.config.php:40
+#: config/module.config.php:39
 msgid "Translation added."
 msgstr "Traduction ajoutée."
 
-#: config/module.config.php:41
+#: config/module.config.php:40
 msgid "Translation deleted."
 msgstr "Traduction supprimée."
 
-#: config/module.config.php:42
+#: config/module.config.php:41
 msgid "Translation saved."
 msgstr "Traduction enregistrée."
 
