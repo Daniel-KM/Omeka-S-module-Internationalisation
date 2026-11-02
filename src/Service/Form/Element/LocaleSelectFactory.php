@@ -55,7 +55,8 @@ class LocaleSelectFactory implements FactoryInterface
                 continue;
             }
             $label = trim((string) $label);
-            if (!isset($locales[$localeId])) {
+            // The admin label replaces the raw id of a locale unknown by intl.
+            if (!isset($locales[$localeId]) || ($label !== '' && $locales[$localeId] === $localeId)) {
                 $locales[$localeId] = $label !== ''
                     ? sprintf('%1$s [%2$s]', $label, $localeId)
                     : $this->getValueOption($localeId);
