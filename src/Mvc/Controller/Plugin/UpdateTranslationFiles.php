@@ -2,6 +2,7 @@
 
 namespace Internationalisation\Mvc\Controller\Plugin;
 
+use Common\Stdlib\FileLock;
 use Doctrine\DBAL\Connection;
 use Laminas\Log\Logger;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
@@ -50,13 +51,6 @@ class UpdateTranslationFiles extends AbstractPlugin
         $existingFilenames = glob($dir . '/*.php');
         $existingFilenames = preg_grep('~[/\\\\][a-zA-Z]{2,3}((-|_)[a-zA-Z0-9]{2,4})?\.php$~', $existingFilenames);
 
-        // Remove all language files.
-        foreach ($existingFilenames as $file) {
-            if (file_exists($file) && is_file($file) && is_writeable($file)) {
-                @unlink($file);
-            }
-        }
-
         $translations = $this->connection
             ->executeQuery('SELECT `lang`, `lang`, `string`, `translation` FROM `translated` ORDER BY `lang` ASC, `string` ASC')
             ->fetchAllAssociative();
@@ -74,6 +68,9 @@ class UpdateTranslationFiles extends AbstractPlugin
             return
             PHP;
 
+        // The files are replaced atomically, so they are always readable.
+        $fileLock = new FileLock();
+        $writtenFiles = [];
         $hasError = false;
         foreach ($translationsByLanguage as $lang => $strings) {
             // In laminas, the language code should be "xx" or "xx_YY".
@@ -93,10 +90,17 @@ class UpdateTranslationFiles extends AbstractPlugin
                     $hasError = true;
                     continue;
                 }
+            }
+            $result = $fileLock->write($file, $content . ' ' . var_export($strings, true) . ";\n");
+            $hasError = $hasError || !$result;
+            $writtenFiles[] = $file;
+        }
+
+        // Remove the files of the removed languages.
+        foreach (array_diff($existingFilenames, $writtenFiles) as $file) {
+            if (file_exists($file) && is_file($file) && is_writeable($file)) {
                 @unlink($file);
             }
-            $result = file_put_contents($file, $content . ' ' . var_export($strings, true) . ";\n");
-            $hasError = $hasError || $result === false;
         }
 
         return !$hasError;
