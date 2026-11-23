@@ -13,6 +13,13 @@ use Doctrine\DBAL\Connection;
 class TranslatedEditor
 {
     /**
+     * The default collation is case and accent insensitive, but a string to
+     * translate is not: compare it as binary, keeping the indexed comparison
+     * first to filter rows.
+     */
+    const MATCH_STRING = '`string` = :string AND `string` COLLATE utf8mb4_bin = :string';
+
+    /**
      * @var \Doctrine\DBAL\Connection
      */
     protected $connection;
@@ -52,7 +59,7 @@ class TranslatedEditor
         }
 
         $this->connection->executeStatement(
-            sprintf('UPDATE `translated` SET `%s` = :text WHERE `lang` = :lang AND `string` = :string', $field),
+            sprintf('UPDATE `translated` SET `%s` = :text WHERE `lang` = :lang AND %s', $field, self::MATCH_STRING),
             ['text' => $text, 'lang' => $language, 'string' => $string]
         );
 
@@ -97,7 +104,7 @@ class TranslatedEditor
         }
 
         $count = $this->connection->executeStatement(
-            'DELETE FROM `translated` WHERE `lang` = :lang AND `string` = :string',
+            'DELETE FROM `translated` WHERE `lang` = :lang AND ' . self::MATCH_STRING,
             ['lang' => $language, 'string' => $string]
         );
         if (!$count) {
@@ -129,17 +136,16 @@ class TranslatedEditor
         $updated = array_intersect_key($translations, $existing);
         foreach ($updated as $string => $translation) {
             $this->connection->executeStatement(
-                'UPDATE `translated` SET `translation` = :translation WHERE `lang` = :lang AND `string` = :string',
+                'UPDATE `translated` SET `translation` = :translation WHERE `lang` = :lang AND ' . self::MATCH_STRING,
                 ['lang' => $language, 'string' => (string) $string, 'translation' => $translation]
             );
         }
 
         $deleted = array_diff_key($existing, $translations);
-        if ($deleted) {
+        foreach (array_keys($deleted) as $string) {
             $this->connection->executeStatement(
-                'DELETE FROM `translated` WHERE `lang` = :lang AND `string` IN (:strings)',
-                ['lang' => $language, 'strings' => array_map('strval', array_keys($deleted))],
-                ['lang' => \Doctrine\DBAL\ParameterType::STRING, 'strings' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
+                'DELETE FROM `translated` WHERE `lang` = :lang AND ' . self::MATCH_STRING,
+                ['lang' => $language, 'string' => (string) $string]
             );
         }
 
@@ -158,7 +164,7 @@ class TranslatedEditor
     {
         $result = $this->connection
             ->executeQuery(
-                'SELECT `translation` FROM `translated` WHERE `lang` = :lang AND `string` = :string LIMIT 1',
+                'SELECT `translation` FROM `translated` WHERE `lang` = :lang AND ' . self::MATCH_STRING . ' LIMIT 1',
                 ['lang' => $language, 'string' => $string]
             )
             ->fetchOne();
