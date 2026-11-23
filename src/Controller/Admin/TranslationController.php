@@ -842,7 +842,7 @@ class TranslationController extends AbstractActionController
         // Use a direct query to avoid to load representations for a simple
         // two-column table.
         return $this->connection
-            ->executeQuery('SELECT `string`, `translation` FROM `translated` WHERE `lang` = :lang ORDER BY `string` ASC', ['lang' => $language])
+            ->executeQuery('SELECT `string`, `translation` FROM `translated` WHERE `lang` = :lang ORDER BY `string` COLLATE utf8mb4_unicode_ci ASC', ['lang' => $language])
             ->fetchAllKeyValue();
     }
 }

@@ -52,7 +52,7 @@ class UpdateTranslationFiles extends AbstractPlugin
         $existingFilenames = preg_grep('~[/\\\\][a-zA-Z]{2,3}((-|_)[a-zA-Z0-9]{2,4})?\.php$~', $existingFilenames);
 
         $translations = $this->connection
-            ->executeQuery('SELECT `lang`, `lang`, `string`, `translation` FROM `translated` ORDER BY `lang` ASC, `string` ASC')
+            ->executeQuery('SELECT `lang`, `lang`, `string`, `translation` FROM `translated` ORDER BY `lang` ASC, `string` COLLATE utf8mb4_unicode_ci ASC')
             ->fetchAllAssociative();
 
         $translationsByLanguage = [];
