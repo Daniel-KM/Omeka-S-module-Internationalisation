@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 00:00+0000\n"
-"PO-Revision-Date: 2026-11-02 00:00+0000\n"
+"POT-Creation-Date: 2026-11-23 00:00+0000\n"
+"PO-Revision-Date: 2026-11-23 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: French <kde-i18n-doc@kde.org>\n"
 "Language: fr\n"
@@ -22,19 +22,19 @@ msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
 
 #: data/scripts/upgrade.php:44 data/scripts/upgrade.php:55
-#: data/scripts/upgrade.php:147
+#: data/scripts/upgrade.php:145
 msgid "Missing requirement. Unable to upgrade."
 msgstr "Pré-requis absent. Impossible de mettre à jour."
 
-#: Module.php:903
+#: Module.php:909
 msgid "Translate the copies of the page"
 msgstr "Traduire les copies de la page"
 
-#: Module.php:909
+#: Module.php:915
 msgid "Copy the page into this site or another one"
 msgstr "Copier la page sur ce site ou sur un autre"
 
-#: Module.php:1267
+#: Module.php:1273
 msgid "Remove and copy data"
 msgstr "Supprimer et copier des données"
 
@@ -76,7 +76,7 @@ msgstr "Langues pour les sites"
 
 #: view/internationalisation/admin/translation/browse.phtml:30
 #: view/internationalisation/admin/translation/show-details.phtml:27
-#: view/internationalisation/admin/translation/show.phtml:70
+#: view/internationalisation/admin/translation/show.phtml:76
 msgid "Translations"
 msgstr "Traductions"
 
@@ -195,7 +195,7 @@ msgid "Delete translations for \"%s\""
 msgstr "Supprimer les traductions « %s »"
 
 #: view/internationalisation/admin/translation/show-details.phtml:37
-#: view/internationalisation/admin/translation/show.phtml:122
+#: view/internationalisation/admin/translation/show.phtml:128
 msgid "No translated strings."
 msgstr "Aucune chaîne traduite."
 
@@ -203,38 +203,43 @@ msgstr "Aucune chaîne traduite."
 msgid "Edit the string"
 msgstr "Modifier la chaîne"
 
-#: view/internationalisation/admin/translation/show.phtml:47
+#: view/internationalisation/admin/translation/show.phtml:51
+#: view/internationalisation/admin/translation/show.phtml:52
+msgid "Save the row"
+msgstr "Enregistrer la ligne"
+
+#: view/internationalisation/admin/translation/show.phtml:53
 msgid "Edit the translation"
 msgstr "Modifier la traduction"
 
-#: view/internationalisation/admin/translation/show.phtml:51
+#: view/internationalisation/admin/translation/show.phtml:57
 msgid "Delete the string and its translation?"
 msgstr "Supprimer la chaîne et sa traduction ?"
 
-#: view/internationalisation/admin/translation/show.phtml:53
+#: view/internationalisation/admin/translation/show.phtml:59
 #, php-format
 msgid "Delete the string \"%s\""
 msgstr "Supprimer la chaîne « %s »"
 
-#: view/internationalisation/admin/translation/show.phtml:55
-#: view/internationalisation/admin/translation/show.phtml:108
+#: view/internationalisation/admin/translation/show.phtml:61
+#: view/internationalisation/admin/translation/show.phtml:114
 msgid "String"
 msgstr "Chaîne"
 
-#: view/internationalisation/admin/translation/show.phtml:56
-#: view/internationalisation/admin/translation/show.phtml:109
+#: view/internationalisation/admin/translation/show.phtml:62
+#: view/internationalisation/admin/translation/show.phtml:115
 msgid "Translation"
 msgstr "Traduction"
 
-#: view/internationalisation/admin/translation/show.phtml:74
+#: view/internationalisation/admin/translation/show.phtml:80
 msgid "Add a translation"
 msgstr "Ajouter une traduction"
 
-#: view/internationalisation/admin/translation/show.phtml:77
+#: view/internationalisation/admin/translation/show.phtml:83
 msgid "Batch edit"
 msgstr "Modifier en lot"
 
-#: view/internationalisation/admin/translation/show.phtml:96
+#: view/internationalisation/admin/translation/show.phtml:102
 msgid ""
 "Editable field: type the text, then press Enter to save or Escape to cancel."
 msgstr ""
@@ -269,13 +274,13 @@ msgstr "Détecter automatiquement la langue"
 msgid "Translate"
 msgstr "Traduire"
 
-#: data/scripts/upgrade.php:127
+#: data/scripts/upgrade.php:125
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 "Le module {module} doit être mis à niveau à la version {version} ou "
 "supérieure."
 
-#: data/scripts/upgrade.php:134
+#: data/scripts/upgrade.php:132
 msgid ""
 "The language switcher is now available as a page block and as a resource "
 "block."
@@ -283,12 +288,12 @@ msgstr ""
 "Le sélecteur de langue est désormais disponible en tant que bloc de page et "
 "bloc de ressource."
 
-#: data/scripts/upgrade.php:143 Module.php:241
+#: data/scripts/upgrade.php:141 Module.php:241
 #: src/Mvc/Controller/Plugin/UpdateTranslationFiles.php:120
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier « {path} » n’est pas inscriptible."
 
-#: data/scripts/upgrade.php:189
+#: data/scripts/upgrade.php:187
 msgid ""
 "It is now possible to translate strings in admin via the {link}page of "
 "translations{link_end}."
@@ -296,7 +301,7 @@ msgstr ""
 "Il est désormais possible de traduire des chaînes via la {link}page des "
 "traductions{link_end}."
 
-#: data/scripts/upgrade.php:197
+#: data/scripts/upgrade.php:195
 msgid ""
 "If you used the module {link}Table{link_end} to manage translations, just "
 "copy them manually in the new form, remove tables and update settings. The "
@@ -307,11 +312,11 @@ msgstr ""
 "les tables et mettez à jour les paramètres. Les paramètres sont conservés "
 "pour gérer les traductions spécifiques."
 
-#: data/scripts/upgrade.php:340
+#: data/scripts/upgrade.php:338
 msgid "The language files could not be regenerated: {message}"
 msgstr "Les fichiers de langue n’ont pas pu être régénérés : {message}"
 
-#: data/scripts/upgrade.php:347
+#: data/scripts/upgrade.php:345
 msgid ""
 "Migrated translations are stored but the language files could not be "
 "regenerated automatically: open and save any language in the translations "
@@ -321,7 +326,7 @@ msgstr ""
 "pu être régénérés automatiquement : ouvrez et enregistrez une langue dans la "
 "page des traductions."
 
-#: data/scripts/upgrade.php:361
+#: data/scripts/upgrade.php:359
 msgid ""
 "Module Table support for translations was removed: {count} strings ({langs} "
 "languages) were copied into the translations page."
@@ -329,14 +334,14 @@ msgstr ""
 "Les traductions gérées par le module Table ont été supprimées : {count} "
 "chaînes ({langs} langues) ont été copiées dans la page de traductions."
 
-#: data/scripts/upgrade.php:367
+#: data/scripts/upgrade.php:365
 msgid ""
 "Module Table support for translations was removed. No translation to migrate."
 msgstr ""
 "La prise en charge du module Table pour les traductions a été supprimée. "
 "Aucune traduction à migrer."
 
-#: data/scripts/upgrade.php:373
+#: data/scripts/upgrade.php:371
 msgid ""
 "These translation tables have no language and were not migrated: {tables}. "
 "Set a language and copy them manually in the translations page."
@@ -345,7 +350,7 @@ msgstr ""
 "{tables}. Définissez une langue et copiez-la manuellement dans la page des "
 "traductions."
 
-#: data/scripts/upgrade.php:381
+#: data/scripts/upgrade.php:379
 msgid ""
 "To manage the site settings and theme settings of grouped sites more easily, "
 "it is recommended to install the module {link}Site Hub{link_end}, that "
@@ -355,7 +360,7 @@ msgstr ""
 "groupes de sites, il est recommandé d’installer le module {link}Site "
 "Hub{link_end}, qui propage les paramètres entre les sites d’un groupe."
 
-#: data/scripts/upgrade.php:391
+#: data/scripts/upgrade.php:389
 msgid "It is now possible to copy and translate site pages individually."
 msgstr ""
 "Il est désormais possible de copier et de traduire les pages "
@@ -388,12 +393,12 @@ msgstr ""
 "l’installer pour gérer les caractères diacritiques et non-latin et pour "
 "traduire les dates, les nombres et plus."
 
-#: Module.php:1145 src/Form/SettingsFieldset.php:32
+#: Module.php:1151 src/Form/SettingsFieldset.php:32
 #: src/Form/SettingsFieldset.php:34
 msgid "Remove all groups"
 msgstr "Supprimer tous les groupes"
 
-#: Module.php:1186
+#: Module.php:1192
 msgid ""
 "No locale is set for this site: interface strings fall back to the global "
 "default locale and may appear in another language. Set the locale below (use "
@@ -403,7 +408,7 @@ msgstr ""
 "est utilisée et les traductions peuvent apparaître dans une autre langue. "
 "Définissez la langue ci-dessous (utilisez « en » pour un site anglais)."
 
-#: Module.php:1209
+#: Module.php:1215
 msgid ""
 "The selected pages will be translations of the current page within a site "
 "group, that must be defined. The language switcher displays only one related "
@@ -413,21 +418,21 @@ msgstr ""
 "du groupe de sites, qui doit être défini. Le sélecteur de langue affiche "
 "seulement une page liée par site."
 
-#: Module.php:1220
+#: Module.php:1226
 msgid "Select translations of this page…"
 msgstr "Choisir les traductions de cette page…"
 
-#: Module.php:1331 src/Job/DuplicateSite.php:91
+#: Module.php:1337 src/Job/DuplicateSite.php:89
 msgid "The site #{site_id} cannot be copied. Check your rights."
 msgstr "Le site #« {site_id} » ne peut pas être copié. Vérifiez vos droits."
 
-#: Module.php:1362
+#: Module.php:1368
 msgid "Remove/copy processes have been done for site \"{site_slug}\"."
 msgstr ""
 "Les traitements de suppression/copie ont été réalisés pour le site "
 "« {site_slug} »."
 
-#: Module.php:1368
+#: Module.php:1374
 msgid ""
 "A job was launched in background to copy site data: ({link_job}job #{job_id}"
 "{link_end}, {link_log}logs{link_end})."
@@ -456,40 +461,36 @@ msgstr ""
 "Le site #« {site_id} » n’est pas disponible pour la copie. Vérifiez vos "
 "droits."
 
-#: src/Job/DuplicateSite.php:176
-msgid "Check logs: an error occurred."
-msgstr "Vérifier les journaux : une erreur est survenue."
-
-#: src/Job/DuplicateSite.php:209
+#: src/Job/DuplicateSite.php:199
 msgid "Site settings of \"{site_slug}\" successfully removed."
 msgstr "Les paramètres du site « {site_slug} » ont été supprimés."
 
-#: src/Job/DuplicateSite.php:243
+#: src/Job/DuplicateSite.php:233
 msgid "{total} site permissions removed from \"{site_slug}\"."
 msgstr "{total} permissions supprimées du site « {site_slug} »."
 
-#: src/Job/DuplicateSite.php:283
+#: src/Job/DuplicateSite.php:273
 msgid "{total} site pages removed from \"{site_slug}\"."
 msgstr "{total} pages supprimées du site « {site_slug} »."
 
-#: src/Job/DuplicateSite.php:297
+#: src/Job/DuplicateSite.php:287
 msgid "{total} collecting forms removed from \"{site_slug}\"."
 msgstr ""
 "{total} formulaires de collecte ont été supprimés du site « {site_slug} »."
 
-#: src/Job/DuplicateSite.php:330
+#: src/Job/DuplicateSite.php:320
 msgid ""
 "Site settings of \"{site_slug}\" successfully copied into \"{site_slug_2}\"."
 msgstr ""
 "Les paramètres du site « {site_slug} » ont été copiés dans « {site_slug_2} » "
 "avec succès."
 
-#: src/Job/DuplicateSite.php:421
+#: src/Job/DuplicateSite.php:411
 msgid ""
 "The page slug \"{page_slug}\" from the source has been renamed \"{slug}\"."
 msgstr "Le chemin de la page source « {page_slug} » a été renommé « {slug} »."
 
-#: src/Job/DuplicateSite.php:427
+#: src/Job/DuplicateSite.php:417
 msgid ""
 "Unable to copy page \"{page_slug}\" of site \"{site_slug}\". The page is "
 "skipped."
@@ -497,7 +498,7 @@ msgstr ""
 "Impossible de copier la page« {page_slug} » du site « {site_slug} ». La page "
 "a été ignorée."
 
-#: src/Job/DuplicateSite.php:441
+#: src/Job/DuplicateSite.php:430
 msgid ""
 "{total} site pages of \"{site_slug}\" successfully copied into "
 "\"{site_slug_2}\" (mode \"{mode}\")."
@@ -505,7 +506,7 @@ msgstr ""
 "{total} pages du site « {site_slug} » ont été copiées avec succès dans le "
 "site « {site_slug_2} » (mode « {mode} »)."
 
-#: src/Job/DuplicateSite.php:566 src/Job/DuplicateSite.php:596
+#: src/Job/DuplicateSite.php:555 src/Job/DuplicateSite.php:585
 msgid ""
 "The module Collecting is a new version and is not copiable for now. Copy "
 "forms manually if needed."
@@ -513,7 +514,7 @@ msgstr ""
 "Le module Collecting est une nouvelle version et n’est pas copiable "
 "actuellement. Copiez les formulaires manuellement si besoin."
 
-#: src/Job/DuplicateSite.php:572
+#: src/Job/DuplicateSite.php:561
 msgid ""
 "{total} collecting forms from site \"{site_slug}\" were successfully copied "
 "into \"{site_slug_2}\"."
@@ -521,7 +522,7 @@ msgstr ""
 "{total} formulaires de collecte du site « {site_slug} » ont été copiés avec "
 "succès dans « {site_slug_2} »."
 
-#: src/Job/DuplicateSite.php:618
+#: src/Job/DuplicateSite.php:630
 msgid ""
 "The full text for page {page_slug} was not saved. Run indexation of full "
 "text manually in main settings or in tasks of Easy Admin. Exception: "
@@ -911,23 +912,23 @@ msgstr "Impossible de rendre la page miroir actuellement : {exception}."
 msgid "Language Switcher"
 msgstr "Sélecteur de langue"
 
-#: src/Stdlib/TranslatedEditor.php:34
+#: src/Stdlib/TranslatedEditor.php:41
 msgid "The field to update is unknown."
 msgstr "Le champ à modifier est inconnu."
 
-#: src/Stdlib/TranslatedEditor.php:38 src/Stdlib/TranslatedEditor.php:73
+#: src/Stdlib/TranslatedEditor.php:45 src/Stdlib/TranslatedEditor.php:80
 msgid "The string and the translation cannot be empty."
 msgstr "La chaîne et la traduction ne peuvent pas être vides."
 
-#: src/Stdlib/TranslatedEditor.php:43 src/Stdlib/TranslatedEditor.php:104
+#: src/Stdlib/TranslatedEditor.php:50 src/Stdlib/TranslatedEditor.php:111
 msgid "This string does not exist anymore: reload the page."
 msgstr "Cette chaîne n’existe plus : rechargez la page."
 
-#: src/Stdlib/TranslatedEditor.php:51 src/Stdlib/TranslatedEditor.php:77
+#: src/Stdlib/TranslatedEditor.php:58 src/Stdlib/TranslatedEditor.php:84
 msgid "This string is already translated in this language."
 msgstr "Cette chaîne est déjà traduite dans cette langue."
 
-#: src/Stdlib/TranslatedEditor.php:96
+#: src/Stdlib/TranslatedEditor.php:103
 msgid "The string cannot be empty."
 msgstr "La chaîne ne peut pas être vide."
 
@@ -946,6 +947,9 @@ msgstr "Traduction supprimée."
 #: config/module.config.php:41
 msgid "Translation saved."
 msgstr "Traduction enregistrée."
+
+#~ msgid "Check logs: an error occurred."
+#~ msgstr "Vérifier les journaux : une erreur est survenue."
 
 #~ msgid "New language"
 #~ msgstr "Nouvelle langue"
