@@ -20,36 +20,36 @@
 
     .action-details {
         cursor: pointer;
-    }
-    .action-details summary {
-        display: list-item;
-        cursor: pointer;
-    }
-    .action-details summary::marker,
-    .action-details summary::-webkit-details-marker {
-        content: none;
-    }
-    .action-details summary::after {
-        content: "⏵";
-        font-weight: 900;
-        margin-left: auto;
-    }
-    .action-details[open] summary::after {
-        content: "▾";
-    }
-    .action-details[open] {
-        z-index: 10;
-        overflow: visible;
-        cursor: auto;
-        min-width: 230px;
-        padding: 15px;
-        border: 1px solid #DCD6CA;
-        background: #EEE;
-        background-color: #FFFFFF;
-        box-shadow: 0 1px 3px 0 rgba(0,0,0,0.2);
-    }
-    .action-details.add-language {
-        display: inline-block;
+        & summary {
+            display: list-item;
+            cursor: pointer;
+            &::marker,
+            &::-webkit-details-marker {
+                content: none;
+            }
+            &::after {
+                content: "⏵";
+                font-weight: 900;
+                margin-left: auto;
+            }
+        }
+        &[open] summary::after {
+            content: "▾";
+        }
+        &[open] {
+            z-index: 10;
+            overflow: visible;
+            cursor: auto;
+            min-width: 230px;
+            padding: 15px;
+            border: 1px solid #DCD6CA;
+            background: #EEE;
+            background-color: #FFFFFF;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.2);
+        }
+        &.add-language {
+            display: inline-block;
+        }
     }
 }
 
@@ -67,28 +67,31 @@
     border: 0;
 }
 
-.translated-list .translated-cell {
-    display: flex;
-    align-items: flex-start;
-    gap: 4px;
-}
+.translated-list {
+    & .translated-cell {
+        display: flex;
+        align-items: flex-start;
+        gap: 4px;
+        & .actions {
+            flex: 0 0 auto;
+            display: flex;
+            margin: 0;
+            visibility: hidden;
+        }
+    }
 
-.translated-list .translated-cell .actions {
-    flex: 0 0 auto;
-    display: flex;
-    margin: 0;
-    visibility: hidden;
-}
+    /* The actions are revealed by the mouse and by the keyboard alike. */
+    & tbody {
+        & tr:hover,
+        & tr:focus-within {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
 
-/* The actions are revealed by the mouse and by the keyboard alike. */
-.translated-list tbody tr:hover,
-.translated-list tbody tr:focus-within {
-    background-color: rgba(0, 0, 0, 0.03);
-}
-
-.translated-list tbody tr:hover .actions,
-.translated-list tbody tr:focus-within .actions {
-    visibility: visible;
+        & tr:hover .actions,
+        & tr:focus-within .actions {
+            visibility: visible;
+        }
+    }
 
     /*
      * The check is the only action displayed without the mouse: a row with a
@@ -131,49 +134,53 @@
 
 /*
  * Bypass core styles set on any editable element. */
-.translated-editable .translated-value {
-    flex: 1 1 auto;
-    /* Without it, a long word without space would widen the cell. */
-    min-width: 0;
-    min-height: unset;
-    max-height: none;
-    height: auto;
-    clear: none;
-    resize: none;
-    overflow-y: visible;
-    padding: 2px 4px;
-    border: 1px solid transparent;
-    border-radius: 2px;
-    background-color: transparent;
-    overflow-wrap: break-word;
+.translated-editable {
+    & .translated-value {
+        flex: 1 1 auto;
+        /* Without it, a long word without space would widen the cell. */
+        min-width: 0;
+        min-height: unset;
+        max-height: none;
+        height: auto;
+        clear: none;
+        resize: none;
+        overflow-y: visible;
+        padding: 2px 4px;
+        border: 1px solid transparent;
+        border-radius: 2px;
+        background-color: transparent;
+        overflow-wrap: break-word;
+        &[contenteditable="true"]:hover {
+            border-color: rgba(0, 0, 0, 0.15);
+            cursor: text;
+        }
+
+        &[contenteditable="true"]:focus {
+            border-color: #4a8bad;
+            outline: 2px solid #4a8bad;
+            outline-offset: 0;
+            background-color: #fff;
+        }
+    }
 }
 
-.translated-editable .translated-value[contenteditable="true"]:hover {
-    border-color: rgba(0, 0, 0, 0.15);
-    cursor: text;
-}
+.translated-list {
+    & .translated-saving,
+    & tr.translated-saving td {
+        cursor: progress;
+        opacity: 0.5;
+    }
 
-.translated-editable .translated-value[contenteditable="true"]:focus {
-    border-color: #4a8bad;
-    outline: 2px solid #4a8bad;
-    outline-offset: 0;
-    background-color: #fff;
-}
-
-.translated-list .translated-saving,
-.translated-list tr.translated-saving td {
-    cursor: progress;
-    opacity: 0.5;
-}
-
-.translated-list tr.translated-new .translated-value {
-    border-color: rgba(0, 0, 0, 0.15);
-    background-color: #fff;
-}
-
-.translated-list tr.translated-new .translated-value:empty::before {
-    content: attr(aria-label);
-    color: #999;
+    & tr.translated-new {
+        & .translated-value {
+            border-color: rgba(0, 0, 0, 0.15);
+            background-color: #fff;
+            &:empty::before {
+                content: attr(aria-label);
+                color: #999;
+            }
+        }
+    }
 }
 
 /* The batch edition is toggled with the table of the page of a language. */
