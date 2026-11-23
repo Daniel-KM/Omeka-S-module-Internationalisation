@@ -89,6 +89,44 @@
 .translated-list tbody tr:hover .actions,
 .translated-list tbody tr:focus-within .actions {
     visibility: visible;
+
+    /*
+     * The check is the only action displayed without the mouse: a row with a
+     * change to save must show how to save it. The other actions stay hidden
+     * until the row is hovered or focused. */
+    & .translated-confirm {
+        display: none;
+    }
+
+    & tbody {
+        & tr.translated-new .translated-confirm,
+        & tr.translated-dirty .translated-confirm {
+            display: inline-block;
+        }
+
+        & tr.translated-new .actions,
+        & tr.translated-dirty .actions {
+            visibility: visible;
+        }
+
+        & tr.translated-new .translated-edit,
+        & tr.translated-dirty .translated-edit,
+        & tr.translated-new .translated-delete,
+        & tr.translated-dirty .translated-delete {
+            visibility: hidden;
+        }
+
+        & tr.translated-new:hover .translated-edit,
+        & tr.translated-new:focus-within .translated-edit,
+        & tr.translated-dirty:hover .translated-edit,
+        & tr.translated-dirty:focus-within .translated-edit,
+        & tr.translated-new:hover .translated-delete,
+        & tr.translated-new:focus-within .translated-delete,
+        & tr.translated-dirty:hover .translated-delete,
+        & tr.translated-dirty:focus-within .translated-delete {
+            visibility: visible;
+        }
+    }
 }
 
 /*

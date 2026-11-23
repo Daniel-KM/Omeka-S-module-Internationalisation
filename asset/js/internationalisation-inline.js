@@ -102,6 +102,13 @@ $(function() {
     };
 
     /**
+     * Flag a row that holds a change to save, so the check is displayed.
+     */
+    const setDirty = function(row, dirty) {
+        row.toggleClass('translated-dirty', !!dirty);
+    };
+
+    /**
      * Save a new row once the string and the translation are filled.
      */
     const saveNewRow = function(row) {
@@ -133,6 +140,7 @@ $(function() {
                         .removeAttr('contenteditable role aria-multiline aria-label aria-describedby');
                     row.find('.translated-edit').closest('li').remove();
                 }
+                setDirty(row, false);
                 announce(Omeka.jsTranslate('Translation added.'));
             })
             .fail(function(jqXHR) {
@@ -156,9 +164,28 @@ $(function() {
         row.find('.translated-string').trigger('focus');
     });
 
+    // The check only makes the save visible: the blur it causes saves the cell.
+    // A new row whose focus already left is saved here.
+
+    table.on('click', '.translated-confirm', function(e) {
+        e.preventDefault();
+        const row = $(this).closest('tr');
+        const focused = row.find('.translated-value[contenteditable="true"]')
+            .filter(function() { return this === document.activeElement; });
+        if (focused.length) {
+            focused[0].blur();
+        } else if (row.hasClass('translated-new')) {
+            saveNewRow(row);
+        }
+    });
+
     // Save a string or a translation.
 
     table
+        .on('input', '.translated-value[contenteditable="true"]', function() {
+            const field = $(this);
+            setDirty(field.closest('tr'), cleanText(field) !== field.data('original-text'));
+        })
         .on('focus', '.translated-value[contenteditable="true"]', function() {
             const field = $(this);
             field.data('original-text', field.text());
@@ -195,12 +222,14 @@ $(function() {
 
             if (newText === '' || newText === oldText) {
                 field.text(oldText);
+                setDirty(row, false);
                 return;
             }
 
             const url = table.data('update-url');
             if (!url) {
                 field.text(oldText);
+                setDirty(row, false);
                 return;
             }
 
@@ -217,10 +246,12 @@ $(function() {
                     // The string is the key of the row: keep it in step.
                     row.attr('data-string', response.data.string);
                     refreshDeleteLabel(row);
+                    setDirty(row, false);
                     announce(Omeka.jsTranslate('Translation saved.'));
                 })
                 .fail(function(jqXHR) {
                     field.text(oldText);
+                    setDirty(row, false);
                     announce(failMessage(jqXHR));
                     CommonDialog.jSendFail(jqXHR);
                 })

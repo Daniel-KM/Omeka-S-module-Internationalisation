@@ -44,7 +44,13 @@ $renderRow = function (string $string, string $translated, bool $isNew = false) 
     // hidden from the assistive technologies.
     $pencil = fn (string $title): string => '<li><a href="#" class="o-icon-edit translated-edit" tabindex="-1" aria-hidden="true" title="' . $escapeAttr($title) . '"></a></li>';
     $actionsString = $editable ? '<ul class="actions">' . $pencil($translate('Edit the string')) . '</ul>' : '';
-    $actionsTranslation = ($editable ? $pencil($translate('Edit the translation')) : '')
+    // The row is saved as soon as the focus leaves a cell, so the check only
+    // makes the save visible: it is displayed when the row has a change to
+    // save, and the blur it causes does the work.
+    $confirm = '<li><a href="#" role="button" class="o-icon- fas fa-check translated-confirm"'
+        . ' aria-label="' . $escapeAttr($translate('Save the row')) . '"'
+        . ' title="' . $escapeAttr($translate('Save the row')) . '"></a></li>';
+    $actionsTranslation = ($editable ? $confirm . $pencil($translate('Edit the translation')) : '')
         // The confirmation and the request use the standard dialog of Common.
         . ($canDelete ? '<li><a href="#" role="button" class="o-icon-delete translated-delete"'
             . ' data-url="' . $escapeAttr($deleteUrl) . '" data-spinner="true"'
