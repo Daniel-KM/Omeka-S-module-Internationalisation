@@ -735,104 +735,110 @@ class Module extends AbstractModule
             $translator = $services->get('MvcTranslator');
         }
 
-        // Set the default locale for intl functions only when a locale is
-        // requested, then restore the original locale to avoid side effects.
+        // Set the default locale for intl functions and the translator only
+        // when a locale is requested, then restore the original locales to
+        // avoid side effects on the rest of the request.
         $originalLocale = null;
-        if ($locale && extension_loaded('intl')) {
-            $originalLocale = \Locale::getDefault();
-            \Locale::setDefault($locale);
-        }
-
-        // Set the locale.
+        $originalTranslatorLocale = null;
         if ($locale) {
+            if (extension_loaded('intl')) {
+                $originalLocale = \Locale::getDefault();
+                \Locale::setDefault($locale);
+            }
+            $originalTranslatorLocale = $translator->getDelegatedTranslator()->getLocale();
             $translator->getDelegatedTranslator()->setLocale($locale);
         }
 
-        // Prepare the template labels.
-        $templateId = 0;
-        if ($useTemplateLabel) {
-            // Resource class and template labels are added too for simplicity.
-            $class = $resource->resourceClass();
-            if ($class) {
-                $classId = $class->id();
-                if (!isset($resourceClassLabels[$classId])) {
-                    $resourceClassLabels[$classId] = $locale
-                        ? $translator->translate($class->label())
-                        : $class->label();
+        try {
+            // Prepare the template labels.
+            $templateId = 0;
+            if ($useTemplateLabel) {
+                // Resource class and template labels are added too for simplicity.
+                $class = $resource->resourceClass();
+                if ($class) {
+                    $classId = $class->id();
+                    if (!isset($resourceClassLabels[$classId])) {
+                        $resourceClassLabels[$classId] = $locale
+                            ? $translator->translate($class->label())
+                            : $class->label();
+                    }
+                    // Manage Omeka < 4.2.
+                    if (is_object($jsonLd['o:resource_class'])) {
+                        $jsonLd['o:resource_class'] = $jsonLd['o:resource_class']->jsonSerialize();
+                    }
+                    $jsonLd['o:resource_class']['o:label'] = $resourceClassLabels[$classId];
                 }
-                // Manage Omeka < 4.2.
-                if (is_object($jsonLd['o:resource_class'])) {
-                    $jsonLd['o:resource_class'] = $jsonLd['o:resource_class']->jsonSerialize();
-                }
-                $jsonLd['o:resource_class']['o:label'] = $resourceClassLabels[$classId];
-            }
 
-            $template = $resource->resourceTemplate();
-            if ($template) {
-                $templateId = $template->id();
-                if (!isset($templatePropertyLabels[$templateId])) {
-                    $resourceTemplateLabels[$templateId] = $locale
-                        ? $translator->translate($template->label())
-                        : $template->label();
-                    foreach ($template->resourceTemplateProperties() as $templateProperty) {
-                        $label = $templateProperty->alternateLabel();
-                        if (strlen($label)) {
-                            $templatePropertyLabels[$templateId][$templateProperty->property()->id()] = $locale
-                                ? $translator->translate($label)
-                                : $label;
+                $template = $resource->resourceTemplate();
+                if ($template) {
+                    $templateId = $template->id();
+                    if (!isset($templatePropertyLabels[$templateId])) {
+                        $resourceTemplateLabels[$templateId] = $locale
+                            ? $translator->translate($template->label())
+                            : $template->label();
+                        foreach ($template->resourceTemplateProperties() as $templateProperty) {
+                            $label = $templateProperty->alternateLabel();
+                            if (strlen($label)) {
+                                $templatePropertyLabels[$templateId][$templateProperty->property()->id()] = $locale
+                                    ? $translator->translate($label)
+                                    : $label;
+                            }
                         }
                     }
+                    if (is_object($jsonLd['o:resource_template'])) {
+                        $jsonLd['o:resource_template'] = $jsonLd['o:resource_template']->jsonSerialize();
+                    }
+                    $jsonLd['o:resource_template']['o:label'] = $resourceTemplateLabels[$templateId];
+                } elseif (!$locale) {
+                    return;
                 }
-                if (is_object($jsonLd['o:resource_template'])) {
-                    $jsonLd['o:resource_template'] = $jsonLd['o:resource_template']->jsonSerialize();
-                }
-                $jsonLd['o:resource_template']['o:label'] = $resourceTemplateLabels[$templateId];
-            } elseif (!$locale) {
-                return;
             }
-        }
 
-        if ($useTemplateLabel && $templateId) {
-            // Process the replacement of the property labels, with or without
-            // locale.
-            foreach (array_keys($resource->values()) as $term) {
-                foreach ($jsonLd[$term] as &$value) {
-                    $value = json_decode(json_encode($value), true);
-                    $propertyId = $value['property_id'];
-                    $label = $value['property_label'];
-                    if (isset($templatePropertyLabels[$templateId][$propertyId])) {
-                        $value['property_label'] = $templatePropertyLabels[$templateId][$propertyId];
-                    } else {
+            if ($useTemplateLabel && $templateId) {
+                // Process the replacement of the property labels, with or without
+                // locale.
+                foreach (array_keys($resource->values()) as $term) {
+                    foreach ($jsonLd[$term] as &$value) {
+                        $value = json_decode(json_encode($value), true);
+                        $propertyId = $value['property_id'];
+                        $label = $value['property_label'];
+                        if (isset($templatePropertyLabels[$templateId][$propertyId])) {
+                            $value['property_label'] = $templatePropertyLabels[$templateId][$propertyId];
+                        } else {
+                            if (!isset($propertyLabels[$label])) {
+                                $propertyLabels[$label] = $translator->translate($label);
+                            }
+                            $value['property_label'] = $propertyLabels[$label];
+                        }
+                    }
+                    unset($value);
+                }
+            } else {
+                // Process the replacement of the property labels without template.
+                foreach (array_keys($resource->values()) as $term) {
+                    foreach ($jsonLd[$term] as &$value) {
+                        // In most of the cases in real data, there is only one value by
+                        // property, so it's useless to store the label outside of the
+                        // loop, that requires a json conversion or to get the value
+                        // representation.
+                        $value = json_decode(json_encode($value), true);
+                        $label = $value['property_label'];
                         if (!isset($propertyLabels[$label])) {
                             $propertyLabels[$label] = $translator->translate($label);
                         }
                         $value['property_label'] = $propertyLabels[$label];
                     }
+                    unset($value);
                 }
-                unset($value);
             }
-        } else {
-            // Process the replacement of the property labels without template.
-            foreach (array_keys($resource->values()) as $term) {
-                foreach ($jsonLd[$term] as &$value) {
-                    // In most of the cases in real data, there is only one value by
-                    // property, so it's useless to store the label outside of the
-                    // loop, that requires a json conversion or to get the value
-                    // representation.
-                    $value = json_decode(json_encode($value), true);
-                    $label = $value['property_label'];
-                    if (!isset($propertyLabels[$label])) {
-                        $propertyLabels[$label] = $translator->translate($label);
-                    }
-                    $value['property_label'] = $propertyLabels[$label];
-                }
-                unset($value);
-            }
-        }
 
-        // Restore the original locale if it was changed.
-        if ($originalLocale !== null) {
-            \Locale::setDefault($originalLocale);
+        } finally {
+            if ($originalLocale !== null) {
+                \Locale::setDefault($originalLocale);
+            }
+            if ($originalTranslatorLocale !== null) {
+                $translator->getDelegatedTranslator()->setLocale($originalTranslatorLocale);
+            }
         }
 
         $event->setParam('jsonLd', $jsonLd);
