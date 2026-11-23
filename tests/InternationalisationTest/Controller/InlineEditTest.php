@@ -324,4 +324,69 @@ class InlineEditTest extends AbstractTestCase
         $this->expectException(\RuntimeException::class);
         $this->editor->delete($this->language, 'Missing');
     }
+
+    public function testAStringIsCaseSensitive(): void
+    {
+        $this->editor->create($this->language, 'browse', 'parcourir');
+        $this->assertSame('parcourir', $this->translationOf('browse'));
+        $this->assertSame('Parcourir', $this->translationOf('Browse'));
+    }
+
+    public function testAStringIsAccentSensitive(): void
+    {
+        $this->editor->create($this->language, 'Ebene', 'Ébène');
+        $this->editor->create($this->language, 'Ébène', 'Ebony');
+        $this->assertSame('Ébène', $this->translationOf('Ebene'));
+        $this->assertSame('Ebony', $this->translationOf('Ébène'));
+    }
+
+    public function testOnlyTheExactStringIsUpdated(): void
+    {
+        $this->editor->create($this->language, 'browse', 'parcourir');
+        $this->editor->update($this->language, 'browse', 'translation', 'naviguer');
+        $this->assertSame('naviguer', $this->translationOf('browse'));
+        $this->assertSame('Parcourir', $this->translationOf('Browse'));
+    }
+
+    public function testOnlyTheExactStringIsDeleted(): void
+    {
+        $this->editor->create($this->language, 'browse', 'parcourir');
+        $this->editor->delete($this->language, 'browse');
+        $this->assertNull($this->translationOf('browse'));
+        $this->assertSame('Parcourir', $this->translationOf('Browse'));
+    }
+
+    public function testTheBatchKeepsTheCaseOfTheStrings(): void
+    {
+        $this->editor->replace($this->language, [
+            'Browse' => 'Parcourir',
+            'browse' => 'parcourir',
+        ]);
+        $this->assertSame('Parcourir', $this->translationOf('Browse'));
+        $this->assertSame('parcourir', $this->translationOf('browse'));
+        $this->assertNull($this->translationOf('Search'));
+    }
+
+    public function testTheStringsAreOrderedAlphabetically(): void
+    {
+        $this->removeTranslations();
+        foreach (['zoo' => 'Zoo', 'Avion' => 'Plane', 'Ébène' => 'Ebony'] as $string => $translation) {
+            $this->editor->create($this->language, $string, $translation);
+        }
+
+        $this->dispatch('/admin/translation/' . $this->language);
+        $this->assertResponseStatusCode(200);
+        $content = (string) $this->getResponse()->getContent();
+
+        // The accented string is not sorted after "zoo", as a binary collation
+        // would do.
+        $positions = [];
+        foreach (['Avion', 'Ébène', 'zoo'] as $string) {
+            $positions[$string] = strpos($content, '>' . $string . '<');
+            $this->assertNotFalse($positions[$string], $string);
+        }
+        $sorted = $positions;
+        asort($sorted);
+        $this->assertSame(array_keys($positions), array_keys($sorted));
+    }
 }
