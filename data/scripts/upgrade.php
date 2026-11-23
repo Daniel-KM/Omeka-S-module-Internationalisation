@@ -390,3 +390,11 @@ if (version_compare($oldVersion, '3.4.21', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.25', '<')) {
+    // The strings to translate are case and accent sensitive, unlike the
+    // default collation of the table.
+    $connection->executeStatement(
+        'ALTER TABLE `translated` MODIFY `string` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL'
+    );
+}
