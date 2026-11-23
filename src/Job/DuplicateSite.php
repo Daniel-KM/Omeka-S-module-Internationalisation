@@ -607,18 +607,47 @@ class DuplicateSite extends AbstractJob
          * @var \Omeka\Stdlib\FulltextSearch $fulltext
          * @var \Omeka\Entity\SitePage $page
          */
-        $fulltext = $this->getServiceLocator()->get('Omeka\FulltextSearch');
-        foreach ($site->getPages() as $page) {
-            try {
-                $fulltext->save($page, $this->pageAdapter);
-            } catch (\Throwable $e) {
-                // Some blocks fail without a site, that may not be provided for
-                // background tasks.
-                $this->logger->warn(
-                    'The full text for page {page_slug} was not saved. Run indexation of full text manually in main settings or in tasks of Easy Admin. Exception: {exception}', // @translate
-                    ['page_slug' => $page->getSlug(), 'exception' => $e]
-                );
+        $services = $this->getServiceLocator();
+        $fulltext = $services->get('Omeka\FulltextSearch');
+
+        // To index a page, each block is rendered, so it needs the context of
+        // the site: a block may read a site setting, or build the url of a
+        // resource, that takes the slug from the route when it is not set. The
+        // route of the job (background or admin request) has no site, so set
+        // the context during the indexation, then restore it.
+        $routeMatch = $services->get('Application')->getMvcEvent()->getRouteMatch();
+        $originalSlug = $routeMatch ? $routeMatch->getParam('site-slug') : null;
+        if ($routeMatch) {
+            $routeMatch->setParam('site-slug', $site->getSlug());
+        }
+
+        // The core has no getter for the current target, so read it to restore
+        // it: the job may run inside a request that set it.
+        /** @var \Omeka\Settings\SiteSettings $siteSettings */
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $targetIdProperty = new \ReflectionProperty(\Omeka\Settings\AbstractTargetSettings::class, 'targetId');
+        $targetIdProperty->setAccessible(true);
+        $originalTargetId = $targetIdProperty->getValue($siteSettings);
+        $siteSettings->setTargetId($site->getId());
+
+        try {
+            foreach ($site->getPages() as $page) {
+                try {
+                    $fulltext->save($page, $this->pageAdapter);
+                } catch (\Throwable $e) {
+                    // Some blocks fail without a site, that may not be provided
+                    // for background tasks.
+                    $this->logger->warn(
+                        'The full text for page {page_slug} was not saved. Run indexation of full text manually in main settings or in tasks of Easy Admin. Exception: {exception}', // @translate
+                        ['page_slug' => $page->getSlug(), 'exception' => $e]
+                    );
+                }
             }
+        } finally {
+            if ($routeMatch) {
+                $routeMatch->setParam('site-slug', $originalSlug);
+            }
+            $siteSettings->setTargetId($originalTargetId);
         }
     }
 
