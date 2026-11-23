@@ -7,7 +7,7 @@
  * and restored on Escape. The pencils are a mouse affordance only: the cells
  * are reachable and editable with the keyboard by themselves.
  */
-$(document).ready(function() {
+$(function() {
 
     // The batch edition is a textarea toggled with the table. The rows may have
     // been edited inline since the page was loaded, so the text is rebuilt
