@@ -72,12 +72,10 @@ class DuplicateSite extends AbstractJob
         } catch (NotFoundException $e) {
         }
         if (empty($target)) {
-            $this->logger->err(
+            throw new \Common\Job\Exception\RuntimeException(
                 'The site #{site_id} is not available for copy. Check your rights.', // @translate
                 ['site_id' => $targetId]
             );
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            return;
         }
 
         if ($sourceId) {
@@ -87,12 +85,10 @@ class DuplicateSite extends AbstractJob
             } catch (NotFoundException $e) {
             }
             if (empty($source)) {
-                $this->logger->err(
+                throw new \Common\Job\Exception\RuntimeException(
                     'The site #{site_id} cannot be copied. Check your rights.', // @translate
                     ['site_id' => $sourceId]
                 );
-                $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-                return;
             }
         } else {
             $copyData = [];
@@ -170,12 +166,6 @@ class DuplicateSite extends AbstractJob
             ],
             $services->get(\Omeka\Job\DispatchStrategy\Synchronous::class)
         );
-
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            $this->logger->warn(
-                'Check logs: an error occurred.' // @translate
-            );
-        }
     }
 
     protected function updateSiteGroups(Site $source, Site $target): void
@@ -427,7 +417,6 @@ class DuplicateSite extends AbstractJob
                     'Unable to copy page "{page_slug}" of site "{site_slug}". The page is skipped.', // @translate
                     ['page_slug' => $sourcePage->getSlug(), 'site_slug' => $source->getSlug()]
                 );
-                $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             }
         }
 
